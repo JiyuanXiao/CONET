@@ -59,7 +59,7 @@ function RootLayoutNav() {
           options={{ title: "Chats", headerShown: false }}
         />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        <Stack.Screen name="chatPage" />
+        <Stack.Screen name="chat-window" />
       </Stack>
     </ThemeProvider>
   );

@@ -11,7 +11,7 @@ interface ChatProps {
   last_msg_time: string;
 }
 
-export default function Chat({ name, last_msg, last_msg_time }: ChatProps) {
+export default function ChatBox({ name, last_msg, last_msg_time }: ChatProps) {
   const { colors } = useTheme();
 
   const styles = StyleSheet.create({

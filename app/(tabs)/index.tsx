@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { Text, View } from "@/components/Themed";
-import Chat from "@/components/Chat";
+import ChatBox from "@/components/ChatBox";
 
 const DATA = [
   {
@@ -37,12 +37,12 @@ export default function ChatListScreen() {
           <TouchableOpacity
             onPress={() => {
               router.push({
-                pathname: "/chatPage",
+                pathname: "/chat-window",
                 params: { id: item.id, name: item.name },
               });
             }}
           >
-            <Chat
+            <ChatBox
               name={item.name}
               last_msg={item.last_msg}
               last_msg_time={item.last_msg_time}
