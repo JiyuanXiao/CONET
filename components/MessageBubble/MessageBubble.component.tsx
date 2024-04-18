@@ -1,13 +1,7 @@
 import React from "react";
 import { useTheme } from "@react-navigation/native";
-import {
-  BubbleContent,
-  BubbleConatiner,
-  Bubble,
-  ArrowContainer,
-  Arrow,
-  ArrowCover,
-} from "./MessageBubble.styles";
+import { BubbleContent, BubbleConatiner, Bubble } from "./MessageBubble.styles";
+import BubbleAvatar from "./BubbleAvatar.component";
 
 export default function MessageBubble({
   isReceived = false,
@@ -22,10 +16,13 @@ export default function MessageBubble({
       <Bubble isReceived={isReceived} theme_colors={colors}>
         <BubbleContent>{message_content}</BubbleContent>
       </Bubble>
-      <ArrowContainer>
-        <Arrow isReceived={isReceived} theme_colors={colors} />
-        <ArrowCover isReceived={isReceived} theme_colors={colors} />
-      </ArrowContainer>
+
+      <BubbleAvatar
+        icon="alien"
+        icon_size={40}
+        icon_color={colors.text}
+        theme_colors={colors}
+      />
     </BubbleConatiner>
   );
 }

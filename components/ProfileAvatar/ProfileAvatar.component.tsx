@@ -1,17 +1,29 @@
 import React from "react";
-import { StyleSheet } from "react-native";
-import { Avatar } from "react-native-paper";
 import { ProfileAvatarIcon } from "./ProfileAvatar.styles";
-import { useTheme } from "@react-navigation/native";
 
-const ProfileAvatar = () => {
-  const { colors } = useTheme();
+interface ProfileAvatarProps {
+  icon: string;
+  icon_size: number;
+  icon_color: string;
+  theme_colors:
+    | {
+        primary: string;
+        background: string;
+        card: string;
+        text: string;
+        border: string;
+        notification: string;
+      }
+    | undefined;
+}
+
+const ProfileAvatar: React.FC<ProfileAvatarProps> = (props) => {
   return (
     <ProfileAvatarIcon
-      icon_size={55}
-      icon="alien"
-      icon_color={colors.text}
-      theme_colors={colors}
+      icon={props.icon}
+      icon_size={props.icon_size}
+      icon_color={props.icon_color}
+      theme_colors={props.theme_colors}
     />
   );
 };
