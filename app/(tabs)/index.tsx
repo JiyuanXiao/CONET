@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { Text, View } from "@/components/Themed";
-import ChatBox from "@/components/ChatBox";
+import ChatBox from "@/components/ChatBox/ChatBox.component";
 
 const DATA = [
   {
