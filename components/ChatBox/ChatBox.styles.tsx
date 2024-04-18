@@ -4,14 +4,16 @@ import { Card } from "react-native-paper";
 interface ChatBoxCardProps {
   user_name: string;
   last_message: string;
-  theme_colors: {
-    primary: string;
-    background: string;
-    card: string;
-    text: string;
-    border: string;
-    notification: string;
-  };
+  theme_colors:
+    | {
+        primary: string;
+        background: string;
+        card: string;
+        text: string;
+        border: string;
+        notification: string;
+      }
+    | undefined;
   avatar: () => React.JSX.Element;
   last_message_time: () => React.JSX.Element;
 }
@@ -24,12 +26,12 @@ export const ChatBoxCard: React.FC<ChatBoxCardProps> = styled(
   titleStyle: {
     fontSize: 17,
     fontWeight: "bold",
-    color: props.theme_colors.text,
+    color: props.theme_colors?.text,
     paddingLeft: 10,
   },
   subtitleStyle: {
     fontSize: 13,
-    color: props.theme_colors.text,
+    color: props.theme_colors?.text,
     paddingLeft: 10,
   },
   left: props.avatar,
@@ -38,8 +40,8 @@ export const ChatBoxCard: React.FC<ChatBoxCardProps> = styled(
   height: 80px;
   padding-right: 16px;
   width: 98%;
-  background-color: ${(props) => props.theme_colors.background};
-  border-color: ${(props) => props.theme_colors.text};
+  background-color: ${(props) => props.theme_colors?.background};
+  border-color: ${(props) => props.theme_colors?.text};
   border-style: solid;
   border-width: 2px;
   border-radius: 20px;

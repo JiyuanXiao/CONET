@@ -1,15 +1,17 @@
 import React from "react";
-import { useTheme } from "@react-navigation/native";
 import { BubbleContent, BubbleConatiner, Bubble } from "./MessageBubble.styles";
 import BubbleAvatar from "./BubbleAvatar.component";
+import { useTheme } from "@react-navigation/native";
 
-export default function MessageBubble({
-  isReceived = false,
-  message_content,
-}: {
+interface MessageBubbleProps {
   isReceived?: boolean;
   message_content: string;
-}) {
+}
+
+const MessageBubble: React.FC<MessageBubbleProps> = ({
+  isReceived = false,
+  message_content,
+}) => {
   const { colors } = useTheme();
   return (
     <BubbleConatiner isReceived={isReceived}>
@@ -17,12 +19,9 @@ export default function MessageBubble({
         <BubbleContent>{message_content}</BubbleContent>
       </Bubble>
 
-      <BubbleAvatar
-        icon="alien"
-        icon_size={40}
-        icon_color={colors.text}
-        theme_colors={colors}
-      />
+      <BubbleAvatar icon="alien" icon_size={40} icon_color="white" />
     </BubbleConatiner>
   );
-}
+};
+
+export default MessageBubble;

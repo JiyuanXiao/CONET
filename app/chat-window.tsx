@@ -3,6 +3,7 @@ import { Text, View } from "@/components/Themed";
 import { useLocalSearchParams } from "expo-router";
 
 import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
+import { useTheme } from "@react-navigation/native";
 
 export default function ChatWindowScreen() {
   const { name } = useLocalSearchParams<{ name: string }>();
