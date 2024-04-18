@@ -37,8 +37,11 @@ export const ChatBoxCard: React.FC<ChatBoxCardProps> = styled(
 }))`
   height: 80px;
   padding-right: 16px;
-  width: 100%;
-  background-color: ${(props) => props.colors.card};
+  width: 98%;
+  background-color: ${(props) => props.colors.background};
+  border-color: ${(props) => props.colors.text};
+  border-style: solid;
+  border-width: 2px;
   border-radius: 20px;
   margin-top: 13px;
 `;

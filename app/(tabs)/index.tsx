@@ -41,6 +41,7 @@ export default function ChatListScreen() {
                 params: { id: item.id, name: item.name },
               });
             }}
+            style={styles.chatBoxContainer}
           >
             <ChatBox
               name={item.name}
@@ -61,7 +62,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
+  chatBoxContainer: {
+    alignSelf: "center",
+  },
   separator: {
     marginVertical: 30,
     height: 1,

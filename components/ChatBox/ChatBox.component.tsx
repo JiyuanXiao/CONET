@@ -1,7 +1,7 @@
 import React from "react";
 import { Text } from "@/components/Themed";
 import { useTheme } from "@react-navigation/native";
-import ProfileAvatar from "@/components/ProfileAvatar";
+import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar.component";
 import { ChatBoxCard } from "./ChatBox.styles";
 
 interface ChatProps {
@@ -18,7 +18,7 @@ export default function ChatBox({ name, last_msg, last_msg_time }: ChatProps) {
       user_name={name}
       last_message={last_msg}
       colors={colors}
-      avatar={() => <ProfileAvatar text={name} />}
+      avatar={() => <ProfileAvatar />}
       last_message_time={() => <Text>{last_msg_time}</Text>}
     />
   );
