@@ -19,12 +19,12 @@ export default function MessageBubble({
   const { colors } = useTheme();
   return (
     <BubbleConatiner isReceived={isReceived}>
-      <Bubble isReceived={isReceived} colors={colors}>
+      <Bubble isReceived={isReceived} theme_colors={colors}>
         <BubbleContent>{message_content}</BubbleContent>
       </Bubble>
       <ArrowContainer>
-        <Arrow isReceived={isReceived} colors={colors} />
-        <ArrowCover isReceived={isReceived} colors={colors} />
+        <Arrow isReceived={isReceived} theme_colors={colors} />
+        <ArrowCover isReceived={isReceived} theme_colors={colors} />
       </ArrowContainer>
     </BubbleConatiner>
   );

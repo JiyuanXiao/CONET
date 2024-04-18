@@ -10,7 +10,7 @@ export const BubbleContent = styled(Text)`
 
 interface BubbleProps {
   isReceived?: boolean;
-  colors?:
+  theme_colors?:
     | {
         primary: string;
         background: string;
@@ -38,14 +38,16 @@ export const Bubble: React.FC<BubbleProps> = styled(View)`
   max-width: ${moderateScale(250, 1)}px;
   border-radius: 20px;
   background-color: ${(props) =>
-    props.isReceived ? props.colors?.border : props.colors?.primary};
+    props.isReceived
+      ? props.theme_colors?.border
+      : props.theme_colors?.primary};
 `;
 
 export const ArrowContainer: React.FC<BubbleProps> = styled(View)`
   position: relative;
   width: ${moderateScale(10, 2)}px;
   bottom: 0;
-  backgroud-color: ${(props) => props.colors?.background};
+  backgroud-color: ${(props) => props.theme_colors?.background};
 `;
 
 export const Arrow: React.FC<BubbleProps> = styled(View)`
@@ -59,7 +61,9 @@ export const Arrow: React.FC<BubbleProps> = styled(View)`
   border-bottom-left-radius: ${(props) => (props.isReceived ? "0" : "20")}px;
   left: ${(props) => (props.isReceived ? "auto" : moderateScale(-8) + "px")};
   background-color: ${(props) =>
-    props.isReceived ? props.colors?.border : props.colors?.primary};
+    props.isReceived
+      ? props.theme_colors?.border
+      : props.theme_colors?.primary};
 `;
 
 export const ArrowCover: React.FC<BubbleProps> = styled(View)`
@@ -70,5 +74,5 @@ export const ArrowCover: React.FC<BubbleProps> = styled(View)`
   align-self: flex-end;
   border-bottom-right-radius: ${(props) => (props.isReceived ? "40" : "0")}px;
   border-bottom-left-radius: ${(props) => (props.isReceived ? "0" : "40")}px;
-  background-color: ${(props) => props.colors?.background};
+  background-color: ${(props) => props.theme_colors?.background};
 `;

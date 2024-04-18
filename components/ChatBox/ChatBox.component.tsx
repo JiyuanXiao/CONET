@@ -17,7 +17,7 @@ export default function ChatBox({ name, last_msg, last_msg_time }: ChatProps) {
     <ChatBoxCard
       user_name={name}
       last_message={last_msg}
-      colors={colors}
+      theme_colors={colors}
       avatar={() => <ProfileAvatar />}
       last_message_time={() => <Text>{last_msg_time}</Text>}
     />
