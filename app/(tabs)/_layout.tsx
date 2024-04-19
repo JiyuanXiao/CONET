@@ -1,19 +1,30 @@
 import React from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { AntDesign, FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
+import { Pressable, StyleProp, TextStyle } from "react-native";
 
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
+interface IconProps {
+  size: number;
   color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  style?: StyleProp<TextStyle>;
 }
+
+const SettingTabIcon = (props: IconProps) => {
+  return <FontAwesome name="gear" {...props} />;
+};
+
+const ChatsTabIcon = (props: IconProps) => {
+  return <FontAwesome6 name="comment-dollar" {...props} />;
+};
+
+const AddUserIcon = (props: IconProps) => {
+  return <AntDesign name="pluscircleo" {...props} />;
+};
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -31,16 +42,19 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "CONET",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="comment" color={color} />
+          tabBarIcon: ({ focused }) => (
+            <ChatsTabIcon
+              size={25}
+              color={Colors[colorScheme ?? "light"].text}
+              style={{ opacity: focused ? 1 : 0.4 }}
+            />
           ),
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
                 {({ pressed }) => (
-                  <FontAwesome
-                    name="plus"
-                    size={25}
+                  <AddUserIcon
+                    size={24}
                     color={Colors[colorScheme ?? "light"].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
@@ -54,7 +68,13 @@ export default function TabLayout() {
         name="setting"
         options={{
           title: "Setting",
-          tabBarIcon: ({ color }) => <TabBarIcon name="gear" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <SettingTabIcon
+              size={28}
+              color={Colors[colorScheme ?? "light"].text}
+              style={{ opacity: focused ? 1 : 0.4 }}
+            />
+          ),
         }}
       />
     </Tabs>
