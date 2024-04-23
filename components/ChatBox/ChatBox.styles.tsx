@@ -1,21 +1,20 @@
+import React from "react";
 import styled from "styled-components/native";
 import { Card } from "react-native-paper";
+import { Text } from "react-native";
+import { ThemeColorsProps } from "@/constants/Types";
 
 interface ChatBoxCardProps {
   user_name: string;
   last_message: string;
-  theme_colors:
-    | {
-        primary: string;
-        background: string;
-        card: string;
-        text: string;
-        border: string;
-        notification: string;
-      }
-    | undefined;
+  theme_colors: ThemeColorsProps;
   avatar: () => React.JSX.Element;
   last_message_time: () => React.JSX.Element;
+}
+
+interface LastMsgTimepProps {
+  theme_colors: ThemeColorsProps;
+  children: string;
 }
 
 export const ChatBoxCard: React.FC<ChatBoxCardProps> = styled(
@@ -40,10 +39,14 @@ export const ChatBoxCard: React.FC<ChatBoxCardProps> = styled(
   height: 80px;
   padding-right: 16px;
   width: 98%;
-  background-color: ${(props) => props.theme_colors?.background};
-  border-color: ${(props) => props.theme_colors?.text};
+  background-color: ${(props) => props.theme_colors?.card};
+  border-color: ${(props) => props.theme_colors?.card};
   border-style: solid;
   border-width: 2px;
   border-radius: 20px;
   margin-top: 13px;
+`;
+
+export const LastMsgTime: React.FC<LastMsgTimepProps> = styled(Text)`
+  color: ${(props) => props.theme_colors.text};
 `;

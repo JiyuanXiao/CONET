@@ -3,33 +3,26 @@ import { useTheme } from "@react-navigation/native";
 import { InputBarContainer, InputBox, OffsetFooter } from "./InputBar.styles";
 import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
+import { ThemeColorsProps } from "@/constants/Types";
 
-const VoiceMessageIcon = () => (
+const VoiceMessageIcon: React.FC<{ theme_colors: ThemeColorsProps }> = (
+  props
+) => (
   <FontAwesome
     name="microphone"
     size={26}
-    color="grey"
+    color={props.theme_colors.border}
     style={{ marginLeft: 5 }}
   />
 );
 
-const StickerIcon = () => (
-  <FontAwesome6
-    name="face-smile"
-    size={26}
-    color="grey"
-    style={{ paddingRight: 0 }}
-  />
+const StickerIcon: React.FC<{ theme_colors: ThemeColorsProps }> = (props) => (
+  <FontAwesome6 name="face-smile" size={26} color={props.theme_colors.border} />
 );
 
-const SelectPictureIcon = () => (
-  <FontAwesome
-    name="picture-o"
-    size={26}
-    color="white"
-    style={{ paddingLeft: 0, paddingRight: 0 }}
-  />
-);
+const SelectPictureIcon: React.FC<{ theme_colors: ThemeColorsProps }> = (
+  props
+) => <FontAwesome name="picture-o" size={26} color={props.theme_colors.text} />;
 
 const InputBar = () => {
   const [message, setMessage] = useState("");
@@ -54,9 +47,9 @@ const InputBar = () => {
 
   return (
     <>
-      <InputBarContainer inputHeight={inputHeight}>
-        <InputBox inputHeight={inputHeight}>
-          <VoiceMessageIcon />
+      <InputBarContainer inputHeight={inputHeight} theme_colors={colors}>
+        <InputBox inputHeight={inputHeight} theme_colors={colors}>
+          <VoiceMessageIcon theme_colors={colors} />
           <TextInput
             value={message}
             inputHeight={inputHeight}
@@ -64,11 +57,11 @@ const InputBar = () => {
             onChangeText={handleChangeText}
             onContentSizeChange={handleContentSizeChange}
           />
-          <StickerIcon />
-          <SelectPictureIcon />
+          <StickerIcon theme_colors={colors} />
+          <SelectPictureIcon theme_colors={colors} />
         </InputBox>
       </InputBarContainer>
-      <OffsetFooter />
+      <OffsetFooter theme_colors={colors} />
     </>
   );
 };

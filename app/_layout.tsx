@@ -1,14 +1,9 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-
 import { useColorScheme } from "@/components/useColorScheme";
 
 export {
@@ -51,9 +46,39 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
+  const DarkTheme = {
+    dark: true,
+    colors: {
+      primary: "#da7c2b",
+      background: "#1a191c",
+      card: "#424248",
+      text: "#ebe8e8",
+      border: "#64636d",
+      notification: "ff453a",
+    },
+  };
+
+  const LightTheme = {
+    dark: false,
+    colors: {
+      primary: "#da7c2b",
+      background: "#f4f4f4",
+      card: "#b5b5b5",
+      text: "#000000",
+      border: "#929293",
+      notification: "ff453a",
+    },
+  };
+
+  const CurrentTheme = colorScheme === "dark" ? DarkTheme : LightTheme;
+
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
+    <ThemeProvider value={CurrentTheme}>
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: CurrentTheme.colors.background },
+        }}
+      >
         <Stack.Screen
           name="(tabs)"
           options={{ title: "Chats", headerShown: false }}

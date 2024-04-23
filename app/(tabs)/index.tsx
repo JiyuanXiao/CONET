@@ -1,8 +1,9 @@
 import React from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
-import { Text, View } from "@/components/Themed";
+import { View } from "react-native";
 import ChatBox from "@/components/ChatBox/ChatBox.component";
+import { useTheme } from "@react-navigation/native";
 
 const DATA = [
   {
@@ -29,8 +30,9 @@ const DATA = [
 ];
 
 export default function ChatListScreen() {
+  const { colors } = useTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
         data={DATA}
         renderItem={({ item }) => (

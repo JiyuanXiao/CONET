@@ -14,12 +14,20 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 }) => {
   const { colors } = useTheme();
   return (
-    <BubbleConatiner isReceived={isReceived}>
+    <BubbleConatiner isReceived={isReceived} theme_colors={colors}>
       <Bubble isReceived={isReceived} theme_colors={colors}>
-        <BubbleContent>{message_content}</BubbleContent>
+        <BubbleContent isReceived={isReceived} theme_colors={colors}>
+          {message_content}
+        </BubbleContent>
       </Bubble>
 
-      <BubbleAvatar icon="alien" icon_size={40} icon_color="white" />
+      <BubbleAvatar
+        icon="alien"
+        icon_size={40}
+        icon_color={colors.text}
+        icon_background_color={colors.border}
+        icon_border_color={colors.text}
+      />
     </BubbleConatiner>
   );
 };
