@@ -1,22 +1,21 @@
 import React from "react";
 import styled from "styled-components/native";
-import { View } from "react-native";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { Platform } from "react-native";
 import { ThemeColorsProps, TextInputBarProps } from "@/constants/Types";
 
-export const InputBarContainer: React.FC<TextInputBarProps> = styled(
-  KeyboardAvoidingView
-).attrs({
-  behavior: Platform.OS === "ios" ? "padding" : "height",
-  keyboardVerticalOffset: Platform.OS === "ios" ? 90 : 0,
-})`
+export const InputBarContainer: React.FC<TextInputBarProps> = styled.KeyboardAvoidingView.attrs(
+  {
+    behavior: Platform.OS === "ios" ? "padding" : "height",
+    keyboardVerticalOffset: Platform.OS === "ios" ? 90 : 0,
+  }
+)`
   flex: 1;
   justify-content: flex-end;
   align-items: center;
   padding-vertical: ${(props) => Math.min(props.inputHeight, 100) + 50}px;
 `;
 
-export const InputBox: React.FC<TextInputBarProps> = styled(View)`
+export const InputBox: React.FC<TextInputBarProps> = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -48,7 +47,7 @@ export const TextInput: React.FC<TextInputBarProps> = styled.TextInput.attrs(
 
 export const OffsetFooter: React.FC<{
   theme_colors: ThemeColorsProps;
-}> = styled(View)`
+}> = styled.View`
   background-color: ${(props) => props.theme_colors.background};
   height: 30px;
 `;

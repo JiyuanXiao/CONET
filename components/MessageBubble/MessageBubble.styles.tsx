@@ -1,16 +1,15 @@
 import React from "react";
 import styled from "styled-components/native";
-import { Text, View } from "react-native";
 import { moderateScale } from "react-native-size-matters";
 import { MessageBubbleProps } from "@/constants/Types";
 
-export const BubbleContent: React.FC<MessageBubbleProps> = styled(Text)`
+export const BubbleContent: React.FC<MessageBubbleProps> = styled.Text`
   font-size: 16px;
   justify-content: center;
   color: ${(props) => props.theme_colors?.text};
 `;
 
-export const BubbleConatiner: React.FC<MessageBubbleProps> = styled(View)`
+export const BubbleConatiner: React.FC<MessageBubbleProps> = styled.View`
   position: relative;
   margin-vertical: ${moderateScale(7, 2)}px;
   justify-content: flex-end;
@@ -18,7 +17,7 @@ export const BubbleConatiner: React.FC<MessageBubbleProps> = styled(View)`
   background-color: rgba(0, 0, 0, 0);
 `;
 
-export const Bubble: React.FC<MessageBubbleProps> = styled(View)`
+export const Bubble: React.FC<MessageBubbleProps> = styled.View`
   position: relative;
   padding-horizontal: ${moderateScale(12, 2)}px;
   padding-top: ${moderateScale(10, 2)}px;
