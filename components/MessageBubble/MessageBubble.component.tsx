@@ -2,22 +2,15 @@ import React from "react";
 import { BubbleContent, BubbleConatiner, Bubble } from "./MessageBubble.styles";
 import BubbleAvatar from "./BubbleAvatar.component";
 import { useTheme } from "@react-navigation/native";
+import { MessageBubbleProps } from "@/constants/Types";
 
-interface MessageBubbleProps {
-  isReceived?: boolean;
-  message_content: string;
-}
-
-const MessageBubble: React.FC<MessageBubbleProps> = ({
-  isReceived = false,
-  message_content,
-}) => {
+const MessageBubble = (props: MessageBubbleProps) => {
   const { colors } = useTheme();
   return (
-    <BubbleConatiner isReceived={isReceived} theme_colors={colors}>
-      <Bubble isReceived={isReceived} theme_colors={colors}>
-        <BubbleContent isReceived={isReceived} theme_colors={colors}>
-          {message_content}
+    <BubbleConatiner isReceived={props.isReceived} theme_colors={colors}>
+      <Bubble isReceived={props.isReceived} theme_colors={colors}>
+        <BubbleContent isReceived={props.isReceived} theme_colors={colors}>
+          {props.message_content}
         </BubbleContent>
       </Bubble>
 

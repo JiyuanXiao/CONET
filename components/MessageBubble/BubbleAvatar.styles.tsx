@@ -1,13 +1,6 @@
 import styled from "styled-components/native";
-import { View } from "react-native";
 
-interface BubbleAvatarContainerProps {
-  children: React.ReactNode;
-}
-
-export const BubbleAvatarContainer: React.FC<BubbleAvatarContainerProps> = styled(
-  View
-)`
+export const BubbleAvatarContainer = styled.View`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;

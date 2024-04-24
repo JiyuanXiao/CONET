@@ -2,24 +2,13 @@ import React from "react";
 import styled from "styled-components/native";
 import { Card } from "react-native-paper";
 import { Text } from "react-native";
-import { ThemeColorsProps } from "@/constants/Types";
+import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar.component";
+import { ChatBoxProps } from "@/constants/Types";
+import { PRIMARY_COLOR } from "@/constants/Colors";
 
-interface ChatBoxCardProps {
-  user_name: string;
-  last_message: string;
-  theme_colors: ThemeColorsProps;
-  avatar: () => React.JSX.Element;
-  last_message_time: () => React.JSX.Element;
-}
-
-interface LastMsgTimepProps {
-  theme_colors: ThemeColorsProps;
-  children: string;
-}
-
-export const ChatBoxCard: React.FC<ChatBoxCardProps> = styled(
+export const ChatBoxCard: React.FC<ChatBoxProps> = styled(
   Card.Title
-).attrs<ChatBoxCardProps>((props) => ({
+).attrs<ChatBoxProps>((props) => ({
   title: props.user_name,
   subtitle: props.last_message,
   titleStyle: {
@@ -33,8 +22,20 @@ export const ChatBoxCard: React.FC<ChatBoxCardProps> = styled(
     color: props.theme_colors?.text,
     paddingLeft: 10,
   },
-  left: props.avatar,
-  right: props.last_message_time,
+  left: () => (
+    <ProfileAvatar
+      icon={props.avatar_icon ?? "alien"}
+      icon_size={55}
+      icon_color={props.theme_colors?.primary ?? PRIMARY_COLOR}
+      icon_background_color={props.theme_colors?.border ?? "white"}
+      icon_border_color={props.theme_colors?.primary ?? PRIMARY_COLOR}
+    />
+  ),
+  right: () => (
+    <Text style={{ color: props.theme_colors?.text }}>
+      {props.last_message_time}
+    </Text>
+  ),
 }))`
   height: 80px;
   padding-right: 16px;
@@ -45,8 +46,4 @@ export const ChatBoxCard: React.FC<ChatBoxCardProps> = styled(
   border-width: 2px;
   border-radius: 20px;
   margin-top: 13px;
-`;
-
-export const LastMsgTime: React.FC<LastMsgTimepProps> = styled(Text)`
-  color: ${(props) => props.theme_colors.text};
 `;

@@ -1,32 +1,58 @@
 import React from "react";
 import { AntDesign, FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
-import { Pressable, StyleProp, TextStyle } from "react-native";
-import { useColorScheme } from "@/components/useColorScheme";
+import { Pressable } from "react-native";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useTheme } from "@react-navigation/native";
+import { ThemeColorsProps } from "@/constants/Types";
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-interface IconProps {
-  size: number;
-  color: string;
-  style?: StyleProp<TextStyle>;
-}
+// explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 
-const SettingTabIcon = (props: IconProps) => {
-  return <FontAwesome name="gear" {...props} />;
+const SettingTabIcon = (props: {
+  theme_colors: ThemeColorsProps;
+  focused: boolean;
+}) => {
+  return (
+    <FontAwesome
+      name="gear"
+      size={28}
+      color={
+        props.focused ? props.theme_colors.primary : props.theme_colors.text
+      }
+    />
+  );
 };
 
-const ChatsTabIcon = (props: IconProps) => {
-  return <FontAwesome6 name="comment-dollar" {...props} />;
+const ChatsTabIcon: React.FC<{
+  theme_colors: ThemeColorsProps;
+  focused: boolean;
+}> = (props) => {
+  return (
+    <FontAwesome6
+      name="comment-dollar"
+      size={25}
+      color={
+        props.focused ? props.theme_colors.primary : props.theme_colors.text
+      }
+    />
+  );
 };
 
-const AddUserIcon = (props: IconProps) => {
-  return <AntDesign name="pluscircleo" {...props} />;
+const AddUserIcon: React.FC<{
+  theme_colors: ThemeColorsProps;
+  pressed: boolean;
+}> = (props) => {
+  return (
+    <AntDesign
+      name="pluscircleo"
+      size={24}
+      color={props.theme_colors.text}
+      style={{ marginRight: 15, opacity: props.pressed ? 0.5 : 1 }}
+    />
+  );
 };
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const { colors } = useTheme();
 
   return (
@@ -47,21 +73,13 @@ export default function TabLayout() {
         options={{
           title: "CONET",
           tabBarIcon: ({ focused }) => (
-            <ChatsTabIcon
-              size={25}
-              color={focused ? colors.primary : colors.text}
-              //style={{ opacity: focused ? 1 : 0.4 }}
-            />
+            <ChatsTabIcon focused={focused} theme_colors={colors} />
           ),
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
                 {({ pressed }) => (
-                  <AddUserIcon
-                    size={24}
-                    color={colors.text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
+                  <AddUserIcon theme_colors={colors} pressed={pressed} />
                 )}
               </Pressable>
             </Link>
@@ -73,11 +91,7 @@ export default function TabLayout() {
         options={{
           title: "Setting",
           tabBarIcon: ({ focused }) => (
-            <SettingTabIcon
-              size={28}
-              color={focused ? colors.primary : colors.text}
-              //style={{ opacity: focused ? 1 : 0.4 }}
-            />
+            <SettingTabIcon focused={focused} theme_colors={colors} />
           ),
         }}
       />

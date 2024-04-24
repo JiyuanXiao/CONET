@@ -1,18 +1,9 @@
 import React from "react";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.component";
 import { BubbleAvatarContainer } from "./BubbleAvatar.styles";
-import { ThemeColorsProps } from "@/constants/Types";
+import { UserAvatarProps } from "@/constants/Types";
 
-interface ProfileAvatarProps {
-  icon: string;
-  icon_size: number;
-  icon_color: string;
-  icon_background_color: string;
-  icon_border_color: string;
-  theme_colors?: ThemeColorsProps;
-}
-
-const BubbleAvatar: React.FC<ProfileAvatarProps> = (props) => {
+const BubbleAvatar = (props: UserAvatarProps) => {
   return (
     <BubbleAvatarContainer>
       <ProfileAvatar

@@ -1,19 +1,10 @@
 import styled from "styled-components";
 import { Avatar } from "react-native-paper";
-import { ThemeColorsProps } from "@/constants/Types";
+import { UserAvatarProps } from "@/constants/Types";
 
-interface AvatorProps {
-  icon: string;
-  icon_size: number;
-  icon_color: string;
-  icon_background_color: string;
-  icon_border_color: string;
-  theme_colors?: ThemeColorsProps;
-}
-
-export const ProfileAvatarIcon: React.FC<AvatorProps> = styled(
+export const ProfileAvatarIcon: React.FC<UserAvatarProps> = styled(
   Avatar.Icon
-).attrs<AvatorProps>((props) => ({
+).attrs<UserAvatarProps>((props) => ({
   icon: props.icon,
   size: props.icon_size,
   color: props.icon_color,

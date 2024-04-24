@@ -5,24 +5,22 @@ import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
 import { ThemeColorsProps } from "@/constants/Types";
 
-const VoiceMessageIcon: React.FC<{ theme_colors: ThemeColorsProps }> = (
-  props
-) => (
+const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   <FontAwesome
     name="microphone"
     size={26}
-    color={props.theme_colors.border}
+    color={theme_colors.border}
     style={{ marginLeft: 5 }}
   />
 );
 
-const StickerIcon: React.FC<{ theme_colors: ThemeColorsProps }> = (props) => (
-  <FontAwesome6 name="face-smile" size={26} color={props.theme_colors.border} />
+const StickerIcon = (theme_colors: ThemeColorsProps) => (
+  <FontAwesome6 name="face-smile" size={26} color={theme_colors.border} />
 );
 
-const SelectPictureIcon: React.FC<{ theme_colors: ThemeColorsProps }> = (
-  props
-) => <FontAwesome name="picture-o" size={26} color={props.theme_colors.text} />;
+const SelectPictureIcon = (theme_colors: ThemeColorsProps) => (
+  <FontAwesome name="picture-o" size={26} color={theme_colors.text} />
+);
 
 const InputBar = () => {
   const [message, setMessage] = useState("");
@@ -49,7 +47,7 @@ const InputBar = () => {
     <>
       <InputBarContainer inputHeight={inputHeight} theme_colors={colors}>
         <InputBox inputHeight={inputHeight} theme_colors={colors}>
-          <VoiceMessageIcon theme_colors={colors} />
+          <VoiceMessageIcon {...colors} />
           <TextInput
             value={message}
             inputHeight={inputHeight}
@@ -57,8 +55,8 @@ const InputBar = () => {
             onChangeText={handleChangeText}
             onContentSizeChange={handleContentSizeChange}
           />
-          <StickerIcon theme_colors={colors} />
-          <SelectPictureIcon theme_colors={colors} />
+          <StickerIcon {...colors} />
+          <SelectPictureIcon {...colors} />
         </InputBox>
       </InputBarContainer>
       <OffsetFooter theme_colors={colors} />

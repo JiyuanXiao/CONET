@@ -4,7 +4,8 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { useColorScheme } from "@/components/useColorScheme";
+import { useColorScheme } from "react-native";
+import { DarkTheme, LightTheme } from "@/constants/Theme";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -45,30 +46,6 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-
-  const DarkTheme = {
-    dark: true,
-    colors: {
-      primary: "#da7c2b",
-      background: "#1a191c",
-      card: "#424248",
-      text: "#ebe8e8",
-      border: "#64636d",
-      notification: "ff453a",
-    },
-  };
-
-  const LightTheme = {
-    dark: false,
-    colors: {
-      primary: "#da7c2b",
-      background: "#f4f4f4",
-      card: "#b5b5b5",
-      text: "#000000",
-      border: "#929293",
-      notification: "ff453a",
-    },
-  };
 
   const CurrentTheme = colorScheme === "dark" ? DarkTheme : LightTheme;
 

@@ -2,23 +2,9 @@ import React from "react";
 import styled from "styled-components/native";
 import { View } from "react-native";
 import { KeyboardAvoidingView, Platform } from "react-native";
-import { ThemeColorsProps } from "@/constants/Types";
+import { ThemeColorsProps, TextInputBarProps } from "@/constants/Types";
 
-interface TextInputContainerProps {
-  inputHeight: number;
-  theme_colors: ThemeColorsProps;
-  children?: React.ReactNode;
-}
-
-interface TextInputProps {
-  inputHeight: number;
-  value: string | undefined;
-  onChangeText: (text: string) => void;
-  onContentSizeChange: (event: any) => void;
-  theme_colors: ThemeColorsProps;
-}
-
-export const InputBarContainer: React.FC<TextInputContainerProps> = styled(
+export const InputBarContainer: React.FC<TextInputBarProps> = styled(
   KeyboardAvoidingView
 ).attrs({
   behavior: Platform.OS === "ios" ? "padding" : "height",
@@ -30,7 +16,7 @@ export const InputBarContainer: React.FC<TextInputContainerProps> = styled(
   padding-vertical: ${(props) => Math.min(props.inputHeight, 100) + 50}px;
 `;
 
-export const InputBox: React.FC<TextInputContainerProps> = styled(View)`
+export const InputBox: React.FC<TextInputBarProps> = styled(View)`
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -41,7 +27,7 @@ export const InputBox: React.FC<TextInputContainerProps> = styled(View)`
   height: ${(props) => Math.min(props.inputHeight, 100) + 50}px;
 `;
 
-export const TextInput: React.FC<TextInputProps> = styled.TextInput.attrs(
+export const TextInput: React.FC<TextInputBarProps> = styled.TextInput.attrs(
   (props) => ({
     multiline: true,
     returnKeyType: "send",

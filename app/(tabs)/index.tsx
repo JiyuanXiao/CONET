@@ -46,9 +46,9 @@ export default function ChatListScreen() {
             style={styles.chatBoxContainer}
           >
             <ChatBox
-              name={item.name}
-              last_msg={item.last_msg}
-              last_msg_time={item.last_msg_time}
+              user_name={item.name}
+              last_message={item.last_msg}
+              last_message_time={item.last_msg_time}
             />
           </TouchableOpacity>
         )}

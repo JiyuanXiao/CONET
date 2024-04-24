@@ -1,16 +1,9 @@
 import React from "react";
 import { ProfileAvatarIcon } from "./ProfileAvatar.styles";
 import { useTheme } from "@react-navigation/native";
+import { UserAvatarProps } from "@/constants/Types";
 
-interface ProfileAvatarProps {
-  icon: string;
-  icon_size: number;
-  icon_color: string;
-  icon_background_color: string;
-  icon_border_color: string;
-}
-
-const ProfileAvatar: React.FC<ProfileAvatarProps> = (props) => {
+const ProfileAvatar = (props: UserAvatarProps) => {
   const { colors } = useTheme();
   return (
     <ProfileAvatarIcon

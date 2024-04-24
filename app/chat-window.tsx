@@ -1,5 +1,4 @@
 import React from "react";
-//import { Text, View } from "@/components/Themed";
 import { View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { FlatList } from "react-native";
