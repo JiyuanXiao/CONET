@@ -9,7 +9,8 @@ export const ProfileAvatarIcon: React.FC<UserAvatarProps> = styled(
   size: props.icon_size,
   color: props.icon_color,
 }))`
-  border-style: "solid";
+  border-style: solid;
+  border-radius: 10px;
   border-width: 2px;
   background-color: ${(props) => props.icon_background_color};
   border-color: ${(props) => props.icon_border_color};
