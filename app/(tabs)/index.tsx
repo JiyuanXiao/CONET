@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { View } from "react-native";
@@ -7,21 +7,21 @@ import { useTheme } from "@react-navigation/native";
 
 const DATA = [
   {
-    id: "0",
+    id: "shaoji",
     name: "烧鸡",
     icon: "",
     last_msg: "帮紧你",
     last_msg_time: "4:50pm",
   },
   {
-    id: "1",
+    id: "yejiang",
     name: "叶酱",
     icon: "",
     last_msg: "Get some wine",
     last_msg_time: "1:00am",
   },
   {
-    id: "2",
+    id: "jichang",
     name: "鸡肠",
     icon: "",
     last_msg: "ojbk",
@@ -31,6 +31,7 @@ const DATA = [
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
@@ -45,11 +46,7 @@ export default function ChatListScreen() {
             }}
             style={styles.chatBoxContainer}
           >
-            <ChatBox
-              user_name={item.name}
-              last_message={item.last_msg}
-              last_message_time={item.last_msg_time}
-            />
+            <ChatBox user_name={item.name} user_id={item.id} />
           </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id}

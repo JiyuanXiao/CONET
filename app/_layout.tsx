@@ -6,6 +6,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { DarkTheme, LightTheme } from "@/constants/Theme";
+import { AuthenticationContextProvider } from "@/api/authentication/authentication.context";
+import { SQLiteProvider } from "expo-sqlite";
+import { ChatsContextProvider } from "@/api/chats/chats.context";
 import "react-native-reanimated";
 
 export {
@@ -52,18 +55,26 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={CurrentTheme}>
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: CurrentTheme.colors.background },
-        }}
-      >
-        <Stack.Screen
-          name="(tabs)"
-          options={{ title: "Chats", headerShown: false }}
-        />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        <Stack.Screen name="chat-window" />
-      </Stack>
+      <AuthenticationContextProvider>
+        <SQLiteProvider databaseName="messages.db">
+          <ChatsContextProvider>
+            <Stack
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: CurrentTheme.colors.background,
+                },
+              }}
+            >
+              <Stack.Screen
+                name="(tabs)"
+                options={{ title: "Chats", headerShown: false }}
+              />
+              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+              <Stack.Screen name="chat-window" />
+            </Stack>
+          </ChatsContextProvider>
+        </SQLiteProvider>
+      </AuthenticationContextProvider>
     </ThemeProvider>
   );
 }

@@ -1,3 +1,5 @@
+import { SQLiteDatabase } from "expo-sqlite";
+
 // Theme props
 export interface ThemeColorsProps {
   primary: string;
@@ -10,9 +12,10 @@ export interface ThemeColorsProps {
 
 // ChatBox Components props
 export interface ChatBoxProps {
+  user_id: string;
   user_name: string;
-  last_message: string;
-  last_message_time: string;
+  last_message?: string;
+  last_message_time?: string;
   avatar_icon?: string;
   theme_colors?: ThemeColorsProps;
 }
@@ -43,4 +46,52 @@ export interface UserAvatarProps {
   icon_background_color: string;
   icon_border_color: string;
   theme_colors?: ThemeColorsProps;
+}
+
+export interface MessagesProps {
+  id: number;
+  content: string;
+  sender_id: string;
+  receiver_id: string;
+  content_type: string;
+  timestamp: string;
+}
+
+export interface MessagesDateabseProps {
+  content: string;
+  sender_id: string;
+  receiver_id: string;
+  content_type: string;
+  is_recevied: boolean;
+  db: SQLiteDatabase;
+}
+
+export interface UserProps {
+  id: string;
+  name: string;
+}
+
+export interface AuthenticationContentProps {
+  user: UserProps | null;
+  isLoading: boolean;
+  error: string;
+}
+
+export interface ChatProps {
+  id: string;
+  last_message_content: string;
+  last_message_timestamp: string;
+}
+
+export interface ChatsContextProps {
+  chats: ChatProps[];
+  setChats: React.Dispatch<React.SetStateAction<ChatProps[]>>;
+  getChatById: (id: string) => ChatProps | undefined;
+  updateChatById: (id: string, updatedChat: ChatProps) => void;
+}
+
+export interface InputBarProps {
+  other_id: string;
+  messages: MessagesProps[];
+  setMessages: React.Dispatch<React.SetStateAction<MessagesProps[]>>;
 }
