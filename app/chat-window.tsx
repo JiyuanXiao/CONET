@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native";
 import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
@@ -22,6 +28,8 @@ export default function ChatWindowScreen() {
 
   const db = useSQLiteContext();
   const { user } = useContext(AuthenticationContext);
+
+  const flatListRef = useRef<FlatList>(null);
 
   // Get message from local storage and used to set messages state
   const fetchMessages = async () => {
@@ -52,8 +60,15 @@ export default function ChatWindowScreen() {
   }, [navigation, name]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
       <FlatList
+        inverted
+        ref={flatListRef}
         data={messages}
         renderItem={({ item }) => (
           <MessageBubble

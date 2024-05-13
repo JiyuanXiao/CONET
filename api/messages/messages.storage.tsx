@@ -117,7 +117,7 @@ export const fetchAllMessages = async (
 
   try {
     const all_msg = (await db.getAllAsync(
-      `SELECT * FROM messages_${table_id};`
+      `SELECT * FROM messages_${table_id} ORDER BY id DESC;`
     )) as MessagesProps[];
     console.info("GET ALL MESSAGES: ");
     for (const msg of all_msg) {

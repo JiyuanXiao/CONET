@@ -53,7 +53,7 @@ const InputBar = (props: InputBarProps) => {
 
         if (newMessage) {
           // update the state of messages by appending the new message
-          props.setMessages([...props.messages, newMessage]);
+          props.setMessages([newMessage, ...props.messages]);
 
           // Updated the chats context so that ChatBox component can re-render
           updateChatById(props.other_id, {

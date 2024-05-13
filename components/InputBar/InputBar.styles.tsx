@@ -9,9 +9,9 @@ export const InputBarContainer: React.FC<TextInputBarProps> = styled.KeyboardAvo
     keyboardVerticalOffset: Platform.OS === "ios" ? 90 : 0,
   }
 )`
-  flex: 1;
   justify-content: flex-end;
   align-items: center;
+  height: 0px;
   padding-vertical: ${(props) => Math.min(props.inputHeight, 100) + 50}px;
 `;
 
