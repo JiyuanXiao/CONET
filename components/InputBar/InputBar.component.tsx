@@ -40,6 +40,9 @@ const InputBar = (props: InputBarProps) => {
 
   const handleChangeText = (text: string) => {
     if (text.endsWith("\n")) {
+      // let chat-window know a new message is sent
+      props.setMessageSent(true);
+
       if (message.length > 0) {
         // store new message to local storage
         const newMessage = storeMessage({

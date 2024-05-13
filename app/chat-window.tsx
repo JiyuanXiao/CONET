@@ -22,6 +22,8 @@ export default function ChatWindowScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [messageSent, setMessageSent] = useState<boolean>(false);
+
   const navigation = useNavigation();
   const route = useRoute();
   const { id, name } = route.params as { id: string; name: string };
@@ -59,6 +61,14 @@ export default function ChatWindowScreen() {
     });
   }, [navigation, name]);
 
+  // Scroll to the bottom of the message if user sent a new message
+  useEffect(() => {
+    if (messageSent) {
+      flatListRef.current?.scrollToIndex({ index: 0, animated: true });
+      setMessageSent(false);
+    }
+  }, [messageSent]);
+
   return (
     <View
       style={{
@@ -77,7 +87,12 @@ export default function ChatWindowScreen() {
           />
         )}
       />
-      <InputBar other_id={id} messages={messages} setMessages={setMessages} />
+      <InputBar
+        other_id={id}
+        messages={messages}
+        setMessages={setMessages}
+        setMessageSent={setMessageSent}
+      />
     </View>
   );
 }
