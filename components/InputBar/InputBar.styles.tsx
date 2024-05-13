@@ -5,8 +5,8 @@ import { ThemeColorsProps, TextInputBarProps } from "@/constants/Types";
 
 export const InputBarContainer: React.FC<TextInputBarProps> = styled.KeyboardAvoidingView.attrs(
   {
-    behavior: Platform.OS === "ios" ? "padding" : "height",
-    keyboardVerticalOffset: Platform.OS === "ios" ? 90 : 0,
+    behavior: "padding",
+    keyboardVerticalOffset: 90,
   }
 )`
   justify-content: flex-end;
@@ -38,7 +38,7 @@ export const TextInput: React.FC<TextInputBarProps> = styled.TextInput.attrs(
   height: ${(props) => props.inputHeight + 20}px;
   max-height: 120px;
   padding-left: 5px;
-  padding-top: 10px;
+  padding-top: ${Platform.OS === "ios" ? 10 : 0}px;
   background-color: ${(props) => props.theme_colors.border};
   border-radius: 10px;
   font-size: 16px;
@@ -49,5 +49,5 @@ export const OffsetFooter: React.FC<{
   theme_colors: ThemeColorsProps;
 }> = styled.View`
   background-color: ${(props) => props.theme_colors.background};
-  height: 30px;
+  height: ${Platform.OS === "ios" ? 30 : 0}px;
 `;
