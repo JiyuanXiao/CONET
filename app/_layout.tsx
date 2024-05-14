@@ -9,6 +9,7 @@ import { DarkTheme, LightTheme } from "@/constants/Theme";
 import { AuthenticationContextProvider } from "@/api/authentication/authentication.context";
 import { SQLiteProvider } from "expo-sqlite";
 import { ChatsContextProvider } from "@/api/chats/chats.context";
+import { MessagesContextProvider } from "@/api/messages/messages.context";
 import "react-native-reanimated";
 
 export {
@@ -58,20 +59,28 @@ function RootLayoutNav() {
       <AuthenticationContextProvider>
         <SQLiteProvider databaseName="messages.db">
           <ChatsContextProvider>
-            <Stack
-              screenOptions={{
-                headerStyle: {
-                  backgroundColor: CurrentTheme.colors.background,
-                },
-              }}
-            >
-              <Stack.Screen
-                name="(tabs)"
-                options={{ title: "Chats", headerShown: false }}
-              />
-              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-              <Stack.Screen name="chat-window" />
-            </Stack>
+            <MessagesContextProvider>
+              <Stack
+                screenOptions={{
+                  headerStyle: {
+                    backgroundColor: CurrentTheme.colors.background,
+                  },
+                }}
+              >
+                <Stack.Screen
+                  name="(tabs)"
+                  options={{ title: "Chats", headerShown: false }}
+                />
+                <Stack.Screen
+                  name="modal"
+                  options={{ presentation: "modal" }}
+                />
+                <Stack.Screen
+                  options={{ headerBackTitleVisible: false }}
+                  name="chat-window"
+                />
+              </Stack>
+            </MessagesContextProvider>
           </ChatsContextProvider>
         </SQLiteProvider>
       </AuthenticationContextProvider>

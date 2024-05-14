@@ -46,25 +46,31 @@ export const fetchLatestMessage = (
   table_id: string | undefined,
   db: SQLiteDatabase
 ) => {
+  //DeleteMessageTableIfExists(table_id, db);
+  if (!tableExist(table_id, db)) {
+    CreateMessageTableIfNotExists(table_id, db);
+  }
   try {
     const lastest_message = db.getFirstSync(
       `SELECT * FROM messages_${table_id} ORDER BY id DESC LIMIT 1;`
     ) as MessagesProps;
-    console.info(
-      "FETCH_LATEST: " +
-        "ID: " +
-        lastest_message.id +
-        "| Sender: " +
-        lastest_message.sender_id +
-        "| Recevier: " +
-        lastest_message.receiver_id +
-        "| Conetent: " +
-        lastest_message.content +
-        "| Conetent Type: " +
-        lastest_message.content_type +
-        "| Timestamp: " +
-        lastest_message.timestamp
-    );
+    if (lastest_message) {
+      console.info(
+        "FETCH_LATEST: " +
+          "ID: " +
+          lastest_message.id +
+          "| Sender: " +
+          lastest_message.sender_id +
+          "| Recevier: " +
+          lastest_message.receiver_id +
+          "| Conetent: " +
+          lastest_message.content +
+          "| Conetent Type: " +
+          lastest_message.content_type +
+          "| Timestamp: " +
+          lastest_message.timestamp
+      );
+    }
     return lastest_message;
   } catch (err) {
     console.error("FETCH_LATEST: " + err);
@@ -119,22 +125,24 @@ export const fetchAllMessages = async (
     const all_msg = (await db.getAllAsync(
       `SELECT * FROM messages_${table_id} ORDER BY id DESC;`
     )) as MessagesProps[];
-    console.info("GET ALL MESSAGES: ");
-    for (const msg of all_msg) {
-      console.info(
-        "ID: " +
-          msg.id +
-          "| Sender: " +
-          msg.sender_id +
-          "| Recevier: " +
-          msg.receiver_id +
-          "| Conetent: " +
-          msg.content +
-          "| Conetent Type: " +
-          msg.content_type +
-          "| Timestamp: " +
-          msg.timestamp
-      );
+    if (all_msg) {
+      console.info("GET ALL MESSAGES: ");
+      for (const msg of all_msg) {
+        console.info(
+          "ID: " +
+            msg.id +
+            "| Sender: " +
+            msg.sender_id +
+            "| Recevier: " +
+            msg.receiver_id +
+            "| Conetent: " +
+            msg.content +
+            "| Conetent Type: " +
+            msg.content_type +
+            "| Timestamp: " +
+            msg.timestamp
+        );
+      }
     }
     return all_msg;
   } catch (err) {

@@ -1,17 +1,13 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useTheme } from "@react-navigation/native";
 import { InputBarContainer, InputBox, OffsetFooter } from "./InputBar.styles";
 import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
-import {
-  ThemeColorsProps,
-  MessagesProps,
-  InputBarProps,
-} from "@/constants/Types";
+import { ThemeColorsProps, InputBarProps } from "@/constants/Types";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
-import { storeMessage } from "@/api/messages/messages.storage";
 import { useSQLiteContext } from "expo-sqlite";
 import { ChatsContext } from "@/api/chats/chats.context";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   <FontAwesome
@@ -36,6 +32,8 @@ const InputBar = (props: InputBarProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const { updateChatById } = useContext(ChatsContext);
+  const { messages_object_list, addMessageById, getLoadedMessagesById } =
+    useContext(MessagesContext);
   const db = useSQLiteContext();
 
   const handleChangeText = (text: string) => {
@@ -44,27 +42,17 @@ const InputBar = (props: InputBarProps) => {
       props.setMessageSent(true);
 
       if (message.length > 0) {
-        // store new message to local storage
-        const newMessage = storeMessage({
+        const formated_message = {
           content: message,
           sender_id: user?.id || "",
           receiver_id: props.other_id,
           content_type: "text",
           is_recevied: false,
           db: db,
-        });
+        };
 
-        if (newMessage) {
-          // update the state of messages by appending the new message
-          props.setMessages([newMessage, ...props.messages]);
-
-          // Updated the chats context so that ChatBox component can re-render
-          updateChatById(props.other_id, {
-            id: props.other_id,
-            last_message_content: newMessage.content,
-            last_message_timestamp: newMessage.timestamp,
-          });
-        }
+        // Update Message Context, Context will store message to local storage for us
+        addMessageById(props.other_id, formated_message);
 
         console.log("INFO: MESSAGE SUNMITTED: ", message);
       }
@@ -77,6 +65,18 @@ const InputBar = (props: InputBarProps) => {
   const handleContentSizeChange = (event: any) => {
     setInputHeight(event.nativeEvent.contentSize.height);
   };
+
+  // update chatbox info
+  useEffect(() => {
+    const newMessages = getLoadedMessagesById(props.other_id);
+    if (newMessages.length > 0) {
+      updateChatById(props.other_id, {
+        id: props.other_id,
+        last_message_content: newMessages[0].content,
+        last_message_timestamp: newMessages[0].timestamp,
+      });
+    }
+  }, [messages_object_list]);
 
   return (
     <>

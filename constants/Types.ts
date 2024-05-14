@@ -92,7 +92,5 @@ export interface ChatsContextProps {
 
 export interface InputBarProps {
   other_id: string;
-  messages: MessagesProps[];
-  setMessages: React.Dispatch<React.SetStateAction<MessagesProps[]>>;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }
