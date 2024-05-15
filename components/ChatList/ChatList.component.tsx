@@ -14,7 +14,7 @@ export const ChatList = (props: {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
     messages_object_list,
-    getLoadedMessagesById,
+    getLoadedMessagesObjectById,
     resetLoadedMessagesById,
     loadMessagesById,
   } = useContext(MessagesContext);
@@ -24,7 +24,8 @@ export const ChatList = (props: {
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
-    const current_messages = getLoadedMessagesById(props.id);
+    const current_messages_object = getLoadedMessagesObjectById(props.id);
+    const current_messages = current_messages_object?.loaded_messages || [];
     setMessages(current_messages);
 
     // let the function recapture the current props and state of the context

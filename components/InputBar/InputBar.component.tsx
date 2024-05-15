@@ -32,7 +32,7 @@ const InputBar = (props: InputBarProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const { updateChatById } = useContext(ChatsContext);
-  const { messages_object_list, addMessageById, getLoadedMessagesById } =
+  const { messages_object_list, addMessageById, getLoadedMessagesObjectById } =
     useContext(MessagesContext);
   const db = useSQLiteContext();
 
@@ -68,8 +68,9 @@ const InputBar = (props: InputBarProps) => {
 
   // update chatbox info
   useEffect(() => {
-    const newMessages = getLoadedMessagesById(props.other_id);
-    if (newMessages.length > 0) {
+    const newMessagesObject = getLoadedMessagesObjectById(props.other_id);
+    const newMessages = newMessagesObject?.loaded_messages;
+    if (newMessages && newMessages.length > 0) {
       updateChatById(props.other_id, {
         id: props.other_id,
         last_message_content: newMessages[0].content,
