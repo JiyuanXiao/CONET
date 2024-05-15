@@ -94,3 +94,16 @@ export interface InputBarProps {
   other_id: string;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+// OptionCard Components props
+export interface OptionBarProps {
+  content: string;
+  theme_colors?: ThemeColorsProps;
+}
+
+export type ConfirmDialogProps = {
+  visible: boolean;
+  confirm_message: string;
+  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>;
+};

@@ -3,11 +3,11 @@ import { Platform, StyleSheet } from "react-native";
 import { Text, View } from "react-native";
 import { useTheme } from "@react-navigation/native";
 
-export default function ModalScreen() {
+export default function AddFriendsScreen() {
   const { colors } = useTheme();
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: colors.text }]}>Modal</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Add Friends</Text>
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />

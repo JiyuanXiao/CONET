@@ -1,5 +1,5 @@
 import React from "react";
-import { AntDesign, FontAwesome6, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
 import { Pressable } from "react-native";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
@@ -23,10 +23,10 @@ const SettingTabIcon = (props: {
   );
 };
 
-const ChatsTabIcon: React.FC<{
+const ChatsTabIcon = (props: {
   theme_colors: ThemeColorsProps;
   focused: boolean;
-}> = (props) => {
+}) => {
   return (
     <FontAwesome6
       name="comment-dollar"
@@ -38,14 +38,14 @@ const ChatsTabIcon: React.FC<{
   );
 };
 
-const AddUserIcon: React.FC<{
+const AddUserIcon = (props: {
   theme_colors: ThemeColorsProps;
   pressed: boolean;
-}> = (props) => {
+}) => {
   return (
-    <AntDesign
-      name="pluscircleo"
-      size={24}
+    <FontAwesome5
+      name="user-plus"
+      size={18}
       color={props.theme_colors.text}
       style={{ marginRight: 15, opacity: props.pressed ? 0.5 : 1 }}
     />
@@ -72,11 +72,12 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "CONET",
+          headerTitleAlign: "center",
           tabBarIcon: ({ focused }) => (
             <ChatsTabIcon focused={focused} theme_colors={colors} />
           ),
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href="/add-friends" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <AddUserIcon theme_colors={colors} pressed={pressed} />
@@ -89,7 +90,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="setting"
         options={{
-          title: "Setting",
+          title: "设置",
           tabBarIcon: ({ focused }) => (
             <SettingTabIcon focused={focused} theme_colors={colors} />
           ),

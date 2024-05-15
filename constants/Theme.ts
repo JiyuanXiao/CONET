@@ -1,9 +1,9 @@
-import { PRIMARY_COLOR } from "./Colors";
+import { default_theme } from "./Colors";
 
 export const DarkTheme = {
   dark: true,
   colors: {
-    primary: PRIMARY_COLOR,
+    primary: default_theme.PRIMARY,
     background: "#1a191c",
     card: "#222228",
     text: "#ebe8e8",
@@ -15,7 +15,7 @@ export const DarkTheme = {
 export const LightTheme = {
   dark: false,
   colors: {
-    primary: PRIMARY_COLOR,
+    primary: default_theme.PRIMARY,
     background: "#f4f4f4",
     card: "#e6e6e6",
     text: "#000000",
