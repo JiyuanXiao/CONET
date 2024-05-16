@@ -35,19 +35,9 @@ export default function RootLayout() {
   //   if (error) throw error;
   // }, [error]);
 
-  // useEffect(() => {
-  //   if (loaded) {
-  //     SplashScreen.hideAsync();
-  //   }
-  // }, [loaded]);
-
-  const hideSplashScreen = async () => {
-    await SplashScreen.hideAsync();
-  };
-
   useEffect(() => {
-    hideSplashScreen();
-  });
+    SplashScreen.hideAsync();
+  }, []);
 
   // if (!loaded) {
   //   return null;
