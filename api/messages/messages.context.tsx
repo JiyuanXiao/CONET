@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import { getAllChats } from "../chats/chats.storage";
+import { fetchAllChats } from "../chats/chats.storage";
 import {
   fetchAllMessages,
   storeMessage,
@@ -87,19 +87,19 @@ export const MessagesContextProvider = (props: {
   const NUM_OF_LITEMS_TO_LOAD_AT_ONCE = 15;
 
   const db = useSQLiteContext();
-  const chat_id_list = getAllChats(db);
 
   const [messages_object_list, setMessagesObjectList] = useState<
     MessageContextObjectProps[]
   >([]);
 
   const initialSetUpObjectList = async () => {
+    const chats = fetchAllChats(db);
     let initialMessagesObjectList: MessageContextObjectProps[] = [];
 
     // Fetach all messages from loacl storage for each chat
-    for (const chat_id of chat_id_list) {
+    for (const chat of chats) {
       const initial_messages_object = {
-        chat_id: chat_id,
+        chat_id: chat.chat_id,
         loaded_messages: [],
         current_index: 0,
         total_messages_amount: 0,
@@ -108,7 +108,7 @@ export const MessagesContextProvider = (props: {
       // First load
       const is_initial_load = true;
       const newly_loaded_messages_object = await getLoadedMessages(
-        chat_id,
+        chat.chat_id,
         initial_messages_object,
         NUM_OF_LITEMS_TO_LOAD_AT_ONCE,
         db,
@@ -123,6 +123,7 @@ export const MessagesContextProvider = (props: {
     }
 
     setMessagesObjectList(initialMessagesObjectList);
+    console.log("Initialize Message Context Successfully...");
   };
 
   // Get loaded message object for a chat
@@ -158,7 +159,9 @@ export const MessagesContextProvider = (props: {
         newly_loaded_messages_object;
       setMessagesObjectList(updated_messages_object_list);
     } else {
-      console.warn(`GET_LOADED_MESSAGES_BY_ID: chat_id ${id} DOES NOT EXIST`);
+      console.warn(
+        `at getLoadedMessagesObjectById() in messages.context.tsx: chat_id ${id} DOES NOT EXIST`
+      );
     }
   };
 
@@ -195,7 +198,9 @@ export const MessagesContextProvider = (props: {
           updated_messages_object;
         setMessagesObjectList(updated_messages_object_list);
       } else {
-        console.warn(`ADD_MESSAGE_BY_ID: chat_id ${id} DOES NOT EXIST`);
+        console.warn(
+          `at addMessageById() in messages.context.tsx: chat_id ${id} DOES NOT EXIST`
+        );
       }
     }
   };
@@ -231,7 +236,9 @@ export const MessagesContextProvider = (props: {
         updated_messages_object;
       setMessagesObjectList(updated_messages_object_list);
     } else {
-      console.warn(`RESET_LOADED_MESSAGES_BY_ID: chat_id ${id} DOES NOT EXIST`);
+      console.warn(
+        `at resetLoadedMessagesById() in messages.context.tsx: chat_id ${id} DOES NOT EXIST`
+      );
     }
   };
 
@@ -269,13 +276,14 @@ export const MessagesContextProvider = (props: {
         cleared_messages_object;
       setMessagesObjectList(updated_messages_object_list);
     } else {
-      console.warn(`LOAD_MESSAGES_BY_ID: chat_id ${id} DOES NOT EXIST`);
+      console.warn(
+        `at ClearAllMessagesById() in messages.context.tsx: chat_id ${id} DOES NOT EXIST`
+      );
     }
   };
 
   useEffect(() => {
     initialSetUpObjectList();
-    console.log("initial set up message context");
   }, []);
 
   return (

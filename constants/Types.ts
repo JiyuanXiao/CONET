@@ -79,6 +79,7 @@ export interface AuthenticationContentProps {
 
 export interface ChatProps {
   id: string;
+  name: string;
   last_message_content: string;
   last_message_timestamp: string;
 }
@@ -88,10 +89,12 @@ export interface ChatsContextProps {
   setChats: React.Dispatch<React.SetStateAction<ChatProps[]>>;
   getChatById: (id: string) => ChatProps | undefined;
   updateChatById: (id: string, updatedChat: ChatProps) => void;
+  deleteChatById: (id: string) => void;
 }
 
 export interface InputBarProps {
-  other_id: string;
+  friend_id: string;
+  friend_name: string;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }
 

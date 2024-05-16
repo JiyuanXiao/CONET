@@ -11,7 +11,7 @@ const tableExist = (
     );
     return result !== null;
   } catch (err) {
-    console.error("CHECK TABLE EXISTS: " + err);
+    console.error("at tableExist() in messages.storage.tsx: " + err);
     return false;
   }
 };
@@ -24,9 +24,11 @@ export const CreateMessageTableIfNotExists = (
     db.execSync(
       `CREATE TABLE IF NOT EXISTS messages_${table_id} (id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id TEXT, receiver_id TEXT, content TEXT, content_type TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);`
     );
-    console.info(`CREATE TABLE: Table ${table_id} created successfully`);
+    console.info(`Table [messages_${table_id}] is Created Successfully...`);
   } catch (err) {
-    console.error("CREATE TABLE: " + err);
+    console.error(
+      "at CreateMessageTableIfNotExists() in messages.storage.tsx: " + err
+    );
   }
 };
 
@@ -36,9 +38,11 @@ export const DeleteMessageTableIfExists = (
 ) => {
   try {
     db.execSync(`DROP TABLE IF EXISTS messages_${table_id};`);
-    console.info(`DELETE TABLE: Tabble ${table_id} deleted successfully`);
+    console.info(`Table [messages_${table_id}] is Deleted Successfully...`);
   } catch (err) {
-    console.error("DELETE TABLE: " + err);
+    console.error(
+      "at DeleteMessageTableIfExists() in messages.storage.tsx: " + err
+    );
   }
 };
 
@@ -56,24 +60,12 @@ export const fetchLatestMessage = (
     ) as MessagesProps;
     if (lastest_message) {
       console.info(
-        "FETCH_LATEST: " +
-          "ID: " +
-          lastest_message.id +
-          "| Sender: " +
-          lastest_message.sender_id +
-          "| Recevier: " +
-          lastest_message.receiver_id +
-          "| Conetent: " +
-          lastest_message.content +
-          "| Conetent Type: " +
-          lastest_message.content_type +
-          "| Timestamp: " +
-          lastest_message.timestamp
+        `Fetched Latest Message in Table [messages_${table_id}] Successfully...`
       );
     }
     return lastest_message;
   } catch (err) {
-    console.error("FETCH_LATEST: " + err);
+    console.error("at fetchLatestMessage() in messages.storage.tsx: " + err);
   }
 };
 
@@ -82,7 +74,9 @@ export const storeMessage = (props: MessagesDateabseProps) => {
   const table_id = props.is_recevied ? props.sender_id : props.receiver_id;
 
   if (!table_id || table_id.length === 0) {
-    throw new Error("table_id is undefined");
+    throw new Error(
+      "at storeMessage() in messages.storage.tsx: table_id is undefined"
+    );
   }
 
   if (!tableExist(table_id, props.db)) {
@@ -98,10 +92,10 @@ export const storeMessage = (props: MessagesDateabseProps) => {
       props.content_type
     );
     console.info(
-      `INSERT MESSAGE: Message stored with ID: ${result.lastInsertRowId}`
+      `Insert New Message into Table [messages_${table_id}]: ${props.content}`
     );
   } catch (err) {
-    console.error("INSERT MESSAGE: " + err);
+    console.error("at storeMessage() in messages.storage.tsx: " + err);
   }
 
   const lastest_message = fetchLatestMessage(table_id, props.db);
@@ -113,7 +107,9 @@ export const fetchAllMessages = async (
   db: SQLiteDatabase
 ) => {
   if (!table_id || table_id.length === 0) {
-    throw new Error("table_id is undefined");
+    throw new Error(
+      "at fetchAllMessages() in messages.storage.tsx: table_id is undefined"
+    );
   }
 
   //DeleteMessageTableIfExists(table_id, db);
@@ -126,27 +122,13 @@ export const fetchAllMessages = async (
       `SELECT * FROM messages_${table_id} ORDER BY id DESC;`
     )) as MessagesProps[];
     if (all_msg) {
-      console.info("GET ALL MESSAGES: ");
-      for (const msg of all_msg) {
-        console.info(
-          "ID: " +
-            msg.id +
-            "| Sender: " +
-            msg.sender_id +
-            "| Recevier: " +
-            msg.receiver_id +
-            "| Conetent: " +
-            msg.content +
-            "| Conetent Type: " +
-            msg.content_type +
-            "| Timestamp: " +
-            msg.timestamp
-        );
-      }
+      console.info(
+        `Fetched All Message From Table [messages_${table_id}] Successfully...`
+      );
     }
     return all_msg;
   } catch (err) {
-    console.error("GET ALL MESSAGES: " + err);
+    console.error("at fetchAllMessages() in messages.storage.tsx: " + err);
     return [];
   }
 };

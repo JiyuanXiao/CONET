@@ -53,7 +53,11 @@ export default function ChatWindowScreen() {
         messageSent={messageSent}
         setMessageSent={setMessageSent}
       />
-      <InputBar other_id={id} setMessageSent={setMessageSent} />
+      <InputBar
+        friend_id={id}
+        friend_name={name}
+        setMessageSent={setMessageSent}
+      />
     </View>
   );
 }

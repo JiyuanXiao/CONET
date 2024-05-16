@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ianxiao.CONET",
-      "buildNumber": "4"
+      "buildNumber": "6"
     },
     "android": {
       "adaptiveIcon": {

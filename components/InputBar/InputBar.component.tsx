@@ -45,16 +45,14 @@ const InputBar = (props: InputBarProps) => {
         const formated_message = {
           content: message,
           sender_id: user?.id || "",
-          receiver_id: props.other_id,
+          receiver_id: props.friend_id,
           content_type: "text",
           is_recevied: false,
           db: db,
         };
 
         // Update Message Context, Context will store message to local storage for us
-        addMessageById(props.other_id, formated_message);
-
-        console.log("INFO: MESSAGE SUNMITTED: ", message);
+        addMessageById(props.friend_id, formated_message);
       }
       setMessage("");
     } else {
@@ -68,11 +66,12 @@ const InputBar = (props: InputBarProps) => {
 
   // update chatbox info
   useEffect(() => {
-    const newMessagesObject = getLoadedMessagesObjectById(props.other_id);
+    const newMessagesObject = getLoadedMessagesObjectById(props.friend_id);
     const newMessages = newMessagesObject?.loaded_messages;
     if (newMessages && newMessages.length > 0) {
-      updateChatById(props.other_id, {
-        id: props.other_id,
+      updateChatById(props.friend_id, {
+        id: props.friend_id,
+        name: props.friend_name,
         last_message_content: newMessages[0].content,
         last_message_timestamp: newMessages[0].timestamp,
       });

@@ -4,38 +4,16 @@ import { router } from "expo-router";
 import { View } from "react-native";
 import ChatBox from "@/components/ChatBox/ChatBox.component";
 import { useTheme } from "@react-navigation/native";
-
-const DATA = [
-  {
-    id: "shaoji",
-    name: "烧鸡",
-    icon: "",
-    last_msg: "帮紧你",
-    last_msg_time: "4:50pm",
-  },
-  {
-    id: "yejiang",
-    name: "叶酱",
-    icon: "",
-    last_msg: "Get some wine",
-    last_msg_time: "1:00am",
-  },
-  {
-    id: "jichang",
-    name: "鸡肠",
-    icon: "",
-    last_msg: "ojbk",
-    last_msg_time: "11:00pm",
-  },
-];
+import { ChatsContext } from "@/api/chats/chats.context";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
+  const { chats } = useContext(ChatsContext);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
-        data={DATA}
+        data={chats}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {

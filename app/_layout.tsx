@@ -1,6 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { ThemeProvider } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -43,9 +41,13 @@ export default function RootLayout() {
   //   }
   // }, [loaded]);
 
-  // useEffect(() => {
-  //   SplashScreen.hideAsync();
-  // }, []);
+  const hideSplashScreen = async () => {
+    await SplashScreen.hideAsync();
+  };
+
+  useEffect(() => {
+    hideSplashScreen();
+  });
 
   // if (!loaded) {
   //   return null;

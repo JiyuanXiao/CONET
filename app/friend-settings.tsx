@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigation } from "expo-router";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { useRoute, useTheme } from "@react-navigation/native";
+import { useRoute, useTheme, StackActions } from "@react-navigation/native";
 import { useSQLiteContext } from "expo-sqlite";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
@@ -19,22 +20,28 @@ export default function FriendSettingsScreen() {
     getLoadedMessagesObjectById,
     ClearAllMessagesById,
   } = useContext(MessagesContext);
-  const { updateChatById } = useContext(ChatsContext);
+  const { updateChatById, deleteChatById } = useContext(ChatsContext);
 
   const [dialog_visible, setDialogVisible] = useState<boolean>(false);
   const [confirm_message, setConfrimMessage] = useState<string>("");
   const [isConfirm, setIsConfirm] = useState<boolean>(false);
   const [actionFunction, setActionFunction] = useState<() => void>(() => {});
+  const navigation = useNavigation();
 
   const ClearChatHistory = () => {
+    console.log("Start to Clear Chat History for: " + id);
     ClearAllMessagesById(id);
+    console.log("Successfully Cleared Chat History for: " + id);
 
-    console.log("HERE IS ClearChatHistory");
+    navigation.goBack();
   };
 
   const DeleteFriend = () => {
-    console.log("HERE IS DeleteFriend");
-    // Write Methods in Chat Context to handle Friend Deletion
+    console.log("Start to Delete Friend: " + id);
+    deleteChatById(id);
+    console.log("Deleted friend " + id + " Successfully...");
+
+    navigation.dispatch(StackActions.popToTop());
   };
 
   useEffect(() => {
@@ -59,6 +66,7 @@ export default function FriendSettingsScreen() {
     // update chat info to refresh the chatbox content
     const updaed_chat = {
       id: id,
+      name: name,
       last_message_content: last_msg_content,
       last_message_timestamp: last_msg_timestamp,
     } as ChatProps;
