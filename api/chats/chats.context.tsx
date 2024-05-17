@@ -5,27 +5,13 @@ import { fetchAllChats } from "./chats.storage";
 import { fetchLatestMessage } from "../messages/messages.storage";
 import { deleteChat, deleteAllChats, addNewChat } from "./chats.storage";
 
-const FRIENDS = [
-  {
-    id: "shaoji",
-    name: "烧鸡",
-  },
-  {
-    id: "yejiang",
-    name: "叶酱",
-  },
-  {
-    id: "jichang",
-    name: "鸡肠",
-  },
-];
-
 export const ChatsContext = createContext<ChatsContextProps>({
   chats: [],
   setChats: () => {},
   getChatById: (id: string) => undefined,
   updateChatById: (id: string, updatedChat: ChatProps) => {},
   deleteChatById: (id: string) => {},
+  addChat: (id: string, name: string) => {},
 });
 
 // Chats context provides chat info such as last message and last message timestamp
@@ -63,6 +49,20 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     return chats.find((chat) => chat.id === id);
   };
 
+  const addChat = (id: string, name: string) => {
+    // add chat to local storage
+    addNewChat(id, name, db);
+
+    const new_chat = {
+      id: id,
+      name: name,
+      last_message_content: "",
+      last_message_timestamp: "",
+    };
+
+    setChats([...chats, new_chat]);
+  };
+
   const updateChatById = (id: string, updatedChat: ChatProps) => {
     const targetChatIndex = chats.findIndex((chat) => chat.id === id);
 
@@ -91,6 +91,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         getChatById,
         updateChatById,
         deleteChatById,
+        addChat,
       }}
     >
       {props.children}

@@ -6,7 +6,13 @@ import { OptionBarCard } from "./OptionBar.styles";
 const OptionBar = (props: OptionBarProps) => {
   const { colors } = useTheme();
 
-  return <OptionBarCard content={props.content} theme_colors={colors} />;
+  return (
+    <OptionBarCard
+      content={props.content}
+      align_self={props.align_self}
+      theme_colors={colors}
+    />
+  );
 };
 
 export default OptionBar;

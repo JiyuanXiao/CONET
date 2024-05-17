@@ -1,4 +1,5 @@
 import React from "react";
+import { FlexAlignType } from "react-native";
 import styled from "styled-components/native";
 import { Card } from "react-native-paper";
 import { OptionBarProps } from "@/constants/Types";
@@ -12,6 +13,7 @@ export const OptionBarCard: React.FC<OptionBarProps> = styled(
     fontSize: 17,
     color: props.theme_colors?.text ?? default_theme.TEXT,
     paddingTop: 3,
+    alignSelf: (props.align_self as FlexAlignType) ?? "auto",
   },
 }))`
   height: 60px;

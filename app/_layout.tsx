@@ -22,7 +22,7 @@ import "react-native-reanimated";
 // };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   // const [loaded, error] = useFonts({
@@ -71,7 +71,16 @@ function RootLayoutNav() {
                   />
                   <Stack.Screen
                     name="add-friends"
-                    options={{ presentation: "modal" }}
+                    options={{ title: "添加朋友", presentation: "modal" }}
+                  />
+                  <Stack.Screen
+                    name="add-friend-detail"
+                    options={{
+                      title: "详情",
+                      headerBackTitleVisible: false,
+                      headerTitleAlign: "center",
+                      presentation: "modal",
+                    }}
                   />
                   <Stack.Screen
                     name="friend-settings"

@@ -19,6 +19,7 @@ export const CreateChatTableIfNotExists = (db: SQLiteDatabase) => {
   try {
     if (!tableExist(db)) {
       db.execSync(
+        // `CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id TEXT UNIQUE, friend_name TEXT, avatar_icon TEXT, icon_color TEXT, icon_background_color TEXT, icon_border_color TEXT);`
         `CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id TEXT UNIQUE, friend_name TEXT);`
       );
       console.info(`Table [chats] is Created Successfully...`);

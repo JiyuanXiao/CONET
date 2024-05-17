@@ -75,7 +75,14 @@ export default function FriendSettingsScreen() {
 
   return (
     <ScrollView>
-      <ProfileBar user_id={id} user_name={name} />
+      <ProfileBar
+        user_id={id}
+        user_name={name}
+        avatar_icon="alien"
+        icon_background_color={colors.border}
+        icon_color={colors.text}
+        icon_border_color={colors.text}
+      />
       <TouchableOpacity
         onPress={() => {
           setDialogVisible(true);

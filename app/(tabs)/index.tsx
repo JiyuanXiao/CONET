@@ -24,7 +24,14 @@ export default function ChatListScreen() {
             }}
             style={styles.chatBoxContainer}
           >
-            <ChatBox user_name={item.name} user_id={item.id} />
+            <ChatBox
+              user_name={item.name}
+              user_id={item.id}
+              avatar_icon="alien"
+              icon_color={colors.text}
+              icon_background_color={colors.border}
+              icon_border_color={colors.text}
+            />
           </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id}

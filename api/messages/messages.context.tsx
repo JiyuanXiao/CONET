@@ -205,7 +205,7 @@ export const MessagesContextProvider = (props: {
     }
   };
 
-  const resetLoadedMessagesById = (id: string) => {
+  const resetLoadedMessagesById = async (id: string) => {
     // find the index original message object
     const target_object_index = messages_object_list.findIndex(
       (messages_object) => messages_object.chat_id === id
@@ -236,9 +236,41 @@ export const MessagesContextProvider = (props: {
         updated_messages_object;
       setMessagesObjectList(updated_messages_object_list);
     } else {
-      console.warn(
-        `at resetLoadedMessagesById() in messages.context.tsx: chat_id ${id} DOES NOT EXIST`
-      );
+      try {
+        console.info(
+          `Message Ojbect with chat_id: ${id} Does not Exist in Message Context`
+        );
+        console.info(`Creating a new Message Object with chat_id: ${id}...`);
+        const initial_messages_object = {
+          chat_id: id,
+          loaded_messages: [],
+          current_index: 0,
+          total_messages_amount: 0,
+        };
+
+        // First load
+        const is_initial_load = true;
+        const newly_loaded_messages_object = await getLoadedMessages(
+          id,
+          initial_messages_object,
+          NUM_OF_LITEMS_TO_LOAD_AT_ONCE,
+          db,
+          is_initial_load
+        );
+
+        // Append new messages object to object list
+        setMessagesObjectList([
+          ...messages_object_list,
+          newly_loaded_messages_object,
+        ]);
+        console.info(
+          `New Message Object with chat_id: ${id} is Created Successfully...`
+        );
+      } catch (err) {
+        console.error(
+          "at resetLoadedMessagesById() in messages.context.tsx: " + err
+        );
+      }
     }
   };
 

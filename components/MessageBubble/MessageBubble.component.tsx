@@ -15,11 +15,11 @@ const MessageBubble = (props: MessageBubbleProps) => {
       </Bubble>
 
       <BubbleAvatar
-        icon="alien"
+        icon={props.avatar_icon ?? "alien"}
         icon_size={40}
-        icon_color={colors.text}
-        icon_background_color={colors.border}
-        icon_border_color={colors.text}
+        icon_color={props.icon_color}
+        icon_background_color={props.icon_background_color}
+        icon_border_color={props.icon_border_color}
       />
     </BubbleConatiner>
   );

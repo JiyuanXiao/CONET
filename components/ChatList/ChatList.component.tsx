@@ -4,6 +4,7 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesProps } from "@/constants/Types";
+import { useTheme } from "@react-navigation/native";
 
 export const ChatList = (props: {
   id: string;
@@ -20,6 +21,7 @@ export const ChatList = (props: {
   } = useContext(MessagesContext);
   const resetLoadedMessagesByIdRef = useRef(resetLoadedMessagesById);
   const { user } = useContext(AuthenticationContext);
+  const { colors } = useTheme();
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -56,6 +58,10 @@ export const ChatList = (props: {
         <MessageBubble
           message_content={item.content}
           isReceived={item.receiver_id === user?.id}
+          avatar_icon="alien"
+          icon_color={colors.text}
+          icon_background_color={colors.border}
+          icon_border_color={colors.text}
         />
       )}
       keyExtractor={(item) => item.id}

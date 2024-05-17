@@ -10,6 +10,10 @@ const ProfileBar = (props: ChatBoxProps) => {
     <ProfileBarCard
       user_id={props.user_id}
       user_name={props.user_name}
+      avatar_icon={props.avatar_icon}
+      icon_color={props.icon_color}
+      icon_background_color={props.icon_background_color}
+      icon_border_color={props.icon_border_color}
       theme_colors={colors}
     />
   );

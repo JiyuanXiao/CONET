@@ -26,9 +26,19 @@ export const ProfileBarCard: React.FC<ChatBoxProps> = styled(
     <ProfileAvatar
       icon={props.avatar_icon ?? "alien"}
       icon_size={65}
-      icon_color={props.theme_colors?.text ?? default_theme.TEXT}
-      icon_background_color={props.theme_colors?.border ?? default_theme.BORDER}
-      icon_border_color={props.theme_colors?.text ?? default_theme.TEXT}
+      icon_color={
+        props.icon_color ?? props.theme_colors?.text ?? default_theme.TEXT
+      }
+      icon_background_color={
+        props.icon_background_color ??
+        props.theme_colors?.border ??
+        default_theme.BORDER
+      }
+      icon_border_color={
+        props.icon_border_color ??
+        props.theme_colors?.text ??
+        default_theme.TEXT
+      }
     />
   ),
 }))`

@@ -17,6 +17,9 @@ export interface ChatBoxProps {
   last_message?: string;
   last_message_time?: string;
   avatar_icon?: string;
+  icon_color?: string;
+  icon_background_color?: string;
+  icon_border_color?: string;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -34,6 +37,10 @@ export interface TextInputBarProps {
 export interface MessageBubbleProps {
   isReceived: boolean;
   message_content?: string;
+  avatar_icon?: string;
+  icon_color?: string;
+  icon_background_color?: string;
+  icon_border_color?: string;
   theme_colors?: ThemeColorsProps;
   children?: React.ReactNode;
 }
@@ -42,9 +49,9 @@ export interface MessageBubbleProps {
 export interface UserAvatarProps {
   icon: string;
   icon_size: number;
-  icon_color: string;
-  icon_background_color: string;
-  icon_border_color: string;
+  icon_color?: string;
+  icon_background_color?: string;
+  icon_border_color?: string;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -90,6 +97,7 @@ export interface ChatsContextProps {
   getChatById: (id: string) => ChatProps | undefined;
   updateChatById: (id: string, updatedChat: ChatProps) => void;
   deleteChatById: (id: string) => void;
+  addChat: (id: string, name: string) => void;
 }
 
 export interface InputBarProps {
@@ -101,6 +109,7 @@ export interface InputBarProps {
 // OptionCard Components props
 export interface OptionBarProps {
   content: string;
+  align_self?: string;
   theme_colors?: ThemeColorsProps;
 }
 
