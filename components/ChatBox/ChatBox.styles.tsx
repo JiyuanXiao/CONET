@@ -24,21 +24,11 @@ export const ChatBoxCard: React.FC<ChatBoxProps> = styled(
   },
   left: () => (
     <ProfileAvatar
-      icon={props.avatar_icon ?? "alien"}
+      icon={props.avatar_icon}
       icon_size={55}
-      icon_color={
-        props.icon_color ?? props.theme_colors?.text ?? default_theme.TEXT
-      }
-      icon_background_color={
-        props.icon_background_color ??
-        props.theme_colors?.border ??
-        default_theme.BORDER
-      }
-      icon_border_color={
-        props.icon_border_color ??
-        props.theme_colors?.text ??
-        default_theme.TEXT
-      }
+      icon_color={props.icon_color}
+      icon_background_color={props.icon_background_color}
+      icon_border_color={props.icon_border_color}
     />
   ),
   right: () => (

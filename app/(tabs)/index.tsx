@@ -19,7 +19,14 @@ export default function ChatListScreen() {
             onPress={() => {
               router.push({
                 pathname: "/chat-window",
-                params: { id: item.id, name: item.name },
+                params: {
+                  id: item.id,
+                  name: item.name,
+                  avatar_icon: item.avatar_icon,
+                  icon_color: item.icon_color,
+                  icon_background_color: item.icon_background_color,
+                  icon_border_color: item.icon_border_color,
+                },
               });
             }}
             style={styles.chatBoxContainer}
@@ -27,10 +34,10 @@ export default function ChatListScreen() {
             <ChatBox
               user_name={item.name}
               user_id={item.id}
-              avatar_icon="alien"
-              icon_color={colors.text}
-              icon_background_color={colors.border}
-              icon_border_color={colors.text}
+              avatar_icon={item.avatar_icon}
+              icon_color={item.icon_color}
+              icon_background_color={item.icon_background_color}
+              icon_border_color={item.icon_border_color}
             />
           </TouchableOpacity>
         )}

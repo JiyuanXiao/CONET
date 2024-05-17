@@ -16,10 +16,10 @@ export interface ChatBoxProps {
   user_name: string;
   last_message?: string;
   last_message_time?: string;
-  avatar_icon?: string;
-  icon_color?: string;
-  icon_background_color?: string;
-  icon_border_color?: string;
+  avatar_icon: string;
+  icon_color: string;
+  icon_background_color: string;
+  icon_border_color: string;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -49,9 +49,9 @@ export interface MessageBubbleProps {
 export interface UserAvatarProps {
   icon: string;
   icon_size: number;
-  icon_color?: string;
-  icon_background_color?: string;
-  icon_border_color?: string;
+  icon_color: string;
+  icon_background_color: string;
+  icon_border_color: string;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -87,6 +87,10 @@ export interface AuthenticationContentProps {
 export interface ChatProps {
   id: string;
   name: string;
+  avatar_icon: string;
+  icon_color: string;
+  icon_background_color: string;
+  icon_border_color: string;
   last_message_content: string;
   last_message_timestamp: string;
 }
@@ -97,12 +101,23 @@ export interface ChatsContextProps {
   getChatById: (id: string) => ChatProps | undefined;
   updateChatById: (id: string, updatedChat: ChatProps) => void;
   deleteChatById: (id: string) => void;
-  addChat: (id: string, name: string) => void;
+  addChat: (
+    id: string,
+    name: string,
+    avatar_icon: string,
+    icon_color: string,
+    icon_background_color: string,
+    icon_border_color: string
+  ) => void;
 }
 
 export interface InputBarProps {
   friend_id: string;
   friend_name: string;
+  avatar_icon: string;
+  icon_color: string;
+  icon_background_color: string;
+  icon_border_color: string;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }
 

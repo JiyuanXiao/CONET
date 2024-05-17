@@ -20,7 +20,21 @@ export default function ChatWindowScreen() {
 
   const navigation = useNavigation();
   const route = useRoute();
-  const { id, name } = route.params as { id: string; name: string };
+  const {
+    id,
+    name,
+    avatar_icon,
+    icon_color,
+    icon_background_color,
+    icon_border_color,
+  } = route.params as {
+    id: string;
+    name: string;
+    avatar_icon: string;
+    icon_color: string;
+    icon_background_color: string;
+    icon_border_color: string;
+  };
 
   // Display the name on the header
   useLayoutEffect(() => {
@@ -31,7 +45,14 @@ export default function ChatWindowScreen() {
           onPress={() => {
             router.push({
               pathname: "/friend-settings",
-              params: { id: id, name: name },
+              params: {
+                id: id,
+                name: name,
+                avatar_icon: avatar_icon,
+                icon_color: icon_color,
+                icon_background_color: icon_background_color,
+                icon_border_color: icon_border_color,
+              },
             });
           }}
         >
@@ -51,11 +72,19 @@ export default function ChatWindowScreen() {
       <ChatList
         id={id}
         messageSent={messageSent}
+        avatar_icon={avatar_icon}
+        icon_color={icon_color}
+        icon_background_color={icon_background_color}
+        icon_border_color={icon_border_color}
         setMessageSent={setMessageSent}
       />
       <InputBar
         friend_id={id}
         friend_name={name}
+        avatar_icon={avatar_icon}
+        icon_color={icon_color}
+        icon_background_color={icon_background_color}
+        icon_border_color={icon_border_color}
         setMessageSent={setMessageSent}
       />
     </View>

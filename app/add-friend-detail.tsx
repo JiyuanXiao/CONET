@@ -29,7 +29,14 @@ export default function AddFriendDetailScreen() {
 
   const handleAddFriend = () => {
     console.log("Start Adding a New Chat: " + id);
-    addChat(id, name);
+    addChat(
+      id,
+      name,
+      icon,
+      icon_color,
+      icon_background_color,
+      icon_border_color
+    );
     console.log("Added New Chat Successfully: " + id);
 
     navigation.dispatch(StackActions.popToTop());

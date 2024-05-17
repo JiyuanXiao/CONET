@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigation } from "expo-router";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { useRoute, useTheme, StackActions } from "@react-navigation/native";
-import { useSQLiteContext } from "expo-sqlite";
+import { useRoute, StackActions } from "@react-navigation/native";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog.component";
@@ -12,9 +11,22 @@ import { ChatProps } from "@/constants/Types";
 
 export default function FriendSettingsScreen() {
   const route = useRoute();
-  const { id, name } = route.params as { id: string; name: string };
-  const { colors } = useTheme();
-  const db = useSQLiteContext();
+  const {
+    id,
+    name,
+    avatar_icon,
+    icon_color,
+    icon_background_color,
+    icon_border_color,
+  } = route.params as {
+    id: string;
+    name: string;
+    avatar_icon: string;
+    icon_color: string;
+    icon_background_color: string;
+    icon_border_color: string;
+  };
+
   const {
     messages_object_list,
     getLoadedMessagesObjectById,
@@ -67,6 +79,10 @@ export default function FriendSettingsScreen() {
     const updaed_chat = {
       id: id,
       name: name,
+      avatar_icon: avatar_icon,
+      icon_color: icon_color,
+      icon_background_color: icon_background_color,
+      icon_border_color: icon_border_color,
       last_message_content: last_msg_content,
       last_message_timestamp: last_msg_timestamp,
     } as ChatProps;
@@ -78,10 +94,10 @@ export default function FriendSettingsScreen() {
       <ProfileBar
         user_id={id}
         user_name={name}
-        avatar_icon="alien"
-        icon_background_color={colors.border}
-        icon_color={colors.text}
-        icon_border_color={colors.text}
+        avatar_icon={avatar_icon}
+        icon_background_color={icon_background_color}
+        icon_color={icon_color}
+        icon_border_color={icon_border_color}
       />
       <TouchableOpacity
         onPress={() => {

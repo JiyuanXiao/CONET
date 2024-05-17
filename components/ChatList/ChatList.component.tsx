@@ -4,11 +4,14 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesProps } from "@/constants/Types";
-import { useTheme } from "@react-navigation/native";
 
 export const ChatList = (props: {
   id: string;
   messageSent: boolean;
+  avatar_icon: string;
+  icon_color: string;
+  icon_background_color: string;
+  icon_border_color: string;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [messages, setMessages] = useState<MessagesProps[]>([]);
@@ -21,7 +24,6 @@ export const ChatList = (props: {
   } = useContext(MessagesContext);
   const resetLoadedMessagesByIdRef = useRef(resetLoadedMessagesById);
   const { user } = useContext(AuthenticationContext);
-  const { colors } = useTheme();
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -58,10 +60,10 @@ export const ChatList = (props: {
         <MessageBubble
           message_content={item.content}
           isReceived={item.receiver_id === user?.id}
-          avatar_icon="alien"
-          icon_color={colors.text}
-          icon_background_color={colors.border}
-          icon_border_color={colors.text}
+          avatar_icon={props.avatar_icon}
+          icon_color={props.icon_color}
+          icon_background_color={props.icon_background_color}
+          icon_border_color={props.icon_border_color}
         />
       )}
       keyExtractor={(item) => item.id}

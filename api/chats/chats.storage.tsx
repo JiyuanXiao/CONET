@@ -19,8 +19,7 @@ export const CreateChatTableIfNotExists = (db: SQLiteDatabase) => {
   try {
     if (!tableExist(db)) {
       db.execSync(
-        // `CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id TEXT UNIQUE, friend_name TEXT, avatar_icon TEXT, icon_color TEXT, icon_background_color TEXT, icon_border_color TEXT);`
-        `CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id TEXT UNIQUE, friend_name TEXT);`
+        `CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id TEXT UNIQUE, friend_name TEXT, avatar_icon TEXT, icon_color TEXT, icon_background_color TEXT, icon_border_color TEXT);`
       );
       console.info(`Table [chats] is Created Successfully...`);
     }
@@ -46,14 +45,22 @@ export const deleteAllChats = (db: SQLiteDatabase) => {
 export const addNewChat = (
   chat_id: string,
   friend_name: string,
+  avatar_icon: string,
+  icon_color: string,
+  icon_background_color: string,
+  icon_border_color: string,
   db: SQLiteDatabase
 ) => {
   CreateChatTableIfNotExists(db);
   try {
     const result = db.runSync(
-      `INSERT INTO chats (chat_id, friend_name) VALUES (?, ?);`,
+      `INSERT INTO chats (chat_id, friend_name, avatar_icon, icon_color, icon_background_color, icon_border_color ) VALUES (?, ?, ?, ?, ?, ?);`,
       chat_id,
-      friend_name
+      friend_name,
+      avatar_icon,
+      icon_color,
+      icon_background_color,
+      icon_border_color
     );
     console.info(`New Row is Added to Table [chats] Successfully: ${chat_id}`);
   } catch (err: any) {
@@ -69,11 +76,24 @@ export const addNewChat = (
 
 export const fetchAllChats = (
   db: SQLiteDatabase
-): { chat_id: string; friend_name: string }[] => {
+): {
+  chat_id: string;
+  friend_name: string;
+  avatar_icon: string;
+  icon_color: string;
+  icon_background_color: string;
+  icon_border_color: string;
+}[] => {
   try {
-    const rows = db.getAllSync(`SELECT chat_id, friend_name FROM chats;`) as {
+    const rows = db.getAllSync(
+      `SELECT chat_id, friend_name, avatar_icon, icon_color, icon_background_color, icon_border_color FROM chats;`
+    ) as {
       chat_id: string;
       friend_name: string;
+      avatar_icon: string;
+      icon_color: string;
+      icon_background_color: string;
+      icon_border_color: string;
     }[];
     //const chatIds = rows.map((row) => row.chat_id);
     console.info(`Fetched All Rows From Table [chats] Successfully...`);
