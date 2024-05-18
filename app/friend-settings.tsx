@@ -7,7 +7,6 @@ import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { ChatsContext } from "@/api/chats/chats.context";
-import { ChatProps } from "@/constants/Types";
 
 export default function FriendSettingsScreen() {
   const route = useRoute();
@@ -41,17 +40,17 @@ export default function FriendSettingsScreen() {
   const navigation = useNavigation();
 
   const ClearChatHistory = () => {
-    console.log("Start to Clear Chat History for: " + id);
+    console.log("Start to clear chat history for: " + id);
     ClearAllMessagesById(id);
-    console.log("Successfully Cleared Chat History for: " + id);
+    console.log("Successfully cleared chat history for: " + id);
 
     navigation.goBack();
   };
 
   const DeleteFriend = () => {
-    console.log("Start to Delete Friend: " + id);
+    console.log("Start to delete friend: " + id);
     deleteChatById(id);
-    console.log("Deleted friend " + id + " Successfully...");
+    console.log("Deleted friend " + id + " successfully...");
 
     navigation.dispatch(StackActions.popToTop());
   };
@@ -65,28 +64,7 @@ export default function FriendSettingsScreen() {
   }, [isConfirm]);
 
   useEffect(() => {
-    const messages_object = getLoadedMessagesObjectById(id);
-    let last_msg_content = "";
-    let last_msg_timestamp = "";
-
-    // Unusual situation
-    if (messages_object && messages_object?.loaded_messages.length !== 0) {
-      last_msg_content = messages_object?.loaded_messages[0].content;
-      last_msg_timestamp = messages_object?.loaded_messages[0].timestamp;
-    }
-
-    // update chat info to refresh the chatbox content
-    const updaed_chat = {
-      id: id,
-      name: name,
-      avatar_icon: avatar_icon,
-      icon_color: icon_color,
-      icon_background_color: icon_background_color,
-      icon_border_color: icon_border_color,
-      last_message_content: last_msg_content,
-      last_message_timestamp: last_msg_timestamp,
-    } as ChatProps;
-    updateChatById(id, updaed_chat);
+    updateChatById(id);
   }, [messages_object_list]);
 
   return (

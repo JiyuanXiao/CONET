@@ -69,16 +69,7 @@ const InputBar = (props: InputBarProps) => {
     const newMessagesObject = getLoadedMessagesObjectById(props.friend_id);
     const newMessages = newMessagesObject?.loaded_messages;
     if (newMessages && newMessages.length > 0) {
-      updateChatById(props.friend_id, {
-        id: props.friend_id,
-        name: props.friend_name,
-        avatar_icon: props.avatar_icon,
-        icon_color: props.avatar_icon,
-        icon_background_color: props.icon_background_color,
-        icon_border_color: props.icon_border_color,
-        last_message_content: newMessages[0].content,
-        last_message_timestamp: newMessages[0].timestamp,
-      });
+      updateChatById(props.friend_id);
     }
   }, [messages_object_list]);
 

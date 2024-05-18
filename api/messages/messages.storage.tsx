@@ -24,7 +24,7 @@ export const CreateMessageTableIfNotExists = (
     db.execSync(
       `CREATE TABLE IF NOT EXISTS messages_${table_id} (id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id TEXT, receiver_id TEXT, content TEXT, content_type TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);`
     );
-    console.info(`Table [messages_${table_id}] is Created Successfully...`);
+    console.info(`Table [messages_${table_id}] is created successfully...`);
   } catch (err) {
     console.error(
       "at CreateMessageTableIfNotExists() in messages.storage.tsx: " + err
@@ -38,7 +38,7 @@ export const DeleteMessageTableIfExists = (
 ) => {
   try {
     db.execSync(`DROP TABLE IF EXISTS messages_${table_id};`);
-    console.info(`Table [messages_${table_id}] is Deleted Successfully...`);
+    console.info(`Table [messages_${table_id}] is deleted successfully...`);
   } catch (err) {
     console.error(
       "at DeleteMessageTableIfExists() in messages.storage.tsx: " + err
@@ -60,7 +60,7 @@ export const fetchLatestMessage = (
     ) as MessagesProps;
     if (lastest_message) {
       console.info(
-        `Fetched Latest Message in Table [messages_${table_id}] Successfully...`
+        `Fetched latest message in table [messages_${table_id}] successfully...`
       );
     }
     return lastest_message;
@@ -92,7 +92,7 @@ export const storeMessage = (props: MessagesDateabseProps) => {
       props.content_type
     );
     console.info(
-      `Insert New Message into Table [messages_${table_id}]: ${props.content}`
+      `Insert new message into table [messages_${table_id}]: ${props.content}`
     );
   } catch (err) {
     console.error("at storeMessage() in messages.storage.tsx: " + err);
@@ -123,7 +123,7 @@ export const fetchAllMessages = async (
     )) as MessagesProps[];
     if (all_msg) {
       console.info(
-        `Fetched All Message From Table [messages_${table_id}] Successfully...`
+        `Fetched all message from table [messages_${table_id}] successfully...`
       );
     }
     return all_msg;

@@ -5,6 +5,7 @@ import { useRoute, StackActions } from "@react-navigation/native";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import { ChatsContext } from "@/api/chats/chats.context";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 export default function AddFriendDetailScreen() {
   const route = useRoute();
@@ -24,11 +25,12 @@ export default function AddFriendDetailScreen() {
     icon_border_color: string;
   };
 
-  const { addChat } = useContext(ChatsContext);
+  const { chats, addChat, updateChatById } = useContext(ChatsContext);
+  const { resetLoadedMessagesById } = useContext(MessagesContext);
   const navigation = useNavigation();
 
   const handleAddFriend = () => {
-    console.log("Start Adding a New Chat: " + id);
+    console.log("Start adding a new chat: " + id);
     addChat(
       id,
       name,
@@ -37,10 +39,13 @@ export default function AddFriendDetailScreen() {
       icon_background_color,
       icon_border_color
     );
-    console.log("Added New Chat Successfully: " + id);
-
+    console.log("Added new chat successfully: " + id);
+    console.log("Start load messages for: " + id);
+    resetLoadedMessagesById(id);
+    console.log("Load messages successfully: " + id);
     navigation.dispatch(StackActions.popToTop());
   };
+
   return (
     <>
       <ProfileBar

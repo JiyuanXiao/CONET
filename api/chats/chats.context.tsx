@@ -9,7 +9,8 @@ export const ChatsContext = createContext<ChatsContextProps>({
   chats: [],
   setChats: () => {},
   getChatById: (id: string) => undefined,
-  updateChatById: (id: string, updatedChat: ChatProps) => {},
+  //updateChatById: (id: string, updatedChat: ChatProps) => {},
+  updateChatById: (id: string) => {},
   deleteChatById: (id: string) => {},
   addChat: (
     id: string,
@@ -61,7 +62,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
       init_chats.push(current_chat);
     }
     setChats(init_chats);
-    console.log("Initialize Chat Context Successfully...");
+    console.log("Initialize chat context successfully...");
   }, []);
 
   const getChatById = (id: string) => {
@@ -101,15 +102,30 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     setChats([...chats, new_chat]);
   };
 
-  const updateChatById = (id: string, updatedChat: ChatProps) => {
+  const updateChatById = (id: string) => {
     const targetChatIndex = chats.findIndex((chat) => chat.id === id);
 
     if (targetChatIndex !== -1) {
+      const latest_messages = fetchLatestMessage(id, db);
+      const updatedChat = {
+        id: id,
+        name: chats[targetChatIndex].name,
+        avatar_icon: chats[targetChatIndex].avatar_icon,
+        icon_color: chats[targetChatIndex].icon_color,
+        icon_background_color: chats[targetChatIndex].icon_background_color,
+        icon_border_color: chats[targetChatIndex].icon_border_color,
+        last_message_content: latest_messages?.content || "",
+        last_message_timestamp: latest_messages?.timestamp || "",
+      };
       const updatedChats = [...chats];
       updatedChats[targetChatIndex] = updatedChat;
       setChats(updatedChats);
     } else {
-      setChats([...chats, updatedChat]);
+      console.warn(
+        "at updateChatById() in chats.context.tsx: chat with " +
+          id +
+          " does not exist"
+      );
     }
   };
 

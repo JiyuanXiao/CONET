@@ -123,7 +123,7 @@ export const MessagesContextProvider = (props: {
     }
 
     setMessagesObjectList(initialMessagesObjectList);
-    console.log("Initialize Message Context Successfully...");
+    console.log("Initialize message context successfully...");
   };
 
   // Get loaded message object for a chat
@@ -238,9 +238,9 @@ export const MessagesContextProvider = (props: {
     } else {
       try {
         console.info(
-          `Message Ojbect with chat_id: ${id} Does not Exist in Message Context`
+          `Message ojbect with chat_id: ${id} does not xxist in message context`
         );
-        console.info(`Creating a new Message Object with chat_id: ${id}...`);
+        console.info(`Creating a new message object with chat_id: ${id}...`);
         const initial_messages_object = {
           chat_id: id,
           loaded_messages: [],
@@ -264,7 +264,7 @@ export const MessagesContextProvider = (props: {
           newly_loaded_messages_object,
         ]);
         console.info(
-          `New Message Object with chat_id: ${id} is Created Successfully...`
+          `New message object with chat_id: ${id} is created successfully...`
         );
       } catch (err) {
         console.error(

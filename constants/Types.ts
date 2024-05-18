@@ -99,7 +99,7 @@ export interface ChatsContextProps {
   chats: ChatProps[];
   setChats: React.Dispatch<React.SetStateAction<ChatProps[]>>;
   getChatById: (id: string) => ChatProps | undefined;
-  updateChatById: (id: string, updatedChat: ChatProps) => void;
+  updateChatById: (id: string) => void;
   deleteChatById: (id: string) => void;
   addChat: (
     id: string,
