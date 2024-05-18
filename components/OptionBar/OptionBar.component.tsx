@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import { useTheme } from "@react-navigation/native";
 import { OptionBarProps } from "@/constants/Types";
 import { OptionBarCard } from "./OptionBar.styles";

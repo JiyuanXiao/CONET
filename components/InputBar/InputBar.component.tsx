@@ -6,7 +6,7 @@ import { TextInput } from "./InputBar.styles";
 import { ThemeColorsProps, InputBarProps } from "@/constants/Types";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { useSQLiteContext } from "expo-sqlite";
-import { ChatsContext } from "@/api/chats/chats.context";
+import { FriendsContext } from "@/api/friends/friends.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
@@ -31,7 +31,7 @@ const InputBar = (props: InputBarProps) => {
   const [inputHeight, setInputHeight] = useState(0);
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
-  const { updateChatById } = useContext(ChatsContext);
+  const { updateFriendById } = useContext(FriendsContext);
   const { messages_object_list, addMessageById, getLoadedMessagesObjectById } =
     useContext(MessagesContext);
   const db = useSQLiteContext();
@@ -69,7 +69,7 @@ const InputBar = (props: InputBarProps) => {
     const newMessagesObject = getLoadedMessagesObjectById(props.friend_id);
     const newMessages = newMessagesObject?.loaded_messages;
     if (newMessages && newMessages.length > 0) {
-      updateChatById(props.friend_id);
+      updateFriendById(props.friend_id);
     }
   }, [messages_object_list]);
 

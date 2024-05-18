@@ -6,7 +6,7 @@ import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog.component";
 import { MessagesContext } from "@/api/messages/messages.context";
-import { ChatsContext } from "@/api/chats/chats.context";
+import { FriendsContext } from "@/api/friends/friends.context";
 
 export default function FriendSettingsScreen() {
   const route = useRoute();
@@ -31,7 +31,7 @@ export default function FriendSettingsScreen() {
     getLoadedMessagesObjectById,
     ClearAllMessagesById,
   } = useContext(MessagesContext);
-  const { updateChatById, deleteChatById } = useContext(ChatsContext);
+  const { updateFriendById, deleteFriendById } = useContext(FriendsContext);
 
   const [dialog_visible, setDialogVisible] = useState<boolean>(false);
   const [confirm_message, setConfrimMessage] = useState<string>("");
@@ -42,6 +42,7 @@ export default function FriendSettingsScreen() {
   const ClearChatHistory = () => {
     console.log("Start to clear chat history for: " + id);
     ClearAllMessagesById(id);
+    updateFriendById(id);
     console.log("Successfully cleared chat history for: " + id);
 
     navigation.goBack();
@@ -49,7 +50,7 @@ export default function FriendSettingsScreen() {
 
   const DeleteFriend = () => {
     console.log("Start to delete friend: " + id);
-    deleteChatById(id);
+    deleteFriendById(id);
     console.log("Deleted friend " + id + " successfully...");
 
     navigation.dispatch(StackActions.popToTop());
@@ -64,7 +65,7 @@ export default function FriendSettingsScreen() {
   }, [isConfirm]);
 
   useEffect(() => {
-    updateChatById(id);
+    updateFriendById(id);
   }, [messages_object_list]);
 
   return (

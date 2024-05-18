@@ -4,7 +4,7 @@ import { useNavigation } from "expo-router";
 import { useRoute, StackActions } from "@react-navigation/native";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
-import { ChatsContext } from "@/api/chats/chats.context";
+import { FriendsContext } from "@/api/friends/friends.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 
 export default function AddFriendDetailScreen() {
@@ -25,13 +25,13 @@ export default function AddFriendDetailScreen() {
     icon_border_color: string;
   };
 
-  const { chats, addChat, updateChatById } = useContext(ChatsContext);
+  const { friends, addFriend, updateFriendById } = useContext(FriendsContext);
   const { resetLoadedMessagesById } = useContext(MessagesContext);
   const navigation = useNavigation();
 
   const handleAddFriend = () => {
     console.log("Start adding a new chat: " + id);
-    addChat(
+    addFriend(
       id,
       name,
       icon,

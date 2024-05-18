@@ -1,8 +1,8 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { MessagesDateabseProps, MessagesProps } from "@/constants/Types";
 
-const tableExist = (
-  table_id: string | undefined,
+export const MessageTableExist = (
+  table_id: string,
   db: SQLiteDatabase
 ): boolean => {
   try {
@@ -17,7 +17,7 @@ const tableExist = (
 };
 
 export const CreateMessageTableIfNotExists = (
-  table_id: string | undefined,
+  table_id: string,
   db: SQLiteDatabase
 ) => {
   try {
@@ -33,7 +33,7 @@ export const CreateMessageTableIfNotExists = (
 };
 
 export const DeleteMessageTableIfExists = (
-  table_id: string | undefined,
+  table_id: string,
   db: SQLiteDatabase
 ) => {
   try {
@@ -46,14 +46,7 @@ export const DeleteMessageTableIfExists = (
   }
 };
 
-export const fetchLatestMessage = (
-  table_id: string | undefined,
-  db: SQLiteDatabase
-) => {
-  //DeleteMessageTableIfExists(table_id, db);
-  if (!tableExist(table_id, db)) {
-    CreateMessageTableIfNotExists(table_id, db);
-  }
+export const fetchLatestMessage = (table_id: string, db: SQLiteDatabase) => {
   try {
     const lastest_message = db.getFirstSync(
       `SELECT * FROM messages_${table_id} ORDER BY id DESC LIMIT 1;`
@@ -79,10 +72,6 @@ export const storeMessage = (props: MessagesDateabseProps) => {
     );
   }
 
-  if (!tableExist(table_id, props.db)) {
-    CreateMessageTableIfNotExists(table_id, props.db);
-  }
-
   try {
     const result = props.db.runSync(
       `INSERT INTO messages_${table_id} (sender_id, receiver_id, content, content_type) VALUES (?, ?, ?, ?);`,
@@ -103,18 +92,13 @@ export const storeMessage = (props: MessagesDateabseProps) => {
 };
 
 export const fetchAllMessages = async (
-  table_id: string | undefined,
+  table_id: string,
   db: SQLiteDatabase
 ) => {
   if (!table_id || table_id.length === 0) {
     throw new Error(
       "at fetchAllMessages() in messages.storage.tsx: table_id is undefined"
     );
-  }
-
-  //DeleteMessageTableIfExists(table_id, db);
-  if (!tableExist(table_id, db)) {
-    CreateMessageTableIfNotExists(table_id, db);
   }
 
   try {

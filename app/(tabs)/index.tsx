@@ -4,22 +4,24 @@ import { router } from "expo-router";
 import { View } from "react-native";
 import ChatBox from "@/components/ChatBox/ChatBox.component";
 import { useTheme } from "@react-navigation/native";
-import { ChatsContext } from "@/api/chats/chats.context";
-import { ChatProps } from "@/constants/Types";
+import { FriendsContext } from "@/api/friends/friends.context";
+import { MessagesContext } from "@/api/messages/messages.context";
+import { FriendProps } from "@/constants/Types";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
-  const { chats, updateChatById } = useContext(ChatsContext);
-  const [current_chats, setCurrentChats] = useState<ChatProps[]>([]);
+  const { friends } = useContext(FriendsContext);
+  const { messages_object_list } = useContext(MessagesContext);
+  const [current_friends, setCurrentFriends] = useState<FriendProps[]>([]);
 
   useEffect(() => {
-    setCurrentChats(chats);
-  }, [chats]);
+    setCurrentFriends(friends);
+  }, [friends, messages_object_list]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
-        data={current_chats}
+        data={current_friends}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {

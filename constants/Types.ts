@@ -84,7 +84,7 @@ export interface AuthenticationContentProps {
   error: string;
 }
 
-export interface ChatProps {
+export interface FriendProps {
   id: string;
   name: string;
   avatar_icon: string;
@@ -95,13 +95,13 @@ export interface ChatProps {
   last_message_timestamp: string;
 }
 
-export interface ChatsContextProps {
-  chats: ChatProps[];
-  setChats: React.Dispatch<React.SetStateAction<ChatProps[]>>;
-  getChatById: (id: string) => ChatProps | undefined;
-  updateChatById: (id: string) => void;
-  deleteChatById: (id: string) => void;
-  addChat: (
+export interface FriendsContextProps {
+  friends: FriendProps[];
+  setFriends: React.Dispatch<React.SetStateAction<FriendProps[]>>;
+  getFriendById: (id: string) => FriendProps | undefined;
+  updateFriendById: (id: string) => void;
+  deleteFriendById: (id: string) => void;
+  addFriend: (
     id: string,
     name: string,
     avatar_icon: string,

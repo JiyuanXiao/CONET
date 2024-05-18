@@ -7,7 +7,7 @@ import { PaperProvider } from "react-native-paper";
 import { DarkTheme, LightTheme } from "@/constants/Theme";
 import { AuthenticationContextProvider } from "@/api/authentication/authentication.context";
 import { SQLiteProvider } from "expo-sqlite";
-import { ChatsContextProvider } from "@/api/chats/chats.context";
+import { FriendsContextProvider } from "@/api/friends/friends.context";
 import { MessagesContextProvider } from "@/api/messages/messages.context";
 import "react-native-reanimated";
 
@@ -56,7 +56,7 @@ function RootLayoutNav() {
       <ThemeProvider value={CurrentTheme}>
         <AuthenticationContextProvider>
           <SQLiteProvider databaseName="messages.db">
-            <ChatsContextProvider>
+            <FriendsContextProvider>
               <MessagesContextProvider>
                 <Stack
                   screenOptions={{
@@ -98,7 +98,7 @@ function RootLayoutNav() {
                   />
                 </Stack>
               </MessagesContextProvider>
-            </ChatsContextProvider>
+            </FriendsContextProvider>
           </SQLiteProvider>
         </AuthenticationContextProvider>
       </ThemeProvider>
