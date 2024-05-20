@@ -1,17 +1,18 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import { FriendsContextProps, FriendProps } from "@/constants/Types";
 import { useSQLiteContext } from "expo-sqlite";
 import {
   fetchLatestMessage,
-  CreateMessageTableIfNotExists,
-  MessageTableExist,
+  createMessageTableIfNotExists,
+  messageTableExist,
 } from "../messages/messages.storage";
 import {
   fetchAllFriends,
   deleteFriend,
-  deleteAllFriends,
   addNewFriend,
+  createFriendTableIfNotExists,
 } from "./friends.storage";
+import { AuthenticationContext } from "../authentication/authentication.context";
 
 export const FriendsContext = createContext<FriendsContextProps>({
   friends: [],
@@ -23,9 +24,7 @@ export const FriendsContext = createContext<FriendsContextProps>({
     id: string,
     name: string,
     avatar_icon: string,
-    icon_color: string,
-    icon_background_color: string,
-    icon_border_color: string
+    icon_background_color: string
   ) => {},
 });
 
@@ -35,31 +34,33 @@ export const FriendsContextProvider = (props: {
   children: React.ReactNode;
 }) => {
   const db = useSQLiteContext();
+  const { user } = useContext(AuthenticationContext);
   const [friends, setFriends] = useState<FriendProps[]>([]);
 
   useEffect(() => {
-    const init_friends = [];
-    // Get all friends' id from local storage
-    const friends = fetchAllFriends(db);
+    if (user) {
+      createFriendTableIfNotExists(user.id, db);
+      const init_friends = [];
+      // Get all friends' id from local storage
+      const friends = fetchAllFriends(user.id, db);
 
-    // Collect all friend's last message and its timestamp from local storage
-    for (const friend of friends) {
-      const current_msg = fetchLatestMessage(friend.friend_id, db);
-      const current_friend = {
-        id: friend.friend_id,
-        name: friend.friend_name,
-        avatar_icon: friend.avatar_icon,
-        icon_color: friend.icon_color,
-        icon_background_color: friend.icon_background_color,
-        icon_border_color: friend.icon_border_color,
-        last_message_content: current_msg?.content || "",
-        last_message_timestamp: current_msg?.timestamp || "",
-      };
-      init_friends.push(current_friend);
+      // Collect all friend's last message and its timestamp from local storage
+      for (const friend of friends) {
+        const current_msg = fetchLatestMessage(user.id, friend.friend_id, db);
+        const current_friend = {
+          id: friend.friend_id,
+          name: friend.friend_name,
+          avatar_icon: friend.avatar_icon,
+          icon_background_color: friend.icon_background_color,
+          last_message_content: current_msg?.content || "",
+          last_message_timestamp: current_msg?.timestamp || "",
+        };
+        init_friends.push(current_friend);
+      }
+      setFriends(init_friends);
+      console.log("Initialize friend context successfully...");
     }
-    setFriends(init_friends);
-    console.log("Initialize friend context successfully...");
-  }, []);
+  }, [user]);
 
   const getFriendById = (id: string) => {
     return friends.find((friend) => friend.id === id);
@@ -69,32 +70,27 @@ export const FriendsContextProvider = (props: {
     id: string,
     name: string,
     avatar_icon: string,
-    icon_color: string,
-    icon_background_color: string,
-    icon_border_color: string
+    icon_background_color: string
   ) => {
     // add friend to local storage
     addNewFriend(
+      user?.id || "",
       id,
       name,
       avatar_icon,
-      icon_color,
       icon_background_color,
-      icon_border_color,
       db
     );
 
-    if (!MessageTableExist(id, db)) {
-      CreateMessageTableIfNotExists(id, db);
+    if (!messageTableExist(user?.id || "", id, db)) {
+      createMessageTableIfNotExists(user?.id || "", id, db);
     }
 
     const new_friend = {
       id: id,
       name: name,
       avatar_icon: avatar_icon,
-      icon_color: icon_color,
       icon_background_color: icon_background_color,
-      icon_border_color: icon_border_color,
       last_message_content: "",
       last_message_timestamp: "",
     };
@@ -106,14 +102,12 @@ export const FriendsContextProvider = (props: {
     const targetFriendIndex = friends.findIndex((friend) => friend.id === id);
 
     if (targetFriendIndex !== -1) {
-      const latest_messages = fetchLatestMessage(id, db);
+      const latest_messages = fetchLatestMessage(user?.id || "", id, db);
       const updatedFriend = {
         id: id,
         name: friends[targetFriendIndex].name,
         avatar_icon: friends[targetFriendIndex].avatar_icon,
-        icon_color: friends[targetFriendIndex].icon_color,
         icon_background_color: friends[targetFriendIndex].icon_background_color,
-        icon_border_color: friends[targetFriendIndex].icon_border_color,
         last_message_content: latest_messages?.content || "",
         last_message_timestamp: latest_messages?.timestamp || "",
       };
@@ -131,7 +125,7 @@ export const FriendsContextProvider = (props: {
 
   const deleteFriendById = (id: string) => {
     // update local storage
-    deleteFriend(id, db);
+    deleteFriend(user?.id || "", id, db);
 
     // update context
     setFriends(friends.filter((friend) => friend.id !== id));

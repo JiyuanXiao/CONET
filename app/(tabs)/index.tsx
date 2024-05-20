@@ -31,9 +31,7 @@ export default function ChatListScreen() {
                   id: item.id,
                   name: item.name,
                   avatar_icon: item.avatar_icon,
-                  icon_color: item.icon_color,
                   icon_background_color: item.icon_background_color,
-                  icon_border_color: item.icon_border_color,
                 },
               });
             }}
@@ -43,9 +41,7 @@ export default function ChatListScreen() {
               user_name={item.name}
               user_id={item.id}
               avatar_icon={item.avatar_icon}
-              icon_color={item.icon_color}
               icon_background_color={item.icon_background_color}
-              icon_border_color={item.icon_border_color}
             />
           </TouchableOpacity>
         )}

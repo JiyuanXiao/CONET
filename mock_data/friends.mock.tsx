@@ -1,5 +1,11 @@
 export const MOCK_FRIENDS = [
   {
+    id: "admin",
+    name: "Admin",
+    avatar_icon: "alpha-a-box",
+    icon_background_color: "#562A72",
+  },
+  {
     id: "shaoji",
     name: "烧鸡",
     avatar_icon: "alpha-x-box",

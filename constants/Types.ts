@@ -17,9 +17,7 @@ export interface ChatBoxProps {
   last_message?: string;
   last_message_time?: string;
   avatar_icon: string;
-  icon_color: string;
   icon_background_color: string;
-  icon_border_color: string;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -38,9 +36,7 @@ export interface MessageBubbleProps {
   isReceived: boolean;
   message_content?: string;
   avatar_icon?: string;
-  icon_color?: string;
   icon_background_color?: string;
-  icon_border_color?: string;
   theme_colors?: ThemeColorsProps;
   children?: React.ReactNode;
 }
@@ -49,9 +45,7 @@ export interface MessageBubbleProps {
 export interface UserAvatarProps {
   icon: string;
   icon_size: number;
-  icon_color: string;
   icon_background_color: string;
-  icon_border_color: string;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -92,9 +86,7 @@ export interface FriendProps {
   id: string;
   name: string;
   avatar_icon: string;
-  icon_color: string;
   icon_background_color: string;
-  icon_border_color: string;
   last_message_content: string;
   last_message_timestamp: string;
 }
@@ -109,19 +101,12 @@ export interface FriendsContextProps {
     id: string,
     name: string,
     avatar_icon: string,
-    icon_color: string,
-    icon_background_color: string,
-    icon_border_color: string
+    icon_background_color: string
   ) => void;
 }
 
 export interface InputBarProps {
   friend_id: string;
-  friend_name: string;
-  avatar_icon: string;
-  icon_color: string;
-  icon_background_color: string;
-  icon_border_color: string;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }
 

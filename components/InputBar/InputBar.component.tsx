@@ -52,7 +52,7 @@ const InputBar = (props: InputBarProps) => {
         };
 
         // Update Message Context, Context will store message to local storage for us
-        addMessageById(props.friend_id, formated_message);
+        addMessageById(user?.id || "", props.friend_id, formated_message);
       }
       setMessage("");
     } else {

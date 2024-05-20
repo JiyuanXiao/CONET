@@ -13,7 +13,7 @@ const tableExist = (db: SQLiteDatabase): boolean => {
   }
 };
 
-const createAuthTableIfNotExists = (db: SQLiteDatabase) => {
+export const createAuthTableIfNotExists = (db: SQLiteDatabase) => {
   try {
     if (!tableExist(db)) {
       db.execSync(
@@ -31,7 +31,7 @@ const createAuthTableIfNotExists = (db: SQLiteDatabase) => {
 const deleteAuthTableIfExist = (db: SQLiteDatabase) => {
   try {
     if (tableExist(db)) {
-      db.execSync(`DROP TABLE IF EXISTS friends;`);
+      db.execSync(`DROP TABLE IF EXISTS auth;`);
       console.info(`Table [auth] is deleted successfully...`);
     }
   } catch (err) {
@@ -43,7 +43,9 @@ const deleteAuthTableIfExist = (db: SQLiteDatabase) => {
 
 export const fetchAuthInfo = (db: SQLiteDatabase): UserProps | null => {
   try {
-    const user = db.getFirstSync(`SELECT * FROM auth LIMIT 1;`) as UserProps;
+    const user = db.getFirstSync(
+      `SELECT account_id, name, avatar_icon, icon_background_color FROM auth LIMIT 1;`
+    ) as UserProps;
     return user;
   } catch (err) {
     console.error("at getFirstRow() in authentication.storage.tsx: " + err);

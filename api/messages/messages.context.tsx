@@ -1,5 +1,8 @@
-import React, { createContext, useState, useEffect } from "react";
-import { fetchAllFriends } from "../friends/friends.storage";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import {
+  fetchAllFriends,
+  createFriendTableIfNotExists,
+} from "../friends/friends.storage";
 import {
   messageTableExist,
   fetchAllMessages,
@@ -9,6 +12,8 @@ import {
 } from "./messages.storage";
 import { useSQLiteContext, SQLiteDatabase } from "expo-sqlite";
 import { MessagesProps, MessagesDateabseProps } from "@/constants/Types";
+import { AuthenticationContext } from "../authentication/authentication.context";
+import { UserProps } from "@/constants/Types";
 
 interface MessageContextObjectProps {
   friend_id: string;
@@ -22,7 +27,11 @@ export const MessagesContext = createContext({
   getLoadedMessagesObjectById: (id: string) =>
     undefined as MessageContextObjectProps | undefined,
   loadMessagesById: (id: string) => {},
-  addMessageById: (id: string, message: MessagesDateabseProps) => {},
+  addMessageById: (
+    user_id: string,
+    friend_id: string,
+    message: MessagesDateabseProps
+  ) => {},
   resetLoadedMessagesById: (id: string) => {},
   ClearAllMessagesById: (id: string) => {},
 });
@@ -38,6 +47,7 @@ export const MessagesContext = createContext({
 // RETURN:
 //              return a new message context object in which the required messages have been loaded
 const getLoadedMessages = async (
+  user_id: string,
   friend_id: string,
   messages_object: MessageContextObjectProps,
   num_of_msg_load: number,
@@ -52,7 +62,7 @@ const getLoadedMessages = async (
   ) {
     const start_index = messages_object.current_index;
 
-    const all_messages = await fetchAllMessages(friend_id, db);
+    const all_messages = await fetchAllMessages(user_id, friend_id, db);
 
     const msg_list_len = all_messages.length;
 
@@ -88,13 +98,15 @@ export const MessagesContextProvider = (props: {
   const NUM_OF_LITEMS_TO_LOAD_AT_ONCE = 15;
 
   const db = useSQLiteContext();
+  const { user } = useContext(AuthenticationContext);
 
   const [messages_object_list, setMessagesObjectList] = useState<
     MessageContextObjectProps[]
   >([]);
 
-  const initialSetUpObjectList = async () => {
-    const friends = fetchAllFriends(db);
+  const initialSetUpObjectList = async (user: UserProps) => {
+    createFriendTableIfNotExists(user.id, db);
+    const friends = fetchAllFriends(user.id, db);
     let initialMessagesObjectList: MessageContextObjectProps[] = [];
 
     // Fetach all messages from loacl storage for each friend
@@ -107,9 +119,10 @@ export const MessagesContextProvider = (props: {
       } as MessageContextObjectProps;
 
       // If message data existed already, load the data
-      if (messageTableExist(friend.friend_id, db)) {
+      if (messageTableExist(user.id, friend.friend_id, db)) {
         const is_initial_load = true;
         initial_messages_object = await getLoadedMessages(
+          user.id,
           friend.friend_id,
           initial_messages_object,
           NUM_OF_LITEMS_TO_LOAD_AT_ONCE,
@@ -119,7 +132,7 @@ export const MessagesContextProvider = (props: {
       }
       // If message data doesn't exist, create one in local storage
       else {
-        createMessageTableIfNotExists(friend.friend_id, db);
+        createMessageTableIfNotExists(user.id, friend.friend_id, db);
       }
 
       // Append new messages object to object list
@@ -153,6 +166,7 @@ export const MessagesContextProvider = (props: {
       //Load messages
       const is_initial_load = false;
       const newly_loaded_messages_object = await getLoadedMessages(
+        user?.id || "",
         id,
         target_messages_object,
         NUM_OF_LITEMS_TO_LOAD_AT_ONCE,
@@ -173,14 +187,18 @@ export const MessagesContextProvider = (props: {
   };
 
   // Add a newly sent or recevied message to local storage and context
-  const addMessageById = (id: string, message: MessagesDateabseProps) => {
+  const addMessageById = (
+    user_id: string,
+    friend_id: string,
+    message: MessagesDateabseProps
+  ) => {
     // store new message to local storage
-    const new_message = storeMessage(message);
+    const new_message = storeMessage(user_id, message);
 
     if (new_message) {
       // find the index of original message object
       const target_object_index = messages_object_list.findIndex(
-        (messages_object) => messages_object.friend_id === id
+        (messages_object) => messages_object.friend_id === friend_id
       );
 
       if (target_object_index !== -1) {
@@ -189,7 +207,7 @@ export const MessagesContextProvider = (props: {
 
         // Construct the message object by appending the new message
         const updated_messages_object: MessageContextObjectProps = {
-          friend_id: id,
+          friend_id: friend_id,
           loaded_messages: [
             new_message,
             ...target_messages_object.loaded_messages,
@@ -206,17 +224,17 @@ export const MessagesContextProvider = (props: {
         setMessagesObjectList(updated_messages_object_list);
       } else {
         console.warn(
-          `at addMessageById() in messages.context.tsx: friend_id ${id} DOES NOT EXIST`
+          `at addMessageById() in messages.context.tsx: friend_id ${friend_id} DOES NOT EXIST`
         );
       }
     }
   };
 
   // Use for switching back from chat screen to chat list screen
-  const resetLoadedMessagesById = async (id: string) => {
+  const resetLoadedMessagesById = async (friend_id: string) => {
     // find the index original message object
     const target_object_index = messages_object_list.findIndex(
-      (messages_object) => messages_object.friend_id === id
+      (messages_object) => messages_object.friend_id === friend_id
     );
 
     if (target_object_index !== -1) {
@@ -229,7 +247,7 @@ export const MessagesContextProvider = (props: {
 
       // Construct the messages object in which the number of loaded messages is the default value
       const updated_messages_object: MessageContextObjectProps = {
-        friend_id: id,
+        friend_id: friend_id,
         loaded_messages: target_messages_object.loaded_messages.slice(
           0,
           end_index
@@ -246,11 +264,13 @@ export const MessagesContextProvider = (props: {
     } else {
       try {
         console.info(
-          `Message ojbect with friend_id: ${id} does not xxist in message context`
+          `Message ojbect with friend_id: ${friend_id} does not xxist in message context`
         );
-        console.info(`Creating a new message object with friend_id: ${id}...`);
+        console.info(
+          `Creating a new message object with friend_id: ${friend_id}...`
+        );
         const initial_messages_object = {
-          friend_id: id,
+          friend_id: friend_id,
           loaded_messages: [],
           current_index: 0,
           total_messages_amount: 0,
@@ -259,7 +279,8 @@ export const MessagesContextProvider = (props: {
         // First load
         const is_initial_load = true;
         const newly_loaded_messages_object = await getLoadedMessages(
-          id,
+          user?.id || "",
+          friend_id,
           initial_messages_object,
           NUM_OF_LITEMS_TO_LOAD_AT_ONCE,
           db,
@@ -272,7 +293,7 @@ export const MessagesContextProvider = (props: {
           newly_loaded_messages_object,
         ]);
         console.info(
-          `New message object with friend_id: ${id} is created successfully...`
+          `New message object with friend_id: ${friend_id} is created successfully...`
         );
       } catch (err) {
         console.error(
@@ -282,19 +303,19 @@ export const MessagesContextProvider = (props: {
     }
   };
 
-  const ClearAllMessagesById = async (id: string) => {
-    deleteMessageTableIfExists(id, db);
-    createMessageTableIfNotExists(id, db);
+  const ClearAllMessagesById = async (friend_id: string) => {
+    deleteMessageTableIfExists(user?.id || "", friend_id, db);
+    createMessageTableIfNotExists(user?.id || "", friend_id, db);
 
     // find the index of original message object
     const target_object_index = messages_object_list.findIndex(
-      (messages_object) => messages_object.friend_id === id
+      (messages_object) => messages_object.friend_id === friend_id
     );
 
     if (target_object_index !== -1) {
       // construct a mock messages oject with a empty message list
       let cleared_messages_object: MessageContextObjectProps = {
-        friend_id: id,
+        friend_id: friend_id,
         loaded_messages: [],
         current_index: 0,
         total_messages_amount: 0,
@@ -303,7 +324,8 @@ export const MessagesContextProvider = (props: {
       // update the actual message object statu by loading messages from the local storage
       const is_initial_load = true;
       cleared_messages_object = await getLoadedMessages(
-        id,
+        user?.id || "",
+        friend_id,
         cleared_messages_object,
         NUM_OF_LITEMS_TO_LOAD_AT_ONCE,
         db,
@@ -317,14 +339,16 @@ export const MessagesContextProvider = (props: {
       setMessagesObjectList(updated_messages_object_list);
     } else {
       console.warn(
-        `at ClearAllMessagesById() in messages.context.tsx: friend_id ${id} DOES NOT EXIST`
+        `at ClearAllMessagesById() in messages.context.tsx: friend_id ${friend_id} DOES NOT EXIST`
       );
     }
   };
 
   useEffect(() => {
-    initialSetUpObjectList();
-  }, []);
+    if (user) {
+      initialSetUpObjectList(user);
+    }
+  }, [user]);
 
   return (
     <MessagesContext.Provider

@@ -26,9 +26,7 @@ export const ChatBoxCard: React.FC<ChatBoxProps> = styled(
     <ProfileAvatar
       icon={props.avatar_icon}
       icon_size={55}
-      icon_color={props.icon_color}
       icon_background_color={props.icon_background_color}
-      icon_border_color={props.icon_border_color}
     />
   ),
   right: () => (

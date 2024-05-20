@@ -10,20 +10,11 @@ import { FriendsContext } from "@/api/friends/friends.context";
 
 export default function FriendSettingsScreen() {
   const route = useRoute();
-  const {
-    id,
-    name,
-    avatar_icon,
-    icon_color,
-    icon_background_color,
-    icon_border_color,
-  } = route.params as {
+  const { id, name, avatar_icon, icon_background_color } = route.params as {
     id: string;
     name: string;
     avatar_icon: string;
-    icon_color: string;
     icon_background_color: string;
-    icon_border_color: string;
   };
 
   const {
@@ -75,8 +66,6 @@ export default function FriendSettingsScreen() {
         user_name={name}
         avatar_icon={avatar_icon}
         icon_background_color={icon_background_color}
-        icon_color={icon_color}
-        icon_border_color={icon_border_color}
       />
       <TouchableOpacity
         onPress={() => {

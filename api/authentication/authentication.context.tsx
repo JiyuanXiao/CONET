@@ -5,6 +5,7 @@ import {
   fetchAuthInfo,
   pushAuthInfo,
   clearAuthInfo,
+  createAuthTableIfNotExists,
 } from "./authentication.storage";
 import { userLogin } from "./authentication.api";
 
@@ -39,6 +40,7 @@ export const AuthenticationContextProvider = (props: {
   };
 
   useEffect(() => {
+    createAuthTableIfNotExists(db);
     const user = fetchAuthInfo(db);
     setUser(user);
   }, []);

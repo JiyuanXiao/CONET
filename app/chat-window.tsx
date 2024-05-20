@@ -20,20 +20,11 @@ export default function ChatWindowScreen() {
 
   const navigation = useNavigation();
   const route = useRoute();
-  const {
-    id,
-    name,
-    avatar_icon,
-    icon_color,
-    icon_background_color,
-    icon_border_color,
-  } = route.params as {
+  const { id, name, avatar_icon, icon_background_color } = route.params as {
     id: string;
     name: string;
     avatar_icon: string;
-    icon_color: string;
     icon_background_color: string;
-    icon_border_color: string;
   };
 
   // Display the name on the header
@@ -49,9 +40,7 @@ export default function ChatWindowScreen() {
                 id: id,
                 name: name,
                 avatar_icon: avatar_icon,
-                icon_color: icon_color,
                 icon_background_color: icon_background_color,
-                icon_border_color: icon_border_color,
               },
             });
           }}
@@ -73,20 +62,10 @@ export default function ChatWindowScreen() {
         id={id}
         messageSent={messageSent}
         avatar_icon={avatar_icon}
-        icon_color={icon_color}
         icon_background_color={icon_background_color}
-        icon_border_color={icon_border_color}
         setMessageSent={setMessageSent}
       />
-      <InputBar
-        friend_id={id}
-        friend_name={name}
-        avatar_icon={avatar_icon}
-        icon_color={icon_color}
-        icon_background_color={icon_background_color}
-        icon_border_color={icon_border_color}
-        setMessageSent={setMessageSent}
-      />
+      <InputBar friend_id={id} setMessageSent={setMessageSent} />
     </View>
   );
 }

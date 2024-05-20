@@ -7,13 +7,13 @@ import { AuthenticationContext } from "@/api/authentication/authentication.conte
 export default function SettngScreen() {
   const { colors } = useTheme();
   const { logOut } = useContext(AuthenticationContext);
-  const handleOnPress = () => {
+  const handleLogout = () => {
     logOut();
   };
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.title, { color: colors.text }]}>Setting</Text>
-      <Button onPress={handleOnPress} title="Logout" color="#841584" />
+      <Button onPress={handleLogout} title="Logout" color="#841584" />
     </View>
   );
 }

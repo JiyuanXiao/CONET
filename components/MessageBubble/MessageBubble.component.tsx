@@ -24,18 +24,10 @@ const MessageBubble = (props: MessageBubbleProps) => {
             : user?.avatar_icon ?? "alien"
         }
         icon_size={40}
-        icon_color={
-          props.isReceived ? props.icon_color ?? colors.text : colors.text
-        }
         icon_background_color={
           props.isReceived
             ? props.icon_background_color ?? colors.border
             : user?.icon_background_color ?? colors.border
-        }
-        icon_border_color={
-          props.isReceived
-            ? props.icon_border_color ?? colors.text
-            : colors.text
         }
       />
     </BubbleConatiner>

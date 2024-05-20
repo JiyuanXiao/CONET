@@ -23,9 +23,7 @@ const ChatBox = (props: ChatBoxProps) => {
       last_message={friend?.last_message_content}
       last_message_time={friend?.last_message_timestamp}
       avatar_icon={props.avatar_icon}
-      icon_color={props.icon_color}
       icon_background_color={props.icon_background_color}
-      icon_border_color={props.icon_border_color}
       theme_colors={colors}
     />
   );

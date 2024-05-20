@@ -9,9 +9,7 @@ export const ChatList = (props: {
   id: string;
   messageSent: boolean;
   avatar_icon: string;
-  icon_color: string;
   icon_background_color: string;
-  icon_border_color: string;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [messages, setMessages] = useState<MessagesProps[]>([]);
@@ -61,9 +59,7 @@ export const ChatList = (props: {
           message_content={item.content}
           isReceived={item.receiver_id === user?.id}
           avatar_icon={props.avatar_icon}
-          icon_color={props.icon_color}
           icon_background_color={props.icon_background_color}
-          icon_border_color={props.icon_border_color}
         />
       )}
       keyExtractor={(item) => item.id}
