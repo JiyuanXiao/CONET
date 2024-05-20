@@ -1,11 +1,11 @@
 import React, { createContext, useState, useEffect } from "react";
-import { fetchAllFriends } from "../friends/firends.storage";
+import { fetchAllFriends } from "../friends/friends.storage";
 import {
-  MessageTableExist,
+  messageTableExist,
   fetchAllMessages,
   storeMessage,
-  DeleteMessageTableIfExists,
-  CreateMessageTableIfNotExists,
+  deleteMessageTableIfExists,
+  createMessageTableIfNotExists,
 } from "./messages.storage";
 import { useSQLiteContext, SQLiteDatabase } from "expo-sqlite";
 import { MessagesProps, MessagesDateabseProps } from "@/constants/Types";
@@ -107,7 +107,7 @@ export const MessagesContextProvider = (props: {
       } as MessageContextObjectProps;
 
       // If message data existed already, load the data
-      if (MessageTableExist(friend.friend_id, db)) {
+      if (messageTableExist(friend.friend_id, db)) {
         const is_initial_load = true;
         initial_messages_object = await getLoadedMessages(
           friend.friend_id,
@@ -119,7 +119,7 @@ export const MessagesContextProvider = (props: {
       }
       // If message data doesn't exist, create one in local storage
       else {
-        CreateMessageTableIfNotExists(friend.friend_id, db);
+        createMessageTableIfNotExists(friend.friend_id, db);
       }
 
       // Append new messages object to object list
@@ -283,8 +283,8 @@ export const MessagesContextProvider = (props: {
   };
 
   const ClearAllMessagesById = async (id: string) => {
-    DeleteMessageTableIfExists(id, db);
-    CreateMessageTableIfNotExists(id, db);
+    deleteMessageTableIfExists(id, db);
+    createMessageTableIfNotExists(id, db);
 
     // find the index of original message object
     const target_object_index = messages_object_list.findIndex(

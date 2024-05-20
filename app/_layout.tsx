@@ -1,10 +1,10 @@
 import { ThemeProvider } from "@react-navigation/native";
-import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { DarkTheme, LightTheme } from "@/constants/Theme";
+import App from "./app";
 import { AuthenticationContextProvider } from "@/api/authentication/authentication.context";
 import { SQLiteProvider } from "expo-sqlite";
 import { FriendsContextProvider } from "@/api/friends/friends.context";
@@ -54,53 +54,15 @@ function RootLayoutNav() {
   return (
     <PaperProvider>
       <ThemeProvider value={CurrentTheme}>
-        <AuthenticationContextProvider>
-          <SQLiteProvider databaseName="messages.db">
+        <SQLiteProvider databaseName="messages.db">
+          <AuthenticationContextProvider>
             <FriendsContextProvider>
               <MessagesContextProvider>
-                <Stack
-                  screenOptions={{
-                    headerStyle: {
-                      backgroundColor: CurrentTheme.colors.background,
-                    },
-                  }}
-                >
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ title: "Chats", headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="add-friends"
-                    options={{ title: "添加朋友", presentation: "modal" }}
-                  />
-                  <Stack.Screen
-                    name="add-friend-detail"
-                    options={{
-                      title: "详情",
-                      headerBackTitleVisible: false,
-                      headerTitleAlign: "center",
-                      presentation: "modal",
-                    }}
-                  />
-                  <Stack.Screen
-                    name="friend-settings"
-                    options={{
-                      title: "聊天设置",
-                      headerBackTitleVisible: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    options={{
-                      headerBackTitleVisible: false,
-                      headerTitleAlign: "center",
-                    }}
-                    name="chat-window"
-                  />
-                </Stack>
+                <App />
               </MessagesContextProvider>
             </FriendsContextProvider>
-          </SQLiteProvider>
-        </AuthenticationContextProvider>
+          </AuthenticationContextProvider>
+        </SQLiteProvider>
       </ThemeProvider>
     </PaperProvider>
   );

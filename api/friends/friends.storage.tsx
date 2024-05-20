@@ -15,7 +15,7 @@ const tableExist = (db: SQLiteDatabase): boolean => {
   }
 };
 
-export const CreateFriendTableIfNotExists = (db: SQLiteDatabase) => {
+export const createFriendTableIfNotExists = (db: SQLiteDatabase) => {
   try {
     if (!tableExist(db)) {
       db.execSync(
@@ -32,10 +32,9 @@ export const CreateFriendTableIfNotExists = (db: SQLiteDatabase) => {
 
 export const deleteAllFriends = (db: SQLiteDatabase) => {
   try {
-    db.execSync(`DROP TABLE IF EXISTS chats;`);
     db.execSync(`DROP TABLE IF EXISTS friends;`);
     console.info(`Table [friends] is deleted successfully...`);
-    CreateFriendTableIfNotExists(db);
+    createFriendTableIfNotExists(db);
   } catch (err) {
     console.error(
       "at CreateFriendTableIfNotExists() in friends.storage.tsx: " + err
@@ -52,7 +51,7 @@ export const addNewFriend = (
   icon_border_color: string,
   db: SQLiteDatabase
 ) => {
-  CreateFriendTableIfNotExists(db);
+  createFriendTableIfNotExists(db);
   try {
     const result = db.runSync(
       `INSERT INTO friends (friend_id, friend_name, avatar_icon, icon_color, icon_background_color, icon_border_color ) VALUES (?, ?, ?, ?, ?, ?);`,

@@ -11,7 +11,7 @@ import {
   deleteFriend,
   deleteAllFriends,
   addNewFriend,
-} from "./firends.storage";
+} from "./friends.storage";
 
 export const FriendsContext = createContext<FriendsContextProps>({
   friends: [],

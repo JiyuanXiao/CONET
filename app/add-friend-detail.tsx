@@ -57,7 +57,7 @@ export default function AddFriendDetailScreen() {
         icon_border_color={icon_border_color}
       />
       <TouchableOpacity onPress={handleAddFriend}>
-        <OptionBar content="添加好友" align_self="center" />
+        <OptionBar content="添加联系人" align_self="center" />
       </TouchableOpacity>
     </>
   );

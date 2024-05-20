@@ -94,7 +94,7 @@ export default function FriendSettingsScreen() {
           setActionFunction(() => DeleteFriend);
         }}
       >
-        <OptionBar content="删除好友" />
+        <OptionBar content="删除联系人" />
       </TouchableOpacity>
       <ConfirmDialog
         visible={dialog_visible}

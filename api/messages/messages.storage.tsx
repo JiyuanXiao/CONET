@@ -1,7 +1,7 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { MessagesDateabseProps, MessagesProps } from "@/constants/Types";
 
-export const MessageTableExist = (
+export const messageTableExist = (
   table_id: string,
   db: SQLiteDatabase
 ): boolean => {
@@ -16,7 +16,7 @@ export const MessageTableExist = (
   }
 };
 
-export const CreateMessageTableIfNotExists = (
+export const createMessageTableIfNotExists = (
   table_id: string,
   db: SQLiteDatabase
 ) => {
@@ -32,7 +32,7 @@ export const CreateMessageTableIfNotExists = (
   }
 };
 
-export const DeleteMessageTableIfExists = (
+export const deleteMessageTableIfExists = (
   table_id: string,
   db: SQLiteDatabase
 ) => {

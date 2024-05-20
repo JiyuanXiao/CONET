@@ -76,12 +76,16 @@ export interface MessagesDateabseProps {
 export interface UserProps {
   id: string;
   name: string;
+  avatar_icon: string;
+  icon_background_color: string;
 }
 
 export interface AuthenticationContentProps {
   user: UserProps | null;
   isLoading: boolean;
   error: string;
+  logIn: (id: string, pw: string) => void;
+  logOut: () => void;
 }
 
 export interface FriendProps {
