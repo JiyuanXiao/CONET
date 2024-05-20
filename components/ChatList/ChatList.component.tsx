@@ -57,7 +57,7 @@ export const ChatList = (props: {
       renderItem={({ item }) => (
         <MessageBubble
           message_content={item.content}
-          isReceived={item.receiver_id === user?.id}
+          isReceived={item.receiver_id === user?.account_id}
           avatar_icon={props.avatar_icon}
           icon_background_color={props.icon_background_color}
         />

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { FriendsContextProps, FriendProps } from "@/constants/Types";
+import { FriendsContextProps, FriendProps, UserProps } from "@/constants/Types";
 import { useSQLiteContext } from "expo-sqlite";
 import {
   fetchLatestMessage,
@@ -36,17 +36,26 @@ export const FriendsContextProvider = (props: {
   const db = useSQLiteContext();
   const { user } = useContext(AuthenticationContext);
   const [friends, setFriends] = useState<FriendProps[]>([]);
+  // const [current_user, setCurrentUser] = useState<UserProps | null>(null);
+
+  // useEffect(() => {
+  //   setCurrentUser(user);
+  // }, [user]);
 
   useEffect(() => {
     if (user) {
-      createFriendTableIfNotExists(user.id, db);
+      createFriendTableIfNotExists(user.account_id, db);
       const init_friends = [];
       // Get all friends' id from local storage
-      const friends = fetchAllFriends(user.id, db);
+      const friends = fetchAllFriends(user.account_id, db);
 
       // Collect all friend's last message and its timestamp from local storage
       for (const friend of friends) {
-        const current_msg = fetchLatestMessage(user.id, friend.friend_id, db);
+        const current_msg = fetchLatestMessage(
+          user.account_id,
+          friend.friend_id,
+          db
+        );
         const current_friend = {
           id: friend.friend_id,
           name: friend.friend_name,
@@ -74,7 +83,7 @@ export const FriendsContextProvider = (props: {
   ) => {
     // add friend to local storage
     addNewFriend(
-      user?.id || "",
+      user?.account_id || "",
       id,
       name,
       avatar_icon,
@@ -82,8 +91,8 @@ export const FriendsContextProvider = (props: {
       db
     );
 
-    if (!messageTableExist(user?.id || "", id, db)) {
-      createMessageTableIfNotExists(user?.id || "", id, db);
+    if (!messageTableExist(user?.account_id || "", id, db)) {
+      createMessageTableIfNotExists(user?.account_id || "", id, db);
     }
 
     const new_friend = {
@@ -102,7 +111,11 @@ export const FriendsContextProvider = (props: {
     const targetFriendIndex = friends.findIndex((friend) => friend.id === id);
 
     if (targetFriendIndex !== -1) {
-      const latest_messages = fetchLatestMessage(user?.id || "", id, db);
+      const latest_messages = fetchLatestMessage(
+        user?.account_id || "",
+        id,
+        db
+      );
       const updatedFriend = {
         id: id,
         name: friends[targetFriendIndex].name,
@@ -125,7 +138,7 @@ export const FriendsContextProvider = (props: {
 
   const deleteFriendById = (id: string) => {
     // update local storage
-    deleteFriend(user?.id || "", id, db);
+    deleteFriend(user?.account_id || "", id, db);
 
     // update context
     setFriends(friends.filter((friend) => friend.id !== id));

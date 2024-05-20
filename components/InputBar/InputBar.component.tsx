@@ -44,7 +44,7 @@ const InputBar = (props: InputBarProps) => {
       if (message.length > 0) {
         const formated_message = {
           content: message,
-          sender_id: user?.id || "",
+          sender_id: user?.account_id || "",
           receiver_id: props.friend_id,
           content_type: "text",
           is_recevied: false,
@@ -52,7 +52,11 @@ const InputBar = (props: InputBarProps) => {
         };
 
         // Update Message Context, Context will store message to local storage for us
-        addMessageById(user?.id || "", props.friend_id, formated_message);
+        addMessageById(
+          user?.account_id || "",
+          props.friend_id,
+          formated_message
+        );
       }
       setMessage("");
     } else {

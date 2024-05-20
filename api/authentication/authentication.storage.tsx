@@ -70,13 +70,13 @@ export const pushAuthInfo = (user_info: UserProps, db: SQLiteDatabase) => {
   try {
     db.runSync(
       `INSERT INTO auth (account_id, name, avatar_icon, icon_background_color) VALUES (?, ?, ?, ?);`,
-      user_info.id,
+      user_info.account_id,
       user_info.name,
       user_info.avatar_icon,
       user_info.icon_background_color
     );
     console.log(
-      `User ${user_info.id}'s info is saved to storage succrssfully...`
+      `User ${user_info.account_id}'s info is saved to storage succrssfully...`
     );
   } catch (err) {
     console.error(`at pushAuthInfo() in authentication.storage.tsx: ${err}`);

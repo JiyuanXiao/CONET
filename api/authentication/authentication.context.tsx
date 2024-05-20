@@ -40,8 +40,12 @@ export const AuthenticationContextProvider = (props: {
   };
 
   useEffect(() => {
+    console.info("Start to initialize authentication context");
     createAuthTableIfNotExists(db);
     const user = fetchAuthInfo(db);
+    console.info(
+      "Initialize authentication context successfully: " + user?.account_id
+    );
     setUser(user);
   }, []);
 

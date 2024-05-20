@@ -68,7 +68,7 @@ export interface MessagesDateabseProps {
 }
 
 export interface UserProps {
-  id: string;
+  account_id: string;
   name: string;
   avatar_icon: string;
   icon_background_color: string;

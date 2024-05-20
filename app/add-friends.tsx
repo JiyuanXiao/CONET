@@ -21,7 +21,7 @@ export default function AddFriendsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [doesSearch, setDoesSearch] = useState(false);
   const [searchResult, setSearchResult] = useState<{
-    id: string;
+    account_id: string;
     name: string;
     avatar_icon: string;
     icon_background_color: string;
@@ -29,7 +29,9 @@ export default function AddFriendsScreen() {
 
   const handleSearch = () => {
     if (searchQuery.length > 0) {
-      const result = MOCK_FRIENDS.find((friend) => friend.id === searchQuery);
+      const result = MOCK_FRIENDS.find(
+        (friend) => friend.account_id === searchQuery
+      );
       setDoesSearch(true);
       setSearchResult(result);
     }
@@ -58,7 +60,7 @@ export default function AddFriendsScreen() {
             router.push({
               pathname: "/add-friend-detail",
               params: {
-                id: searchResult.id,
+                id: searchResult.account_id,
                 name: searchResult.name,
                 icon: searchResult.avatar_icon,
                 icon_background_color: searchResult.icon_background_color,
@@ -67,7 +69,7 @@ export default function AddFriendsScreen() {
           }
         >
           <ProfileBar
-            user_id={searchResult.id}
+            user_id={searchResult.account_id}
             user_name={searchResult.name}
             avatar_icon={searchResult.avatar_icon}
             icon_background_color={searchResult.icon_background_color}
