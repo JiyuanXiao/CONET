@@ -13,7 +13,7 @@ export const AuthenticationContext = createContext<AuthenticationContentProps>({
   isLoading: false,
   user: null as UserProps | null,
   error: "",
-  logIn: (id: string, pw: string) => {},
+  logIn: (id: string, pw: string) => false,
   logOut: () => {},
 });
 
@@ -30,8 +30,10 @@ export const AuthenticationContextProvider = (props: {
     const user = userLogin(id, pw);
     if (user) {
       pushAuthInfo(user, db);
+      setUser(user);
+      return true;
     }
-    setUser(user);
+    return false;
   };
 
   const logOut = () => {

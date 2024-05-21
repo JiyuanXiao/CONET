@@ -89,7 +89,6 @@ const InputBar = (props: InputBarProps) => {
             onChangeText={handleChangeText}
             onContentSizeChange={handleContentSizeChange}
           />
-          <StickerIcon {...colors} />
           <SelectPictureIcon {...colors} />
         </InputBox>
       </InputBarContainer>

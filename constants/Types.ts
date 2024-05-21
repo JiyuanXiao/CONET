@@ -78,7 +78,7 @@ export interface AuthenticationContentProps {
   user: UserProps | null;
   isLoading: boolean;
   error: string;
-  logIn: (id: string, pw: string) => void;
+  logIn: (id: string, pw: string) => boolean;
   logOut: () => void;
 }
 
