@@ -21,12 +21,12 @@ export default function AddFriendDetailScreen() {
   const navigation = useNavigation();
 
   const handleAddFriend = () => {
-    console.log("Start adding a new chat: " + id);
+    console.log("AddFriendDetailScreen(): Start adding a new chat: " + id);
     addFriend(id, name, icon, icon_background_color);
-    console.log("Added new chat successfully: " + id);
-    console.log("Start load messages for: " + id);
+    console.log("AddFriendDetailScreen(): Added new chat successfully: " + id);
+    console.log("AddFriendDetailScreen(): Start load messages for: " + id);
     resetLoadedMessagesById(id);
-    console.log("Load messages successfully: " + id);
+    console.log("AddFriendDetailScreen(): Load messages successfully: " + id);
     navigation.dispatch(StackActions.popToTop());
   };
 

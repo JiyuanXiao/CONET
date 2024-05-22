@@ -29,6 +29,7 @@ export const AuthenticationContextProvider = (props: {
   const logIn = (id: string, pw: string) => {
     const user = userLogin(id, pw);
     if (user) {
+      console.info("User " + user.account_id + " loging in...");
       pushAuthInfo(user, db);
       setUser(user);
       return true;
@@ -37,6 +38,7 @@ export const AuthenticationContextProvider = (props: {
   };
 
   const logOut = () => {
+    console.info("User loging out...");
     clearAuthInfo(db);
     setUser(null);
   };

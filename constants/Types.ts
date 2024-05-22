@@ -38,6 +38,7 @@ export interface MessageBubbleProps {
   avatar_icon?: string;
   icon_background_color?: string;
   theme_colors?: ThemeColorsProps;
+  timestamp?: string;
   children?: React.ReactNode;
 }
 
@@ -94,6 +95,8 @@ export interface FriendProps {
 export interface FriendsContextProps {
   friends: FriendProps[];
   setFriends: React.Dispatch<React.SetStateAction<FriendProps[]>>;
+  current_talking_friend_id: string;
+  setCurrentTalkingFriendId: React.Dispatch<React.SetStateAction<string>>;
   getFriendById: (id: string) => FriendProps | undefined;
   updateFriendById: (id: string) => void;
   deleteFriendById: (id: string) => void;

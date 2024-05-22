@@ -4,6 +4,7 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesProps } from "@/constants/Types";
+import { FriendsContext } from "@/api/friends/friends.context";
 
 export const ChatList = (props: {
   id: string;
@@ -22,10 +23,14 @@ export const ChatList = (props: {
   } = useContext(MessagesContext);
   const resetLoadedMessagesByIdRef = useRef(resetLoadedMessagesById);
   const { user } = useContext(AuthenticationContext);
+  const { updateFriendById } = useContext(FriendsContext);
 
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
+    console.log(
+      "ChatList(): calling getLoadedMessagesObjectById() for " + props.id
+    );
     const current_messages_object = getLoadedMessagesObjectById(props.id);
     const current_messages = current_messages_object?.loaded_messages || [];
     setMessages(current_messages);
@@ -45,7 +50,13 @@ export const ChatList = (props: {
   useEffect(() => {
     // This function will be called when the component unmounts
     return () => {
+      console.log(
+        "ChatList(): calling resetLoadedMessagesById() for " + props.id
+      );
       resetLoadedMessagesByIdRef.current(props.id);
+
+      // console.log("ChatList(): calling updateFriendById for " + props.id);
+      // updateFriendById(props.id);
     };
   }, []);
 
@@ -60,10 +71,12 @@ export const ChatList = (props: {
           isReceived={item.receiver_id === user?.account_id}
           avatar_icon={props.avatar_icon}
           icon_background_color={props.icon_background_color}
+          timestamp={item.timestamp}
         />
       )}
       keyExtractor={(item) => item.id}
       onEndReached={() => {
+        console.log("ChatList(): calling loadMessagesById() for " + props.id);
         loadMessagesById(props.id);
       }}
       onEndReachedThreshold={0.05}

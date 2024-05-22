@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components/native";
 import { moderateScale } from "react-native-size-matters";
 import { MessageBubbleProps } from "@/constants/Types";
+import { ThemeColorsProps } from "@/constants/Types";
 
 export const BubbleContent: React.FC<MessageBubbleProps> = styled.Text`
   font-size: 16px;
@@ -33,4 +34,14 @@ export const Bubble: React.FC<MessageBubbleProps> = styled.View`
   border-width: 1px;
   background-color: ${(props) =>
     props.isReceived ? props.theme_colors?.card : props.theme_colors?.primary};
+`;
+
+export const BubbleTime: React.FC<{
+  theme_colors: ThemeColorsProps;
+  children: React.ReactNode;
+}> = styled.Text`
+  color: ${(props) => props.theme_colors.border};
+  font-size: 10px;
+  align-self: flex-end;
+  padding-right: 8px;
 `;

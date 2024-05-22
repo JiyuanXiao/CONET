@@ -52,6 +52,7 @@ const InputBar = (props: InputBarProps) => {
         };
 
         // Update Message Context, Context will store message to local storage for us
+        console.log("InputBar(): calling addMessageById() for " + user?.name);
         addMessageById(
           user?.account_id || "",
           props.friend_id,
@@ -70,11 +71,15 @@ const InputBar = (props: InputBarProps) => {
 
   // update chatbox info
   useEffect(() => {
-    const newMessagesObject = getLoadedMessagesObjectById(props.friend_id);
-    const newMessages = newMessagesObject?.loaded_messages;
-    if (newMessages && newMessages.length > 0) {
-      updateFriendById(props.friend_id);
-    }
+    // console.log(
+    //   "InputBar(): calling getLoadedMessagesObjectById for " + props.friend_id
+    // );
+    // const newMessagesObject = getLoadedMessagesObjectById(props.friend_id);
+    // const newMessages = newMessagesObject?.loaded_messages;
+    // if (newMessages && newMessages.length > 0) {
+    console.log("InputBar(): calling updateFriendById for " + props.friend_id);
+    updateFriendById(props.friend_id);
+    // }
   }, [messages_object_list]);
 
   return (

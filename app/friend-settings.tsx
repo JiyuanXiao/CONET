@@ -31,18 +31,24 @@ export default function FriendSettingsScreen() {
   const navigation = useNavigation();
 
   const ClearChatHistory = () => {
-    console.log("Start to clear chat history for: " + id);
+    console.log(
+      "FriendSettingsScreen(): Start to clear chat history for: " + name
+    );
     ClearAllMessagesById(id);
     updateFriendById(id);
-    console.log("Successfully cleared chat history for: " + id);
+    console.log(
+      "FriendSettingsScreen(): Successfully cleared chat history for: " + name
+    );
 
     navigation.goBack();
   };
 
   const DeleteFriend = () => {
-    console.log("Start to delete friend: " + id);
+    console.log("FriendSettingsScreen(): Start to delete friend: " + name);
     deleteFriendById(id);
-    console.log("Deleted friend " + id + " successfully...");
+    console.log(
+      "FriendSettingsScreen(): Deleted friend " + name + " successfully..."
+    );
 
     navigation.dispatch(StackActions.popToTop());
   };
@@ -56,7 +62,13 @@ export default function FriendSettingsScreen() {
   }, [isConfirm]);
 
   useEffect(() => {
+    console.log(
+      "FriendSettingsScreen(): Start to update chat history for: " + name
+    );
     updateFriendById(id);
+    console.log(
+      "FriendSettingsScreen(): Successfully updated chat history for: " + name
+    );
   }, [messages_object_list]);
 
   return (

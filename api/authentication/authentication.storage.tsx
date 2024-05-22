@@ -46,6 +46,9 @@ export const fetchAuthInfo = (db: SQLiteDatabase): UserProps | null => {
     const user = db.getFirstSync(
       `SELECT account_id, name, avatar_icon, icon_background_color FROM auth LIMIT 1;`
     ) as UserProps;
+    console.info(
+      `User ${user?.name}'s authentication info is fetcehed successfully...`
+    );
     return user;
   } catch (err) {
     console.error("at getFirstRow() in authentication.storage.tsx: " + err);
@@ -59,6 +62,9 @@ export const pushAuthInfo = (user_info: UserProps, db: SQLiteDatabase) => {
       `SELECT COUNT(*) as count FROM auth;`
     );
     if (num_of_login_user !== 0) {
+      console.info(
+        `Table [auth] should be empty but it is not, clearing the [auth] table now...`
+      );
       deleteAuthTableIfExist(db);
       createAuthTableIfNotExists(db);
     }
@@ -75,8 +81,8 @@ export const pushAuthInfo = (user_info: UserProps, db: SQLiteDatabase) => {
       user_info.avatar_icon,
       user_info.icon_background_color
     );
-    console.log(
-      `User ${user_info.account_id}'s info is saved to storage succrssfully...`
+    console.info(
+      `User ${user_info.name}'s info is saved to storage succrssfully...`
     );
   } catch (err) {
     console.error(`at pushAuthInfo() in authentication.storage.tsx: ${err}`);
@@ -84,6 +90,7 @@ export const pushAuthInfo = (user_info: UserProps, db: SQLiteDatabase) => {
 };
 
 export const clearAuthInfo = (db: SQLiteDatabase) => {
+  console.info(`Table [auth] is clearing...`);
   deleteAuthTableIfExist(db);
   createAuthTableIfNotExists(db);
 };

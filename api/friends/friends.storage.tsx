@@ -73,6 +73,9 @@ export const addNewFriend = (
     console.error("at addNewFriend() in friends.storage.tsx: user_id is empty");
     return;
   }
+  console.info(
+    "Start to add new friend " + friend_name + " to storage and context"
+  );
   createFriendTableIfNotExists(user_id, db);
   try {
     const result = db.runSync(

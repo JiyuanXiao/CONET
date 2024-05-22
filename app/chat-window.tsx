@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect, useContext } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import InputBar from "@/components/InputBar/InputBar.component";
@@ -6,6 +6,7 @@ import { useTheme, useRoute, useNavigation } from "@react-navigation/native";
 import { ChatList } from "@/components/ChatList/ChatList.component";
 import { ThemeColorsProps } from "@/constants/Types";
 import { Feather } from "@expo/vector-icons";
+import { FriendsContext } from "@/api/friends/friends.context";
 
 const MoreIcon = (props: { theme_colors: ThemeColorsProps }) => {
   return (
@@ -26,6 +27,8 @@ export default function ChatWindowScreen() {
     avatar_icon: string;
     icon_background_color: string;
   };
+
+  const { setCurrentTalkingFriendId } = useContext(FriendsContext);
 
   // Display the name on the header
   useLayoutEffect(() => {
@@ -50,6 +53,10 @@ export default function ChatWindowScreen() {
       ),
     });
   }, [navigation, name]);
+
+  useEffect(() => {
+    setCurrentTalkingFriendId(id);
+  }, []);
 
   return (
     <View

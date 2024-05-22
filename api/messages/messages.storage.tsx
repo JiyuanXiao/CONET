@@ -34,7 +34,8 @@ export const createMessageTableIfNotExists = (
   }
   try {
     db.execSync(
-      `CREATE TABLE IF NOT EXISTS ${user_id}_messages_${friend_id} (id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id TEXT, receiver_id TEXT, content TEXT, content_type TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);`
+      //`CREATE TABLE IF NOT EXISTS ${user_id}_messages_${friend_id} (id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id TEXT, receiver_id TEXT, content TEXT, content_type TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);`
+      `CREATE TABLE IF NOT EXISTS ${user_id}_messages_${friend_id} (id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id TEXT, receiver_id TEXT, content TEXT, content_type TEXT, timestamp INTEGER);`
     );
     console.info(
       `Table [${user_id}_messages_${friend_id}] is created successfully...`
@@ -119,7 +120,8 @@ export const storeMessage = (
 
   try {
     message.db.runSync(
-      `INSERT INTO ${user_id}_messages_${friend_id} (sender_id, receiver_id, content, content_type) VALUES (?, ?, ?, ?);`,
+      //`INSERT INTO ${user_id}_messages_${friend_id} (sender_id, receiver_id, content, content_type) VALUES (?, ?, ?, ?);`,
+      `INSERT INTO ${user_id}_messages_${friend_id} (sender_id, receiver_id, content, content_type, timestamp) VALUES (?, ?, ?, ?, CAST(strftime('%s', 'now') AS INTEGER));`,
       message.sender_id,
       message.receiver_id,
       message.content,
@@ -156,7 +158,7 @@ export const fetchAllMessages = async (
 
   try {
     const all_msg = (await db.getAllAsync(
-      `SELECT * FROM ${user_id}_messages_${friend_id} ORDER BY id DESC;`
+      `SELECT id , sender_id , receiver_id , content , content_type , datetime(timestamp, 'utc', '-7 hours') as timestamp FROM ${user_id}_messages_${friend_id} ORDER BY id DESC;`
     )) as MessagesProps[];
     if (all_msg) {
       console.info(

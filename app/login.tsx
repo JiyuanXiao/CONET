@@ -22,6 +22,7 @@ export default function LoginScreen() {
 
   const handleOnPress = () => {
     if (id.length > 0 && passwrod.length > 0) {
+      console.log("LoginScreen(): calls logIn() for: " + id);
       const login_success = logIn(id, passwrod);
       if (!login_success) {
         setHelperText("用户ID或密码错误");
@@ -29,6 +30,7 @@ export default function LoginScreen() {
       } else {
         setId("");
         setPasswrod("");
+        console.log("LoginScreen(): " + id + "Login success...");
       }
     } else {
       setHelperText("ID或密码不能空白");

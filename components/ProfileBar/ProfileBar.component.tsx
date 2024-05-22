@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useTheme } from "@react-navigation/native";
 import { ChatBoxProps } from "@/constants/Types";
 import { ProfileBarCard } from "./ProfileBar.styles";

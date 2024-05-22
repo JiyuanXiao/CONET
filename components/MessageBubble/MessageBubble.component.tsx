@@ -1,22 +1,54 @@
 import React, { useContext } from "react";
-import { BubbleContent, BubbleConatiner, Bubble } from "./MessageBubble.styles";
+import { View } from "react-native";
+import {
+  BubbleContent,
+  BubbleConatiner,
+  Bubble,
+  BubbleTime,
+} from "./MessageBubble.styles";
 import BubbleAvatar from "./BubbleAvatar.component";
 import { useTheme } from "@react-navigation/native";
 import { MessageBubbleProps } from "@/constants/Types";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 
+const formatTimestamp = (timestamp: number) => {
+  const now = Date.now();
+  const elapsed_time = now - timestamp * 1000; // Convert to milliseconds
+
+  if (elapsed_time < 365 * 24 * 60 * 60 * 1000) {
+    // Less than one year
+    return new Date(timestamp * 1000).toLocaleString([], {
+      month: "numeric",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } else {
+    // More than a year
+    return new Date(timestamp * 1000).toLocaleString([], {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
+};
+
 const MessageBubble = (props: MessageBubbleProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
 
+  const lastMessageTime = formatTimestamp(Number(props.timestamp));
+
   return (
     <BubbleConatiner isReceived={props.isReceived} theme_colors={colors}>
-      <Bubble isReceived={props.isReceived} theme_colors={colors}>
-        <BubbleContent isReceived={props.isReceived} theme_colors={colors}>
-          {props.message_content}
-        </BubbleContent>
-      </Bubble>
-
+      <View>
+        <Bubble isReceived={props.isReceived} theme_colors={colors}>
+          <BubbleContent isReceived={props.isReceived} theme_colors={colors}>
+            {props.message_content}
+          </BubbleContent>
+        </Bubble>
+        <BubbleTime theme_colors={colors}>{lastMessageTime}</BubbleTime>
+      </View>
       <BubbleAvatar
         icon={
           props.isReceived
