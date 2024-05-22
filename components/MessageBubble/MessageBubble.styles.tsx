@@ -4,7 +4,12 @@ import { moderateScale } from "react-native-size-matters";
 import { MessageBubbleProps } from "@/constants/Types";
 import { ThemeColorsProps } from "@/constants/Types";
 
-export const BubbleContent: React.FC<MessageBubbleProps> = styled.Text`
+export const BubbleContent: React.FC<MessageBubbleProps> = styled.Text.attrs<MessageBubbleProps>(
+  (props) => ({
+    selectable: true,
+    selectionColor: props.theme_colors?.card,
+  })
+)`
   font-size: 16px;
   justify-content: center;
   color: ${(props) => props.theme_colors?.text};

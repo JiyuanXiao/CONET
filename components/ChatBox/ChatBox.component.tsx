@@ -25,7 +25,10 @@ const formatTimestamp = (timestamp: number) => {
     });
   } else {
     // More than a year
-    return new Date(timestamp * 1000).toLocaleString([], { year: "numeric" });
+    return new Date(timestamp * 1000).toLocaleString([], {
+      year: "numeric",
+      month: "short",
+    });
   }
 };
 
