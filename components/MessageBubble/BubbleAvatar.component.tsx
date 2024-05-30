@@ -7,9 +7,9 @@ const BubbleAvatar = (props: UserAvatarProps) => {
   return (
     <BubbleAvatarContainer>
       <ProfileAvatar
-        icon={props.icon}
-        icon_size={props.icon_size}
-        icon_background_color={props.icon_background_color}
+        img_src={props.img_src}
+        size={props.size}
+        is_direct_chat={true}
       />
     </BubbleAvatarContainer>
   );

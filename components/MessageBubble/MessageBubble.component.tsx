@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View } from "react-native";
 import {
   BubbleContent,
@@ -8,16 +8,19 @@ import {
 } from "./MessageBubble.styles";
 import BubbleAvatar from "./BubbleAvatar.component";
 import { useTheme } from "@react-navigation/native";
-import { MessageBubbleProps } from "@/constants/Types";
+import { MessageBubbleProps, MessagesProps } from "@/constants/Types";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
+import { ChatsContext } from "@/api/chats/chats.context";
+import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
 
-const formatTimestamp = (timestamp: number) => {
-  const now = Date.now();
-  const elapsed_time = now - timestamp * 1000; // Convert to milliseconds
+const formatTimestamp = (utc_timestamp: string) => {
+  const dateObj = new Date(utc_timestamp);
+  const now = new Date();
+  const elapsed_time = now.getTime() - dateObj.getTime();
 
   if (elapsed_time < 365 * 24 * 60 * 60 * 1000) {
     // Less than one year
-    return new Date(timestamp * 1000).toLocaleString([], {
+    return dateObj.toLocaleString([], {
       month: "numeric",
       day: "numeric",
       hour: "2-digit",
@@ -25,7 +28,7 @@ const formatTimestamp = (timestamp: number) => {
     });
   } else {
     // More than a year
-    return new Date(timestamp * 1000).toLocaleString([], {
+    return dateObj.toLocaleString([], {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -33,34 +36,61 @@ const formatTimestamp = (timestamp: number) => {
   }
 };
 
-const MessageBubble = (props: MessageBubbleProps) => {
+const MessageBubble = ({
+  chat_id,
+  message_object,
+}: {
+  chat_id: number;
+  message_object: MessagesProps;
+}) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
+  const { chats } = useContext(ChatsContext);
+  const [current_chat_member, setCurrentChatMembers] =
+    useState<CE_ChatMemberProps>();
 
-  const lastMessageTime = formatTimestamp(Number(props.timestamp));
+  const is_received = user?.username !== message_object.sender_username;
+  const lastMessageTime = formatTimestamp(message_object.timestamp);
+
+  useEffect(() => {
+    const current_chat = chats.find(
+      (chat) => chat.id.toString() === chat_id.toString()
+    );
+    if (!current_chat) {
+      console.error(
+        `at MessageBubble() in MessageBubble.component.tsx: chat ${chat_id} is not in chat context`
+      );
+    }
+
+    const target_chat_member = current_chat?.people.find(
+      (chat_member) =>
+        chat_member.person.username === message_object.sender_username
+    );
+    if (target_chat_member) {
+      setCurrentChatMembers(target_chat_member);
+    } else {
+      console.error(
+        `at MessageBubble() in MessageBubble.component.tsx: chat member ${message_object.sender_username} is not in chat context`
+      );
+    }
+  }, []);
 
   return (
-    <BubbleConatiner isReceived={props.isReceived} theme_colors={colors}>
+    <BubbleConatiner isReceived={is_received} theme_colors={colors}>
       <View>
-        <Bubble isReceived={props.isReceived} theme_colors={colors}>
-          <BubbleContent isReceived={props.isReceived} theme_colors={colors}>
-            {props.message_content}
+        <Bubble isReceived={is_received} theme_colors={colors}>
+          <BubbleContent isReceived={is_received} theme_colors={colors}>
+            {message_object.text_content}
           </BubbleContent>
         </Bubble>
         <BubbleTime theme_colors={colors}>{lastMessageTime}</BubbleTime>
       </View>
       <BubbleAvatar
-        icon={
-          props.isReceived
-            ? props.avatar_icon ?? "alien"
-            : user?.avatar_icon ?? "alien"
+        img_src={
+          current_chat_member?.person.avatar ||
+          "../../assets/avatars/avatar_1.png"
         }
-        icon_size={40}
-        icon_background_color={
-          props.isReceived
-            ? props.icon_background_color ?? colors.border
-            : user?.icon_background_color ?? colors.border
-        }
+        size={40}
       />
     </BubbleConatiner>
   );

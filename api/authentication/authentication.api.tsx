@@ -1,9 +1,16 @@
 import React from "react";
-import { MOCK_USERS_AUTH } from "@/mock_data/users.mock";
+import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 
-export const userLogin = (id: string, pw: string) => {
-  const result = MOCK_USERS_AUTH.find((user) => user.account_id === id);
-  if (result?.passwrod === pw) {
+const MOCK_USERS_AUTH = require("../../mock_data/users.mock.json");
+
+export const GetMyAccount = (
+  username: string,
+  pw: string
+): CE_UserProps | null => {
+  const result = MOCK_USERS_AUTH.find(
+    (user: CE_UserProps) => user.username === username
+  );
+  if (result?.secret === pw) {
     return result;
   }
   return null;

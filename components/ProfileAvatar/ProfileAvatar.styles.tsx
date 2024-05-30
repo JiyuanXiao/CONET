@@ -2,17 +2,16 @@ import styled from "styled-components";
 import { Avatar } from "react-native-paper";
 import { UserAvatarProps } from "@/constants/Types";
 import { default_theme } from "@/constants/Colors";
+import { Image } from "react-native";
 
 export const ProfileAvatarIcon: React.FC<UserAvatarProps> = styled(
-  Avatar.Icon
+  Avatar.Image
 ).attrs<UserAvatarProps>((props) => ({
-  icon: props.icon,
-  size: props.icon_size,
-  color: props.theme_colors?.text ?? default_theme.TEXT,
-}))`
-  border-style: solid;
-  border-radius: 10px;
-  border-width: 2px;
-  background-color: ${(props) => props.icon_background_color};
-  border-color: ${(props) => props.theme_colors?.text ?? default_theme.TEXT};
-`;
+  source: props.is_direct_chat
+    ? { uri: props.img_src }
+    : require("@/assets/avatars/group_chat_avatar.png"),
+  //{ uri: props.img_src },
+  //source: require(props.img_src),
+
+  size: props.size,
+}))``;

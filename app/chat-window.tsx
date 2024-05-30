@@ -6,7 +6,7 @@ import { useTheme, useRoute, useNavigation } from "@react-navigation/native";
 import { ChatList } from "@/components/ChatList/ChatList.component";
 import { ThemeColorsProps } from "@/constants/Types";
 import { Feather } from "@expo/vector-icons";
-import { FriendsContext } from "@/api/friends/friends.context";
+import { ChatsContext } from "@/api/chats/chats.context";
 
 const MoreIcon = (props: { theme_colors: ThemeColorsProps }) => {
   return (
@@ -21,14 +21,13 @@ export default function ChatWindowScreen() {
 
   const navigation = useNavigation();
   const route = useRoute();
-  const { id, name, avatar_icon, icon_background_color } = route.params as {
-    id: string;
+  const { chat_id, name, avatar_img_src } = route.params as {
+    chat_id: number;
     name: string;
-    avatar_icon: string;
-    icon_background_color: string;
+    avatar_img_src: string;
   };
 
-  const { setCurrentTalkingFriendId } = useContext(FriendsContext);
+  const { setCurrentTalkingChatId } = useContext(ChatsContext);
 
   // Display the name on the header
   useLayoutEffect(() => {
@@ -38,12 +37,9 @@ export default function ChatWindowScreen() {
         <TouchableOpacity
           onPress={() => {
             router.push({
-              pathname: "/friend-settings",
+              pathname: "/chat-settings",
               params: {
-                id: id,
-                name: name,
-                avatar_icon: avatar_icon,
-                icon_background_color: icon_background_color,
+                chat_id: chat_id,
               },
             });
           }}
@@ -55,7 +51,7 @@ export default function ChatWindowScreen() {
   }, [navigation, name]);
 
   useEffect(() => {
-    setCurrentTalkingFriendId(id);
+    setCurrentTalkingChatId(chat_id);
   }, []);
 
   return (
@@ -66,13 +62,11 @@ export default function ChatWindowScreen() {
       }}
     >
       <ChatList
-        id={id}
+        chat_id={chat_id}
         messageSent={messageSent}
-        avatar_icon={avatar_icon}
-        icon_background_color={icon_background_color}
         setMessageSent={setMessageSent}
       />
-      <InputBar friend_id={id} setMessageSent={setMessageSent} />
+      <InputBar chat_id={chat_id} setMessageSent={setMessageSent} />
     </View>
   );
 }

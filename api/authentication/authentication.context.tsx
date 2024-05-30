@@ -1,61 +1,84 @@
 import React, { useState, createContext, useEffect } from "react";
-import { useSQLiteContext } from "expo-sqlite";
 import { AuthenticationContentProps, UserProps } from "@/constants/Types";
 import {
-  fetchAuthInfo,
-  pushAuthInfo,
-  clearAuthInfo,
-  createAuthTableIfNotExists,
+  storeAuthenticatedUser,
+  fetchAuthenticatedUser,
+  removeAuthenticatedUser,
 } from "./authentication.storage";
-import { userLogin } from "./authentication.api";
+import { GetMyAccount } from "./authentication.api";
+import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
+import { updateId } from "expo-updates";
 
 export const AuthenticationContext = createContext<AuthenticationContentProps>({
   isLoading: false,
-  user: null as UserProps | null,
+  user: null as CE_UserProps | null,
   error: "",
-  logIn: (id: string, pw: string) => false,
-  logOut: () => {},
+  is_authentication_initialized: false,
+  logIn: async (id: string, pw: string) => false,
+  logOut: async () => {},
 });
 
 export const AuthenticationContextProvider = (props: {
   children: React.ReactNode;
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<UserProps | null>(null);
+  const [user, setUser] = useState<CE_UserProps | null>(null);
   const [error, setError] = useState<string>("");
+  const [is_authentication_initialized, setIsAuthenticationInitialized] =
+    useState<boolean>(false);
 
-  const db = useSQLiteContext();
-
-  const logIn = (id: string, pw: string) => {
-    const user = userLogin(id, pw);
-    if (user) {
-      console.info("User " + user.account_id + " loging in...");
-      pushAuthInfo(user, db);
-      setUser(user);
+  const logIn = async (username: string, pw: string) => {
+    const curr_user = GetMyAccount(username, pw);
+    if (curr_user) {
+      console.info("User " + curr_user.username + " loging in...");
+      curr_user.secret = pw;
+      await storeAuthenticatedUser(curr_user);
+      setUser(curr_user);
+      setIsAuthenticationInitialized(true);
       return true;
     }
+    console.warn("Username or password incorrect");
+    setIsAuthenticationInitialized(false);
     return false;
   };
 
-  const logOut = () => {
+  const logOut = async () => {
     console.info("User loging out...");
-    clearAuthInfo(db);
+    setIsAuthenticationInitialized(false);
+    await removeAuthenticatedUser();
     setUser(null);
   };
 
-  useEffect(() => {
+  const initializeUserData = async () => {
     console.info("Start to initialize authentication context");
-    createAuthTableIfNotExists(db);
-    const user = fetchAuthInfo(db);
-    console.info(
-      "Initialize authentication context successfully: " + user?.account_id
-    );
-    setUser(user);
+    const curr_user = await fetchAuthenticatedUser();
+    if (curr_user) {
+      const updated_user = GetMyAccount(curr_user.username, curr_user.secret);
+      setUser(updated_user);
+      setIsAuthenticationInitialized(true);
+      console.info(
+        "Initialize authentication context successfully: " + curr_user?.username
+      );
+    } else {
+      console.log("No user info in storage. Waiting for login...");
+      setIsAuthenticationInitialized(false);
+    }
+  };
+
+  useEffect(() => {
+    initializeUserData();
   }, []);
 
   return (
     <AuthenticationContext.Provider
-      value={{ isLoading, user, error, logIn, logOut }}
+      value={{
+        isLoading,
+        user,
+        error,
+        is_authentication_initialized,
+        logIn,
+        logOut,
+      }}
     >
       {props.children}
     </AuthenticationContext.Provider>

@@ -77,7 +77,7 @@ export default function TabLayout() {
             <ChatsTabIcon focused={focused} theme_colors={colors} />
           ),
           headerRight: () => (
-            <Link href="/add-friends" asChild>
+            <Link href="/add-contact" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <AddUserIcon theme_colors={colors} pressed={pressed} />

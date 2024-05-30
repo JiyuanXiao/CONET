@@ -1,4 +1,5 @@
 import { SQLiteDatabase } from "expo-sqlite";
+import { CE_UserProps, CE_ChatProps } from "./ChatEngineObjectTypes";
 
 // Theme props
 export interface ThemeColorsProps {
@@ -12,12 +13,12 @@ export interface ThemeColorsProps {
 
 // ChatBox Components props
 export interface ChatBoxProps {
-  user_id: string;
-  user_name: string;
-  last_message?: string;
-  last_message_time?: string;
-  avatar_icon: string;
-  icon_background_color: string;
+  chat_id: number;
+  chat_title: string;
+  last_message: string;
+  last_message_time: string;
+  avatar_img_src: string;
+  is_direct_chat?: boolean;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -35,8 +36,7 @@ export interface TextInputBarProps {
 export interface MessageBubbleProps {
   isReceived: boolean;
   message_content?: string;
-  avatar_icon?: string;
-  icon_background_color?: string;
+  avatar_img_src?: string;
   theme_colors?: ThemeColorsProps;
   timestamp?: string;
   children?: React.ReactNode;
@@ -44,72 +44,74 @@ export interface MessageBubbleProps {
 
 // Avatar Components props
 export interface UserAvatarProps {
-  icon: string;
-  icon_size: number;
-  icon_background_color: string;
+  img_src: string;
+  size: number;
+  is_direct_chat?: boolean;
   theme_colors?: ThemeColorsProps;
 }
 
+export interface MessagesDateabseProps {
+  message_id: number;
+  sender_username: string;
+  text_content: string;
+  file_url: string;
+  content_type: string;
+  timestamp: string;
+  db: SQLiteDatabase;
+}
+
 export interface MessagesProps {
-  id: number;
-  content: string;
-  sender_id: string;
-  receiver_id: string;
+  message_id: number;
+  sender_username: string;
+  text_content: string;
+  file_url: string;
   content_type: string;
   timestamp: string;
 }
 
-export interface MessagesDateabseProps {
-  content: string;
-  sender_id: string;
-  receiver_id: string;
-  content_type: string;
-  is_recevied: boolean;
-  db: SQLiteDatabase;
+export interface MessageContextObjectProps {
+  chat_id: number;
+  loaded_messages: MessagesProps[];
+  current_index: number; // THis is the first unloaded messages index
+  total_messages_amount: number;
 }
 
 export interface UserProps {
   account_id: string;
   name: string;
-  avatar_icon: string;
-  icon_background_color: string;
+  avatar_img_src: string;
 }
 
 export interface AuthenticationContentProps {
-  user: UserProps | null;
+  user: CE_UserProps | null;
   isLoading: boolean;
   error: string;
-  logIn: (id: string, pw: string) => boolean;
-  logOut: () => void;
+  is_authentication_initialized: boolean;
+  logIn: (id: string, pw: string) => Promise<boolean>;
+  logOut: () => Promise<void>;
 }
 
-export interface FriendProps {
-  id: string;
-  name: string;
-  avatar_icon: string;
-  icon_background_color: string;
-  last_message_content: string;
+export interface ChatProps {
+  chat_id: number;
+  chat_name: string;
+  avatar_img_src: string;
+  last_message: string;
   last_message_timestamp: string;
 }
 
-export interface FriendsContextProps {
-  friends: FriendProps[];
-  setFriends: React.Dispatch<React.SetStateAction<FriendProps[]>>;
-  current_talking_friend_id: string;
-  setCurrentTalkingFriendId: React.Dispatch<React.SetStateAction<string>>;
-  getFriendById: (id: string) => FriendProps | undefined;
-  updateFriendById: (id: string) => void;
-  deleteFriendById: (id: string) => void;
-  addFriend: (
-    id: string,
-    name: string,
-    avatar_icon: string,
-    icon_background_color: string
-  ) => void;
+export interface ChatsContextProps {
+  chats: CE_ChatProps[];
+  setChats: React.Dispatch<React.SetStateAction<CE_ChatProps[]>>;
+  current_talking_chat_id: number;
+  setCurrentTalkingChatId: React.Dispatch<React.SetStateAction<number>>;
+  is_chats_initialized: boolean;
+  addChat: (chat_object: CE_ChatProps) => void;
+  updateChat: (chat_object: CE_ChatProps) => void;
+  deleteChat: (chat_id: number) => void;
 }
 
 export interface InputBarProps {
-  friend_id: string;
+  chat_id: number;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -126,3 +128,11 @@ export type ConfirmDialogProps = {
   setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
   setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+export interface ProfileBarProps {
+  contact_id?: number;
+  contact_alias: string;
+  contact_username: string;
+  avatar_img_src: string;
+  theme_colors?: ThemeColorsProps;
+}

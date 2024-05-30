@@ -2,16 +2,16 @@ import React from "react";
 import { useTheme } from "@react-navigation/native";
 import { ChatBoxProps } from "@/constants/Types";
 import { ProfileBarCard } from "./ProfileBar.styles";
+import { ProfileBarProps } from "@/constants/Types";
 
-const ProfileBar = (props: ChatBoxProps) => {
+const ProfileBar = (props: ProfileBarProps) => {
   const { colors } = useTheme();
 
   return (
     <ProfileBarCard
-      user_id={props.user_id}
-      user_name={props.user_name}
-      avatar_icon={props.avatar_icon}
-      icon_background_color={props.icon_background_color}
+      contact_alias={props.contact_alias}
+      contact_username={props.contact_username}
+      avatar_img_src={props.avatar_img_src}
       theme_colors={colors}
     />
   );

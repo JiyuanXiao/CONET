@@ -7,7 +7,7 @@ import { DarkTheme, LightTheme } from "@/constants/Theme";
 import App from "./app";
 import { AuthenticationContextProvider } from "@/api/authentication/authentication.context";
 import { SQLiteProvider } from "expo-sqlite";
-import { FriendsContextProvider } from "@/api/friends/friends.context";
+import { ChatsContextProvider } from "@/api/chats/chats.context";
 import { MessagesContextProvider } from "@/api/messages/messages.context";
 import "react-native-reanimated";
 
@@ -56,11 +56,11 @@ function RootLayoutNav() {
       <ThemeProvider value={CurrentTheme}>
         <SQLiteProvider databaseName="messages.db">
           <AuthenticationContextProvider>
-            <FriendsContextProvider>
+            <ChatsContextProvider>
               <MessagesContextProvider>
                 <App />
               </MessagesContextProvider>
-            </FriendsContextProvider>
+            </ChatsContextProvider>
           </AuthenticationContextProvider>
         </SQLiteProvider>
       </ThemeProvider>

@@ -7,10 +7,10 @@ const ProfileAvatar = (props: UserAvatarProps) => {
   const { colors } = useTheme();
   return (
     <ProfileAvatarIcon
-      icon={props.icon}
-      icon_size={props.icon_size}
-      icon_background_color={props.icon_background_color}
+      img_src={props.img_src}
+      size={props.size}
       theme_colors={colors}
+      is_direct_chat={props.is_direct_chat}
     />
   );
 };

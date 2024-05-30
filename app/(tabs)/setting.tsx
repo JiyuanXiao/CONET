@@ -13,13 +13,14 @@ export default function SettngScreen() {
     console.log("SettingScreen() in setting.tsx is calling logOut()");
     logOut();
   };
+
   return (
     <ScrollView>
       <ProfileBar
-        user_id={user?.account_id || ""}
-        user_name={user?.name || ""}
-        avatar_icon={user?.avatar_icon || "alien"}
-        icon_background_color={user?.icon_background_color || colors.border}
+        contact_id={user?.id || 0}
+        contact_alias={user?.first_name || ""}
+        contact_username={user?.username || ""}
+        avatar_img_src={user?.avatar || "@/assets/avatars/avatar_1.png"}
       />
       <TouchableOpacity onPress={handleLogout}>
         <OptionBar content="退出登录" align_self="center" />

@@ -4,12 +4,15 @@ import { Card } from "react-native-paper";
 import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar.component";
 import { ChatBoxProps } from "@/constants/Types";
 import { default_theme } from "@/constants/Colors";
+import { ProfileBarProps } from "@/constants/Types";
 
-export const ProfileBarCard: React.FC<ChatBoxProps> = styled(
+export const ProfileBarCard: React.FC<ProfileBarProps> = styled(
   Card.Title
-).attrs<ChatBoxProps>((props) => ({
-  title: props.user_name,
-  subtitle: "ID: " + props.user_id,
+).attrs<ProfileBarProps>((props) => ({
+  title: props.contact_alias,
+  subtitle: props.contact_id
+    ? `ID: ${props.contact_id} `
+    : `用户名: ${props.contact_username}`,
   titleStyle: {
     fontSize: 17,
     fontWeight: "bold",
@@ -23,9 +26,9 @@ export const ProfileBarCard: React.FC<ChatBoxProps> = styled(
   },
   left: () => (
     <ProfileAvatar
-      icon={props.avatar_icon}
-      icon_size={65}
-      icon_background_color={props.icon_background_color}
+      img_src={props.avatar_img_src}
+      size={65}
+      is_direct_chat={true}
     />
   ),
 }))`

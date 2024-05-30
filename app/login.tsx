@@ -13,27 +13,27 @@ import { Entypo } from "@expo/vector-icons";
 
 export default function LoginScreen() {
   const { colors } = useTheme();
-  const [id, setId] = useState("");
+  const [username, setUsername] = useState("");
   const [passwrod, setPasswrod] = useState("");
   const [password_invisiable, setPasswordInvisiable] = useState(true);
   const [helpertext_visiable, setHelperTextVisiable] = useState(false);
   const [helpertext, setHelperText] = useState("");
   const { logIn } = useContext(AuthenticationContext);
 
-  const handleOnPress = () => {
-    if (id.length > 0 && passwrod.length > 0) {
-      console.log("LoginScreen(): calls logIn() for: " + id);
-      const login_success = logIn(id, passwrod);
+  const handleOnPress = async () => {
+    if (username.length > 0 && passwrod.length > 0) {
+      console.log("LoginScreen(): calls logIn() for: " + username);
+      const login_success = await logIn(username, passwrod);
       if (!login_success) {
-        setHelperText("用户ID或密码错误");
+        setHelperText("用户名或密码错误");
         setHelperTextVisiable(true);
       } else {
-        setId("");
+        setUsername("");
         setPasswrod("");
-        console.log("LoginScreen(): " + id + "Login success...");
+        console.log("LoginScreen(): " + username + " Login success...");
       }
     } else {
-      setHelperText("ID或密码不能空白");
+      setHelperText("用户名或密码不能空白");
       setHelperTextVisiable(true);
     }
   };
@@ -43,7 +43,7 @@ export default function LoginScreen() {
   };
 
   const onChangeId = (text: string) => {
-    setId(text);
+    setUsername(text);
     setHelperText("");
     setHelperTextVisiable(false);
   };
@@ -66,8 +66,8 @@ export default function LoginScreen() {
             mode={"outlined"}
             style={[styles.input]}
             onChangeText={onChangeId}
-            value={id}
-            placeholder="用户ID"
+            value={username}
+            placeholder="用户名"
             outlineColor="black"
             activeOutlineColor={colors.primary}
             textColor="black"

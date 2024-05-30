@@ -4,13 +4,10 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesProps } from "@/constants/Types";
-import { FriendsContext } from "@/api/friends/friends.context";
 
 export const ChatList = (props: {
-  id: string;
+  chat_id: number;
   messageSent: boolean;
-  avatar_icon: string;
-  icon_background_color: string;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [messages, setMessages] = useState<MessagesProps[]>([]);
@@ -23,15 +20,15 @@ export const ChatList = (props: {
   } = useContext(MessagesContext);
   const resetLoadedMessagesByIdRef = useRef(resetLoadedMessagesById);
   const { user } = useContext(AuthenticationContext);
-  const { updateFriendById } = useContext(FriendsContext);
 
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     console.log(
-      "ChatList(): calling getLoadedMessagesObjectById() for " + props.id
+      "ChatList(): calling getLoadedMessagesObjectById() for " + props.chat_id
     );
-    const current_messages_object = getLoadedMessagesObjectById(props.id);
+
+    const current_messages_object = getLoadedMessagesObjectById(props.chat_id);
     const current_messages = current_messages_object?.loaded_messages || [];
     setMessages(current_messages);
 
@@ -51,12 +48,9 @@ export const ChatList = (props: {
     // This function will be called when the component unmounts
     return () => {
       console.log(
-        "ChatList(): calling resetLoadedMessagesById() for " + props.id
+        "ChatList(): calling resetLoadedMessagesById() for " + props.chat_id
       );
-      resetLoadedMessagesByIdRef.current(props.id);
-
-      // console.log("ChatList(): calling updateFriendById for " + props.id);
-      // updateFriendById(props.id);
+      resetLoadedMessagesByIdRef.current(props.chat_id);
     };
   }, []);
 
@@ -65,19 +59,15 @@ export const ChatList = (props: {
       inverted
       ref={flatListRef}
       data={messages}
-      renderItem={({ item }) => (
-        <MessageBubble
-          message_content={item.content}
-          isReceived={item.receiver_id === user?.account_id}
-          avatar_icon={props.avatar_icon}
-          icon_background_color={props.icon_background_color}
-          timestamp={item.timestamp}
-        />
+      renderItem={({ item }: { item: MessagesProps }) => (
+        <MessageBubble chat_id={props.chat_id} message_object={item} />
       )}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.message_id.toString()}
       onEndReached={() => {
-        console.log("ChatList(): calling loadMessagesById() for " + props.id);
-        loadMessagesById(props.id);
+        console.log(
+          "ChatList(): calling loadMessagesById() for " + props.chat_id
+        );
+        loadMessagesById(props.chat_id);
       }}
       onEndReachedThreshold={0.05}
     />

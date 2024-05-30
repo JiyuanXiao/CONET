@@ -20,11 +20,11 @@ const App = () => {
         options={{ title: "Chats", headerShown: false }}
       />
       <Stack.Screen
-        name="add-friends"
+        name="add-contact"
         options={{ title: "添加联系人", presentation: "modal" }}
       />
       <Stack.Screen
-        name="add-friend-detail"
+        name="add-contact-detail"
         options={{
           title: "详情",
           headerBackTitleVisible: false,
@@ -33,7 +33,7 @@ const App = () => {
         }}
       />
       <Stack.Screen
-        name="friend-settings"
+        name="chat-settings"
         options={{
           title: "聊天设置",
           headerBackTitleVisible: false,

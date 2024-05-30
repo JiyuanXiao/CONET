@@ -9,7 +9,7 @@ import { default_theme } from "@/constants/Colors";
 export const ChatBoxCard: React.FC<ChatBoxProps> = styled(
   Card.Title
 ).attrs<ChatBoxProps>((props) => ({
-  title: props.user_name,
+  title: props.chat_title,
   subtitle: props.last_message,
   titleStyle: {
     fontSize: 17,
@@ -24,9 +24,9 @@ export const ChatBoxCard: React.FC<ChatBoxProps> = styled(
   },
   left: () => (
     <ProfileAvatar
-      icon={props.avatar_icon}
-      icon_size={55}
-      icon_background_color={props.icon_background_color}
+      img_src={props.avatar_img_src}
+      size={55}
+      is_direct_chat={props.is_direct_chat}
     />
   ),
   right: () => (

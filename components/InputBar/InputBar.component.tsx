@@ -6,7 +6,6 @@ import { TextInput } from "./InputBar.styles";
 import { ThemeColorsProps, InputBarProps } from "@/constants/Types";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { useSQLiteContext } from "expo-sqlite";
-import { FriendsContext } from "@/api/friends/friends.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
@@ -31,8 +30,7 @@ const InputBar = (props: InputBarProps) => {
   const [inputHeight, setInputHeight] = useState(0);
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
-  const { updateFriendById } = useContext(FriendsContext);
-  const { messages_object_list, addMessageById, getLoadedMessagesObjectById } =
+  const { messages_object_list, sendMessage, getLoadedMessagesObjectById } =
     useContext(MessagesContext);
   const db = useSQLiteContext();
 
@@ -42,22 +40,21 @@ const InputBar = (props: InputBarProps) => {
       props.setMessageSent(true);
 
       if (message.length > 0) {
-        const formated_message = {
-          content: message,
-          sender_id: user?.account_id || "",
-          receiver_id: props.friend_id,
-          content_type: "text",
-          is_recevied: false,
-          db: db,
-        };
-
-        // Update Message Context, Context will store message to local storage for us
-        console.log("InputBar(): calling addMessageById() for " + user?.name);
-        addMessageById(
-          user?.account_id || "",
-          props.friend_id,
-          formated_message
-        );
+        if (user) {
+          // Update Message Context, Context will store message to local storage for us
+          console.log(
+            "InputBar(): calling sendMessage() for " + user?.username
+          );
+          sendMessage(
+            props.chat_id,
+            user.username,
+            message,
+            null,
+            Date.now().toString()
+          );
+        } else {
+          console.error("InputBar(): User is undefined");
+        }
       }
       setMessage("");
     } else {
@@ -70,17 +67,7 @@ const InputBar = (props: InputBarProps) => {
   };
 
   // update chatbox info
-  useEffect(() => {
-    // console.log(
-    //   "InputBar(): calling getLoadedMessagesObjectById for " + props.friend_id
-    // );
-    // const newMessagesObject = getLoadedMessagesObjectById(props.friend_id);
-    // const newMessages = newMessagesObject?.loaded_messages;
-    // if (newMessages && newMessages.length > 0) {
-    console.log("InputBar(): calling updateFriendById for " + props.friend_id);
-    updateFriendById(props.friend_id);
-    // }
-  }, [messages_object_list]);
+  useEffect(() => {}, [messages_object_list]);
 
   return (
     <>

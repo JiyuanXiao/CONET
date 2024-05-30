@@ -4,7 +4,7 @@ import { useTheme } from "@react-navigation/native";
 import { Searchbar, Card } from "react-native-paper";
 import { router } from "expo-router";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
-import { MOCK_FRIENDS } from "@/mock_data/friends.mock";
+import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 
 interface FriendProps {
   id: string;
@@ -15,26 +15,21 @@ interface FriendProps {
   icon_border_color: string;
 }
 
-export default function AddFriendsScreen() {
+export default function AddContactScreen() {
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [doesSearch, setDoesSearch] = useState(false);
-  const [searchResult, setSearchResult] = useState<{
-    account_id: string;
-    name: string;
-    avatar_icon: string;
-    icon_background_color: string;
-  }>();
+  const [searchResult, setSearchResult] = useState<CE_UserProps>();
 
   const handleSearch = () => {
-    if (searchQuery.length > 0) {
-      const result = MOCK_FRIENDS.find(
-        (friend) => friend.account_id === searchQuery
-      );
-      setDoesSearch(true);
-      setSearchResult(result);
-    }
+    // if (searchQuery.length > 0) {
+    //   const result = MOCK_FRIENDS.find(
+    //     (friend) => friend.account_id === searchQuery
+    //   );
+    //   setDoesSearch(true);
+    //   setSearchResult(result);
+    // }
   };
 
   const handleClearText = () => {
@@ -58,21 +53,21 @@ export default function AddFriendsScreen() {
         <TouchableOpacity
           onPress={() =>
             router.push({
-              pathname: "/add-friend-detail",
+              pathname: "/add-contact-detail",
               params: {
-                id: searchResult.account_id,
-                name: searchResult.name,
-                icon: searchResult.avatar_icon,
-                icon_background_color: searchResult.icon_background_color,
+                contact_id: searchResult.id,
+                contact_alias: searchResult.first_name,
+                contact_username: searchResult.username,
+                avatar_img_src: searchResult.avatar,
               },
             })
           }
         >
           <ProfileBar
-            user_id={searchResult.account_id}
-            user_name={searchResult.name}
-            avatar_icon={searchResult.avatar_icon}
-            icon_background_color={searchResult.icon_background_color}
+            contact_id={searchResult.id}
+            contact_alias={searchResult.first_name}
+            contact_username={searchResult.username}
+            avatar_img_src={searchResult.avatar}
           />
         </TouchableOpacity>
       ) : (
