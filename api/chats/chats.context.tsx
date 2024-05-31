@@ -35,7 +35,10 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
       const chat_server_connected = true;
       if (chat_server_connected) {
         console.log("Start to fetch chats' data from server...");
-        const new_chats = ChatServer.GetMyChats(user.username, user.secret);
+        const new_chats = await ChatServer.GetMyChats(
+          user.username,
+          user.secret
+        );
         setChats(new_chats);
         console.log("Update new chat data to local storage...");
         for (const chat of new_chats) {

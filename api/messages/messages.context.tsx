@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import * as ChatStorage from "../chats/chats.storage";
 import * as MessagesStorage from "./messages.storage";
-import * as ChatServer from "../chats/chats.api";
+import * as ChatServer from "@/api/chats/chats.api";
+import * as MessageServer from "@/api/messages/messages.api";
 import { useSQLiteContext, SQLiteDatabase } from "expo-sqlite";
 import { MessageContextObjectProps } from "@/constants/Types";
 import { AuthenticationContext } from "../authentication/authentication.context";
@@ -396,12 +397,14 @@ export const MessagesContextProvider = (props: {
             user.username,
             chat.id
           );
-          const ce_message_object_list = ChatServer.GetUnreadChatMessages(
-            user.username,
-            user.secret,
-            chat.id,
-            last_read
-          );
+          const ce_message_object_list =
+            await MessageServer.GetUnreadChatMessages(
+              user.username,
+              user.secret,
+              chat.id,
+              last_read
+            );
+
           if (!MessagesStorage.messageTableExist(user.username, chat.id, db)) {
             MessagesStorage.createMessageTableIfNotExists(
               user.username,
@@ -409,16 +412,26 @@ export const MessagesContextProvider = (props: {
               db
             );
           }
+          let latest_message_id = last_read;
           for (const ce_message_object of ce_message_object_list) {
             if (ce_message_object.id > last_read) {
-              console.log(ce_message_object.text);
               MessagesStorage.storeMessage(
                 user.username,
                 chat.id,
                 ce_message_object,
                 db
               );
+              latest_message_id = ce_message_object.id;
             }
+          }
+          if (latest_message_id > last_read) {
+            ChatStorage.setLastRead(user.username, chat.id, latest_message_id);
+            MessageServer.ReadMessage(
+              user.username,
+              user.secret,
+              chat.id,
+              latest_message_id
+            );
           }
         }
         console.log("Finish updating messages storage data from server...");
@@ -433,8 +446,6 @@ export const MessagesContextProvider = (props: {
       // Fetach all messages from loacl storage for each friend
       for (const chat of chats) {
         console.log("Update last read for chat " + chat.id);
-        const current_chat_last_read = chat.last_message.id;
-        ChatStorage.setLastRead(user.username, chat.id, current_chat_last_read);
 
         let initial_messages_object = {
           chat_id: chat.id,

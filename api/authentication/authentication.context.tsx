@@ -28,7 +28,7 @@ export const AuthenticationContextProvider = (props: {
     useState<boolean>(false);
 
   const logIn = async (username: string, pw: string) => {
-    const curr_user = GetMyAccount(username, pw);
+    const curr_user = await GetMyAccount(username, pw);
     if (curr_user) {
       console.info("User " + curr_user.username + " loging in...");
       curr_user.secret = pw;
@@ -53,8 +53,14 @@ export const AuthenticationContextProvider = (props: {
     console.info("Start to initialize authentication context");
     const curr_user = await fetchAuthenticatedUser();
     if (curr_user) {
-      const updated_user = GetMyAccount(curr_user.username, curr_user.secret);
-      setUser(updated_user);
+      const updated_user = await GetMyAccount(
+        curr_user.username,
+        curr_user.secret
+      );
+      if (updated_user) {
+        updated_user.secret = curr_user.secret;
+        setUser(updated_user);
+      }
       setIsAuthenticationInitialized(true);
       console.info(
         "Initialize authentication context successfully: " + curr_user?.username
