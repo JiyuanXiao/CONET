@@ -21,8 +21,6 @@ const formatTimestamp = (utc_timestamp: string) => {
     return dateObj.toLocaleString([], {
       month: "short",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
   } else {
     // More than a year

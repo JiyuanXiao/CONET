@@ -15,17 +15,17 @@ export const ChatBoxCard: React.FC<ChatBoxProps> = styled(
     fontSize: 17,
     fontWeight: "bold",
     color: props.theme_colors?.text ?? default_theme.TEXT,
-    paddingLeft: 10,
+    paddingLeft: 30,
   },
   subtitleStyle: {
     fontSize: 13,
     color: props.theme_colors?.text ?? default_theme.TEXT,
-    paddingLeft: 10,
+    paddingLeft: 30,
   },
   left: () => (
     <ProfileAvatar
       img_src={props.avatar_img_src}
-      size={55}
+      size={65}
       is_direct_chat={props.is_direct_chat}
     />
   ),
@@ -35,7 +35,7 @@ export const ChatBoxCard: React.FC<ChatBoxProps> = styled(
     </Text>
   ),
 }))`
-  height: 80px;
+  height: 85px;
   padding-right: 16px;
   width: 99%;
   background-color: ${(props) =>
