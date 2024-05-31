@@ -18,6 +18,7 @@ export default function ChatWindowScreen() {
   const { colors } = useTheme();
 
   const [messageSent, setMessageSent] = useState<boolean>(false);
+  const { chats } = useContext(ChatsContext);
 
   const navigation = useNavigation();
   const route = useRoute();

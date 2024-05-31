@@ -10,9 +10,10 @@ export const ProfileBarCard: React.FC<ProfileBarProps> = styled(
   Card.Title
 ).attrs<ProfileBarProps>((props) => ({
   title: props.contact_alias,
-  subtitle: props.contact_username
-    ? `ID: ${props.contact_id} | 用户名: ${props.contact_username}`
-    : `ID: ${props.contact_id}`,
+  subtitle:
+    (props.contact_id ? `ID: ${props.contact_id}` : ``) +
+    (props.contact_id && props.contact_username ? " | " : "") +
+    (props.contact_username ? `用户名: ${props.contact_username}` : ``),
   titleStyle: {
     fontSize: 17,
     fontWeight: "bold",

@@ -8,6 +8,7 @@ import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { ChatsContext } from "@/api/chats/chats.context";
 import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
+import { AuthenticationContext } from "@/api/authentication/authentication.context";
 
 export default function ChatSettingsScreen() {
   const route = useRoute();
@@ -21,8 +22,10 @@ export default function ChatSettingsScreen() {
     ClearAllMessagesById,
   } = useContext(MessagesContext);
   const { chats, setChats, deleteChat } = useContext(ChatsContext);
-
   const [chat_members, setChatMembers] = useState<CE_ChatMemberProps[]>([]);
+  const { user } = useContext(AuthenticationContext);
+  const [is_direct_chat, setIsDirectChat] = useState<boolean>(false);
+  const [friend, setFriend] = useState<CE_ChatMemberProps>();
   const [dialog_visible, setDialogVisible] = useState<boolean>(false);
   const [confirm_message, setConfrimMessage] = useState<string>("");
   const [isConfirm, setIsConfirm] = useState<boolean>(false);
@@ -71,6 +74,16 @@ export default function ChatSettingsScreen() {
     );
     if (current_chat) {
       setChatMembers(current_chat.people);
+      setIsDirectChat(current_chat.is_direct_chat);
+      if (current_chat.is_direct_chat) {
+        const member_1 = current_chat.people[0];
+        const member_2 = current_chat.people[1];
+        if (member_1.person.username === user?.username) {
+          setFriend(member_2);
+        } else {
+          setFriend(member_1);
+        }
+      }
     } else {
       console.error(
         "at ChatSettingsScreen() in chat-settings.tsx: chat " +
@@ -92,17 +105,14 @@ export default function ChatSettingsScreen() {
 
   return (
     <ScrollView>
-      <FlatList
-        data={chat_members}
-        renderItem={({ item }) => (
-          <ProfileBar
-            contact_username={item.person.username}
-            contact_alias={item.person.first_name}
-            avatar_img_src={item.person.avatar}
-          />
-        )}
-        keyExtractor={(item) => item.person.username}
-      />
+      {is_direct_chat ? (
+        <ProfileBar
+          contact_alias={friend?.person.first_name || ""}
+          avatar_img_src={friend?.person.avatar || ""}
+        />
+      ) : (
+        <></>
+      )}
 
       <TouchableOpacity
         onPress={() => {

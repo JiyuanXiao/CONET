@@ -4,6 +4,8 @@ import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesProps } from "@/constants/Types";
+import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
+import { ChatsContext } from "@/api/chats/chats.context";
 
 export const ChatList = (props: {
   chat_id: number;
@@ -20,6 +22,8 @@ export const ChatList = (props: {
   } = useContext(MessagesContext);
   const resetLoadedMessagesByIdRef = useRef(resetLoadedMessagesById);
   const { user } = useContext(AuthenticationContext);
+  const { chats } = useContext(ChatsContext);
+  const [current_chat, setCurrentChat] = useState<CE_ChatProps>();
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -54,13 +58,36 @@ export const ChatList = (props: {
     };
   }, []);
 
+  useEffect(() => {
+    const current_chat = chats.find(
+      (chat) => chat.id.toString() === props.chat_id.toString()
+    );
+    if (current_chat) {
+      setCurrentChat(current_chat);
+    } else {
+      console.error(
+        "at ChatWindowScreen() in chat-window.tsx: chat " +
+          props.chat_id.toString() +
+          " is not in chat context"
+      );
+    }
+  }, [chats]);
+
   return (
     <FlatList
       inverted
       ref={flatListRef}
       data={messages}
       renderItem={({ item }: { item: MessagesProps }) => (
-        <MessageBubble chat_id={props.chat_id} message_object={item} />
+        <MessageBubble
+          chat_member={current_chat?.people.find(
+            (chat_member) =>
+              chat_member.person.username === item.sender_username
+          )}
+          chat_id={props.chat_id}
+          message_object={item}
+          is_direct_chat={current_chat?.is_direct_chat || false}
+        />
       )}
       keyExtractor={(item) => item.message_id.toString()}
       onEndReached={() => {

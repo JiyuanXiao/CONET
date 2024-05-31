@@ -30,9 +30,9 @@ export const Bubble: React.FC<MessageBubbleProps> = styled.View`
   padding-bottom: ${moderateScale(10, 2)}px;
   margin-horizontal: ${moderateScale(5, 2)}px;
   max-width: ${moderateScale(250, 1)}px;
-  border-radius: 35px;
-  border-bottom-left-radius: ${(props) => (props.isReceived ? "0" : "35")}px;
-  border-bottom-right-radius: ${(props) => (props.isReceived ? "35" : "0")}px;
+  border-radius: 25px;
+  border-bottom-left-radius: ${(props) => (props.isReceived ? "0" : "25")}px;
+  border-bottom-right-radius: ${(props) => (props.isReceived ? "25" : "0")}px;
   border-color: ${(props) =>
     props.isReceived ? props.theme_colors?.card : props.theme_colors?.primary};
   border-style: solid;
@@ -43,10 +43,24 @@ export const Bubble: React.FC<MessageBubbleProps> = styled.View`
 
 export const BubbleTime: React.FC<{
   theme_colors: ThemeColorsProps;
+  isReceived: boolean;
   children: React.ReactNode;
 }> = styled.Text`
   color: ${(props) => props.theme_colors.border};
   font-size: 10px;
-  align-self: flex-end;
-  padding-right: 8px;
+  align-self: ${(props) => (props.isReceived ? "flex-start" : "flex-end")};
+  padding-right: ${(props) => (props.isReceived ? "0px" : "8px")};
+  padding-left: ${(props) => (props.isReceived ? "8px" : "0px")};
+`;
+
+export const BubbleAlias: React.FC<{
+  theme_colors: ThemeColorsProps;
+  isReceived: boolean;
+  children: React.ReactNode;
+}> = styled.Text`
+  color: ${(props) => props.theme_colors.text};
+  font-size: 12px;
+  align-self: ${(props) => (props.isReceived ? "flex-end" : "flex-right")};
+  padding-right: ${(props) => (props.isReceived ? "10px" : "0px")};
+  padding-left: ${(props) => (props.isReceived ? "0px" : "10px")};
 `;
