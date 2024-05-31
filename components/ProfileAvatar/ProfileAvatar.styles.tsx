@@ -13,7 +13,7 @@ export const ProfileAvatarIcon: React.FC<UserAvatarProps> = (props) => {
   );
 
   const handleError = () => {
-    setSource(require("@/assets/avatars/avatar_2.png"));
+    setSource(require("@/assets/avatars/avatar_default.png"));
   };
 
   return (
