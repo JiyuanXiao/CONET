@@ -39,7 +39,6 @@ export default function AddContactDetailScreen() {
       <ProfileBar
         contact_id={contact_id}
         contact_alias={contact_alias}
-        contact_username={contact_username}
         avatar_img_src={avatar_img_src}
       />
       <TouchableOpacity onPress={handleAddFriend}>

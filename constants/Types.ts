@@ -130,9 +130,9 @@ export type ConfirmDialogProps = {
 };
 
 export interface ProfileBarProps {
-  contact_id?: number;
+  contact_id: number;
   contact_alias: string;
-  contact_username: string;
+  contact_username?: string;
   avatar_img_src: string;
   theme_colors?: ThemeColorsProps;
 }

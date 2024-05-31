@@ -11,9 +11,9 @@ export const setChat = async (
     return;
   }
   try {
-    const chat_id_string = `${username}_chat_${chat_id.toString()}`;
-    const chat_data_string = JSON.stringify(chat_data_json);
-    await AsyncStorage.setItem(chat_id_string, chat_data_string);
+    const key = `${username}_chat_${chat_id.toString()}`;
+    const value = JSON.stringify(chat_data_json);
+    await AsyncStorage.setItem(key, value);
   } catch (err) {
     console.error("at setChat() in chats.storage.tsx: " + err);
   }
@@ -27,8 +27,8 @@ export const removeAllChats = async (username: string | undefined) => {
   try {
     const all_keys = await AsyncStorage.getAllKeys();
     const key_prefix = `${username}_chat_`;
-    const all_chat_ids = all_keys.filter((key) => key.startsWith(key_prefix));
-    await AsyncStorage.multiRemove(all_chat_ids);
+    const target_keys = all_keys.filter((key) => key.startsWith(key_prefix));
+    await AsyncStorage.multiRemove(target_keys);
   } catch (err) {
     console.error("at removeMultiChats() in chats.storage.tsx: " + err);
   }
@@ -47,8 +47,8 @@ export const fetchAllChats = async (
       return [];
     }
     const key_prefix = `${username}_chat_`;
-    const all_chat_ids = all_keys.filter((key) => key.startsWith(key_prefix));
-    const all_chat_key_value_pair = await AsyncStorage.multiGet(all_chat_ids);
+    const target_keys = all_keys.filter((key) => key.startsWith(key_prefix));
+    const all_chat_key_value_pair = await AsyncStorage.multiGet(target_keys);
     if (all_chat_key_value_pair.length === 0) {
       return [];
     }
@@ -72,9 +72,62 @@ export const removeChat = async (
       console.error("at setChat() in chats.storage.tsx: user is undefined");
       return;
     }
-    const chat_id_sting = `${username}_chat_${chat_id.toString()}`;
-    await AsyncStorage.removeItem(chat_id_sting);
+    const key = `${username}_chat_${chat_id.toString()}`;
+    await AsyncStorage.removeItem(key);
   } catch (err) {
     console.error("at removeChat() in chats.storage.tsx: " + err);
+  }
+};
+
+export const setLastRead = async (
+  username: string | undefined,
+  chat_id: number,
+  last_read_message_id: number
+) => {
+  if (!username) {
+    console.error("at setLastRead() in chats.storage.tsx: user is undefined");
+    return;
+  }
+  try {
+    const key = `${username}_last_read_${chat_id.toString()}`;
+    await AsyncStorage.setItem(key, last_read_message_id.toString());
+  } catch (err) {
+    console.error("at setLastRead() in chats.storage.tsx: " + err);
+  }
+};
+
+export const getLastRead = async (
+  username: string | undefined,
+  chat_id: number
+): Promise<number> => {
+  if (!username) {
+    console.error("at getLastRead() in chats.storage.tsx: user is undefined");
+    return -1;
+  }
+  try {
+    const key = `${username}_last_read_${chat_id.toString()}`;
+    const last_read = await AsyncStorage.getItem(key);
+    return Number(last_read);
+  } catch (err) {
+    console.error("at getLastRead() in chats.storage.tsx: " + err);
+    return -1;
+  }
+};
+
+export const deleteLastRead = async (
+  username: string | undefined,
+  chat_id: number
+) => {
+  if (!username) {
+    console.error(
+      "at deleteLastRead() in chats.storage.tsx: user is undefined"
+    );
+    return;
+  }
+  try {
+    const key = `${username}_last_read_${chat_id.toString()}`;
+    await AsyncStorage.removeItem(key);
+  } catch (err) {
+    console.error("at deleteLastRead() in chats.storage.tsx: " + err);
   }
 };

@@ -392,10 +392,15 @@ export const MessagesContextProvider = (props: {
             user.username
         );
         for (const chat of chats) {
-          const ce_message_object_list = ChatServer.GetChatMessages(
+          const last_read = await ChatStorage.getLastRead(
+            user.username,
+            chat.id
+          );
+          const ce_message_object_list = ChatServer.GetUnreadChatMessages(
             user.username,
             user.secret,
-            chat.id
+            chat.id,
+            last_read
           );
           if (!MessagesStorage.messageTableExist(user.username, chat.id, db)) {
             MessagesStorage.createMessageTableIfNotExists(
@@ -405,23 +410,32 @@ export const MessagesContextProvider = (props: {
             );
           }
           for (const ce_message_object of ce_message_object_list) {
-            MessagesStorage.storeMessage(
-              user.username,
-              chat.id,
-              ce_message_object,
-              db
-            );
+            if (ce_message_object.id > last_read) {
+              console.log(ce_message_object.text);
+              MessagesStorage.storeMessage(
+                user.username,
+                chat.id,
+                ce_message_object,
+                db
+              );
+            }
           }
         }
-        console.log("Finish updating messages data from server...");
+        console.log("Finish updating messages storage data from server...");
       }
 
-      console.log("Start to fetch messages data from local storage...");
+      console.log(
+        "Start to fetch messages data from local storage to context..."
+      );
 
       let initialMessagesObjectList: MessageContextObjectProps[] = [];
 
       // Fetach all messages from loacl storage for each friend
       for (const chat of chats) {
+        console.log("Update last read for chat " + chat.id);
+        const current_chat_last_read = chat.last_message.id;
+        ChatStorage.setLastRead(user.username, chat.id, current_chat_last_read);
+
         let initial_messages_object = {
           chat_id: chat.id,
           loaded_messages: [],
@@ -465,7 +479,9 @@ export const MessagesContextProvider = (props: {
       }
 
       setMessagesObjectList(initialMessagesObjectList);
-      console.log("Finish fetching messages data from local storage...");
+      console.log(
+        "Finish fetching messages data from local storage to context..."
+      );
 
       console.info("Initialize message context successfully...");
     }

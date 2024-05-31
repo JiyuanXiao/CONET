@@ -86,8 +86,31 @@ export const GetUnreadChatMessages = (
   username: string,
   secret: string,
   chat_id: number,
-  chat_count: number,
   last_read_message_id: number
 ): CE_MessageProps[] => {
+  if (chat_id.toString() === "253921") {
+    const messages =
+      require("@/mock_data/messages-253921.mock.json") as CE_MessageProps[];
+    const unread_message = messages.filter(
+      (message) => message.id > last_read_message_id
+    );
+    return unread_message;
+  }
+  if (chat_id.toString() === "254343") {
+    const messages =
+      require("@/mock_data/messages-254343.mock.json") as CE_MessageProps[];
+    const unread_message = messages.filter(
+      (message) => message.id > last_read_message_id
+    );
+    return unread_message;
+  }
+  if (chat_id.toString() === "255451") {
+    const messages =
+      require("@/mock_data/messages-255451.mock.json") as CE_MessageProps[];
+    const unread_message = messages.filter(
+      (message) => message.id > last_read_message_id
+    );
+    return unread_message;
+  }
   return [];
 };

@@ -9,6 +9,7 @@ const ProfileBar = (props: ProfileBarProps) => {
 
   return (
     <ProfileBarCard
+      contact_id={props.contact_id}
       contact_alias={props.contact_alias}
       contact_username={props.contact_username}
       avatar_img_src={props.avatar_img_src}
