@@ -8,18 +8,18 @@ import { ChatsContext } from "@/api/chats/chats.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
+import { ActivityIndicator } from "react-native-paper";
 import * as ChatStorage from "@/api/chats/chats.storage";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
-  const { chats, has_new_message } = useContext(ChatsContext);
+  const {
+    chats,
+    has_new_message,
+    is_chats_loaded_from_storage,
+    is_chats_loading_from_server,
+  } = useContext(ChatsContext);
   const { user } = useContext(AuthenticationContext);
-  const { messages_object_list, is_messages_initialized } =
-    useContext(MessagesContext);
-  // const [last_read_map, setLastReadMap] = useState<Map<number, number>>(
-  //   new Map<number, number>()
-  // );
-  //const [isLoading, setIsLoading] = useState(true);
 
   const getChatTitle = (chat: CE_ChatProps) => {
     if (chat.is_direct_chat) {
@@ -45,45 +45,23 @@ export default function ChatListScreen() {
   const getLastMessageInfo = (
     chat_id: number
   ): { last_message: string; last_message_time: string } => {
-    if (messages_object_list.length === 0) {
-      console.log(
-        "at getLastMessageInfo() in index.tsx: Message context is empty"
-      );
-      return {
-        last_message: "",
-        last_message_time: "",
-      };
-    }
-
-    const target_messages_object = messages_object_list.find(
-      (messages_object) =>
-        messages_object.chat_id.toString() === chat_id.toString()
+    const target_chat = chats.find(
+      (chat) => chat.id.toString() === chat_id.toString()
     );
 
-    if (
-      target_messages_object &&
-      target_messages_object.loaded_messages.length > 0
-    ) {
-      const target_message = target_messages_object?.loaded_messages[0];
+    if (target_chat) {
       const result = {
-        last_message:
-          target_message.content_type === "text"
-            ? target_message.text_content
-            : "[媒体文件]",
-        last_message_time: target_message.timestamp,
+        last_message: target_chat.last_message.text
+          ? target_chat.last_message.text
+          : "[媒体文件]",
+        last_message_time: target_chat.last_message.created,
       };
       return result;
-    } else if (!target_messages_object) {
-      console.log(
-        "at getLastMessageInfo() in index.tsx: chat " +
-          chat_id +
-          " is not in message context yet"
-      );
     } else {
       console.log(
         "at getLastMessageInfo() in index.tsx: chat " +
           chat_id +
-          "'s loaded message is empty"
+          " is not in chat context"
       );
     }
     return {
@@ -116,44 +94,55 @@ export default function ChatListScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {is_messages_initialized ? (
-        <FlatList
-          data={chats}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  router.push({
-                    pathname: "/chat-window",
-                    params: {
-                      chat_id: item.id,
-                      name: getChatTitle(item),
-                      avatar_img_src: getChatAvatar(item),
-                    },
-                  });
-                }}
-                style={styles.chatBoxContainer}
-              >
-                <ChatBox
-                  chat_id={item.id}
-                  chat_title={getChatTitle(item)}
-                  last_message={getLastMessageInfo(item.id).last_message}
-                  last_message_time={
-                    getLastMessageInfo(item.id).last_message_time
-                  }
-                  is_direct_chat={item.is_direct_chat}
-                  has_new_message={has_new_message.get(item.id) || false}
-                  avatar_img_src={getChatAvatar(item)}
-                />
-              </TouchableOpacity>
-            );
-          }}
-          keyExtractor={(item) => item.id.toString()}
-        />
+      {is_chats_loaded_from_storage ? (
+        <>
+          {is_chats_loading_from_server ? (
+            <ActivityIndicator
+              animating={true}
+              color={colors.primary}
+              style={{ paddingVertical: 20 }}
+            />
+          ) : null}
+          <FlatList
+            data={chats}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push({
+                      pathname: "/chat-window",
+                      params: {
+                        chat_id: item.id,
+                        name: getChatTitle(item),
+                        avatar_img_src: getChatAvatar(item),
+                      },
+                    });
+                  }}
+                  style={styles.chatBoxContainer}
+                >
+                  <ChatBox
+                    chat_id={item.id}
+                    chat_title={getChatTitle(item)}
+                    last_message={getLastMessageInfo(item.id).last_message}
+                    last_message_time={
+                      getLastMessageInfo(item.id).last_message_time
+                    }
+                    is_direct_chat={item.is_direct_chat}
+                    has_new_message={has_new_message.get(item.id) || false}
+                    avatar_img_src={getChatAvatar(item)}
+                  />
+                </TouchableOpacity>
+              );
+            }}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </>
       ) : (
-        <View>
-          <Text style={{ color: colors.text }}>Loading</Text>
-        </View>
+        <ActivityIndicator
+          animating={true}
+          size={"large"}
+          color={colors.primary}
+        />
       )}
     </View>
   );

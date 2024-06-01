@@ -89,6 +89,8 @@ export interface ChatsContextProps {
   current_talking_chat_id: number;
   setCurrentTalkingChatId: React.Dispatch<React.SetStateAction<number>>;
   is_chats_initialized: boolean;
+  is_chats_loaded_from_storage: boolean;
+  is_chats_loading_from_server: boolean;
   addChat: (chat_object: CE_ChatProps) => void;
   updateChat: (chat_object: CE_ChatProps) => void;
   deleteChat: (chat_id: number) => void;
