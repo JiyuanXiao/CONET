@@ -1,26 +1,25 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import ChatBox from "@/components/ChatBox/ChatBox.component";
 import { useTheme } from "@react-navigation/native";
 import { ChatsContext } from "@/api/chats/chats.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
-//import { FriendProps } from "@/constants/Types";
+import * as ChatStorage from "@/api/chats/chats.storage";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
-  const { chats } = useContext(ChatsContext);
+  const { chats, has_new_message } = useContext(ChatsContext);
   const { user } = useContext(AuthenticationContext);
-  const { messages_object_list } = useContext(MessagesContext);
-
-  const [current_chats, setCurrentChats] = useState<CE_ChatProps[]>([]);
-
-  useEffect(() => {
-    setCurrentChats(chats);
-  }, [chats]);
+  const { messages_object_list, is_messages_initialized } =
+    useContext(MessagesContext);
+  // const [last_read_map, setLastReadMap] = useState<Map<number, number>>(
+  //   new Map<number, number>()
+  // );
+  //const [isLoading, setIsLoading] = useState(true);
 
   const getChatTitle = (chat: CE_ChatProps) => {
     if (chat.is_direct_chat) {
@@ -93,36 +92,69 @@ export default function ChatListScreen() {
     };
   };
 
+  // useEffect(() => {
+  //   const initializeLastReadMap = async () => {
+  //     console.log("initializeLastReadMap");
+  //     for (const chat of chats) {
+  //       const last_read_message_id = await ChatStorage.getLastRead(
+  //         user?.username,
+  //         chat.id
+  //       );
+  //       const map = last_read_map;
+  //       map.set(chat.id, last_read_message_id);
+
+  //       setLastReadMap(map);
+  //     }
+  //   };
+
+  //   if (is_messages_initialized) {
+  //     initializeLastReadMap();
+
+  //     setIsLoading(false);
+  //   }
+  // });
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <FlatList
-        data={current_chats}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              router.push({
-                pathname: "/chat-window",
-                params: {
-                  chat_id: item.id,
-                  name: getChatTitle(item),
-                  avatar_img_src: getChatAvatar(item),
-                },
-              });
-            }}
-            style={styles.chatBoxContainer}
-          >
-            <ChatBox
-              chat_id={item.id}
-              chat_title={getChatTitle(item)}
-              last_message={getLastMessageInfo(item.id).last_message}
-              last_message_time={getLastMessageInfo(item.id).last_message_time}
-              is_direct_chat={item.is_direct_chat}
-              avatar_img_src={getChatAvatar(item)}
-            />
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      />
+      {is_messages_initialized ? (
+        <FlatList
+          data={chats}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({
+                    pathname: "/chat-window",
+                    params: {
+                      chat_id: item.id,
+                      name: getChatTitle(item),
+                      avatar_img_src: getChatAvatar(item),
+                    },
+                  });
+                }}
+                style={styles.chatBoxContainer}
+              >
+                <ChatBox
+                  chat_id={item.id}
+                  chat_title={getChatTitle(item)}
+                  last_message={getLastMessageInfo(item.id).last_message}
+                  last_message_time={
+                    getLastMessageInfo(item.id).last_message_time
+                  }
+                  is_direct_chat={item.is_direct_chat}
+                  has_new_message={has_new_message.get(item.id) || false}
+                  avatar_img_src={getChatAvatar(item)}
+                />
+              </TouchableOpacity>
+            );
+          }}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      ) : (
+        <View>
+          <Text style={{ color: colors.text }}>Loading</Text>
+        </View>
+      )}
     </View>
   );
 }

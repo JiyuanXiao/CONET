@@ -11,9 +11,11 @@ export const ChatsContext = createContext<ChatsContextProps>({
   current_talking_chat_id: -1,
   setCurrentTalkingChatId: () => {},
   is_chats_initialized: false,
-  addChat: (chat_object: CE_ChatProps) => {},
-  updateChat: (chat_object: CE_ChatProps) => {},
-  deleteChat: (chat_id: number) => {},
+  addChat: () => {},
+  updateChat: () => {},
+  deleteChat: () => {},
+  has_new_message: new Map<number, boolean>(),
+  setHasNewMessageStatus: () => {},
 });
 
 // Friends context provides friend info such as last message and last message timestamp
@@ -27,6 +29,13 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     useState<number>(-1);
   const [is_chats_initialized, setIsChatsInitialized] =
     useState<boolean>(false);
+  const [has_new_message, setHasNewMessage] = useState<Map<number, boolean>>(
+    new Map<number, boolean>()
+  );
+
+  const setHasNewMessageStatus = (chat_id: number, read_status: boolean) => {
+    setHasNewMessage(new Map(has_new_message.set(chat_id, read_status)));
+  };
 
   const initializeChatsContext = async () => {
     if (user) {
@@ -41,6 +50,23 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         );
         setChats(new_chats);
         console.log("Update new chat data to local storage...");
+        console.log("Checking if chats have new messages");
+        for (const chat of new_chats) {
+          const last_read = await ChatStorage.getLastRead(
+            user.username,
+            chat.id
+          );
+          // const new_map = new Map(
+          //   has_new_message.set(chat.id, chat.last_message.id > last_read)
+          // );
+          // setHasNewMessage(new_map);
+          setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
+          console.log(`${chat.id}: New message: ${chat.last_message.id}`);
+          console.log(`${chat.id}: Last read: ${last_read}`);
+          console.log(
+            `${chat.id}: has new message: ${has_new_message.get(chat.id)}`
+          );
+        }
         for (const chat of new_chats) {
           ChatStorage.setChat(user.username, chat.id, chat);
         }
@@ -49,6 +75,18 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         console.log("Start to fetch chats' data from local storage...");
         const all_chats = await ChatStorage.fetchAllChats(user.username);
         setChats(all_chats);
+        console.log("Checking if chats have new messages");
+        for (const chat of all_chats) {
+          const last_read = await ChatStorage.getLastRead(
+            user.username,
+            chat.id
+          );
+          // const new_map = new Map(
+          //   has_new_message.set(chat.id, chat.last_message.id > last_read)
+          // );
+          // setHasNewMessage(new_map);
+          setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
+        }
       }
 
       console.log("Initialize chat context successfully...");
@@ -127,6 +165,8 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         addChat,
         updateChat,
         deleteChat,
+        has_new_message,
+        setHasNewMessageStatus,
       }}
     >
       {props.children}

@@ -84,6 +84,9 @@ export const setLastRead = async (
   chat_id: number,
   last_read_message_id: number
 ) => {
+  if (last_read_message_id < 0) {
+    return;
+  }
   if (!username) {
     console.error("at setLastRead() in chats.storage.tsx: user is undefined");
     return;
@@ -91,6 +94,9 @@ export const setLastRead = async (
   try {
     const key = `${username}_last_read_${chat_id.toString()}`;
     await AsyncStorage.setItem(key, last_read_message_id.toString());
+    console.log(
+      `Chat Storage: Set chat ${chat_id} last read as ${last_read_message_id}`
+    );
   } catch (err) {
     console.error("at setLastRead() in chats.storage.tsx: " + err);
   }
@@ -107,6 +113,7 @@ export const getLastRead = async (
   try {
     const key = `${username}_last_read_${chat_id.toString()}`;
     const last_read = await AsyncStorage.getItem(key);
+    console.log("getLastRead for " + chat_id);
     return Number(last_read);
   } catch (err) {
     console.error("at getLastRead() in chats.storage.tsx: " + err);

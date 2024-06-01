@@ -21,6 +21,7 @@ export const ProfileAvatarIcon: React.FC<UserAvatarProps> = (props) => {
       {...props}
       source={source}
       size={props.size}
+      style={{ backgroundColor: "transparent" }}
       onError={handleError}
     />
   );

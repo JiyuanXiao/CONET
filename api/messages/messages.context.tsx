@@ -31,6 +31,7 @@ export const MessagesContext = createContext({
   ) => {},
   resetLoadedMessagesById: (chat_id: number) => {},
   ClearAllMessagesById: (chat_id: number) => {},
+  is_messages_initialized: false,
 });
 
 // DESCRIPTION: getLoadedMessages() is a helper function that load specific amount messages from local
@@ -103,11 +104,14 @@ export const MessagesContextProvider = (props: {
 
   const db = useSQLiteContext();
   const { user } = useContext(AuthenticationContext);
-  const { chats, is_chats_initialized } = useContext(ChatsContext);
+  const { chats, is_chats_initialized, has_new_message } =
+    useContext(ChatsContext);
 
   const [messages_object_list, setMessagesObjectList] = useState<
     MessageContextObjectProps[]
   >([]);
+  const [is_messages_initialized, setIsMessagesInitialized] =
+    useState<boolean>(false);
 
   // Get loaded message object for a friend
   const getLoadedMessagesObjectById = (chat_id: number) => {
@@ -424,15 +428,17 @@ export const MessagesContextProvider = (props: {
               latest_message_id = ce_message_object.id;
             }
           }
-          if (latest_message_id > last_read) {
-            ChatStorage.setLastRead(user.username, chat.id, latest_message_id);
-            MessageServer.ReadMessage(
-              user.username,
-              user.secret,
-              chat.id,
-              latest_message_id
-            );
-          }
+          // console.log("Server last_id: " + latest_message_id);
+          // console.log("Storage last is: " + last_read);
+          // if (latest_message_id > last_read) {
+          //   //ChatStorage.setLastRead(user.username, chat.id, latest_message_id);
+          //   MessageServer.ReadMessage(
+          //     user.username,
+          //     user.secret,
+          //     chat.id,
+          //     latest_message_id
+          //   );
+          // }
         }
         console.log("Finish updating messages storage data from server...");
       }
@@ -445,8 +451,6 @@ export const MessagesContextProvider = (props: {
 
       // Fetach all messages from loacl storage for each friend
       for (const chat of chats) {
-        console.log("Update last read for chat " + chat.id);
-
         let initial_messages_object = {
           chat_id: chat.id,
           loaded_messages: [],
@@ -495,6 +499,7 @@ export const MessagesContextProvider = (props: {
       );
 
       console.info("Initialize message context successfully...");
+      setIsMessagesInitialized(true);
     }
   };
 
@@ -514,6 +519,7 @@ export const MessagesContextProvider = (props: {
         conformMessageIsSent,
         resetLoadedMessagesById,
         ClearAllMessagesById,
+        is_messages_initialized,
       }}
     >
       {props.children}

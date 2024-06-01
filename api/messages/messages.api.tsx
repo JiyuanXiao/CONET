@@ -72,32 +72,32 @@ export const GetUnreadChatMessages = async (
   }
 };
 
-export const ReadMessage = async (
-  username: string,
-  secret: string,
-  chat_id: number,
-  last_read_message_id: number
-) => {
-  const url = `${process.env.EXPO_PUBLIC_BASE_URL}/chats/${chat_id}/people/`;
+// export const ReadMessage = async (
+//   username: string,
+//   secret: string,
+//   chat_id: number,
+//   last_read_message_id: number
+// ) => {
+//   const url = `${process.env.EXPO_PUBLIC_BASE_URL}/chats/${chat_id}/people/`;
 
-  const headers = {
-    "Project-ID": process.env.EXPO_PUBLIC_PROJECT_ID,
-    "User-Name": username,
-    "User-Secret": secret,
-  };
+//   const headers = {
+//     "Project-ID": process.env.EXPO_PUBLIC_PROJECT_ID,
+//     "User-Name": username,
+//     "User-Secret": secret,
+//   };
 
-  const data = new FormData();
-  data.append("last_read", last_read_message_id.toString());
+//   const data = new FormData();
+//   data.append("last_read", last_read_message_id.toString());
 
-  try {
-    await axios.patch(url, data, { headers });
-    console.log(
-      `PATCH Request: ReadMessage() for ${username}: updated lastest read message as ${last_read_message_id}`
-    );
-  } catch (err) {
-    console.error(`PATCH Request: ReadMessage() ERROR:`, err);
-  }
-};
+//   try {
+//     await axios.patch(url, data, { headers });
+//     console.log(
+//       `PATCH Request: ReadMessage() for ${username}: updated lastest read message as ${last_read_message_id}`
+//     );
+//   } catch (err: any) {
+//     console.error(`PATCH Request: ReadMessage() ERROR:`, err.message);
+//   }
+// };
 
 // export const GetChatMessages = async (
 //   username: string,

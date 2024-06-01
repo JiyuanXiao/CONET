@@ -19,6 +19,7 @@ export interface ChatBoxProps {
   last_message_time: string;
   avatar_img_src: string;
   is_direct_chat?: boolean;
+  has_new_message: boolean;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -108,6 +109,8 @@ export interface ChatsContextProps {
   addChat: (chat_object: CE_ChatProps) => void;
   updateChat: (chat_object: CE_ChatProps) => void;
   deleteChat: (chat_id: number) => void;
+  has_new_message: Map<number, boolean>;
+  setHasNewMessageStatus: (chat_id: number, read_status: boolean) => void;
 }
 
 export interface InputBarProps {

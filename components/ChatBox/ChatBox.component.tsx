@@ -3,9 +3,14 @@ import { ChatBoxCard } from "./ChatBox.styles";
 import { useTheme } from "@react-navigation/native";
 import { ChatBoxProps } from "@/constants/Types";
 import { ChatsContext } from "@/api/chats/chats.context";
-//import { FriendProps } from "@/constants/Types";
+
+import { AuthenticationContext } from "@/api/authentication/authentication.context";
+import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
 
 const formatTimestamp = (utc_timestamp: string) => {
+  if (utc_timestamp.length === 0) {
+    return "";
+  }
   const dateObj = new Date(utc_timestamp);
   const now = new Date();
   const elapsed_time = now.getTime() - dateObj.getTime();
@@ -34,14 +39,8 @@ const formatTimestamp = (utc_timestamp: string) => {
 const ChatBox = (props: ChatBoxProps) => {
   const { colors } = useTheme();
   const { chats, current_talking_chat_id } = useContext(ChatsContext);
-  const [chat, setChat] = useState<any | undefined>();
-
-  useEffect(() => {
-    const curr_chat = chats.find(
-      (chat) => chat.id.toString() === props.chat_id.toString()
-    );
-    setChat(curr_chat);
-  }, []);
+  const { user } = useContext(AuthenticationContext);
+  const [chat, setChat] = useState<CE_ChatProps>();
 
   // Get the chat's last message and timestamp whenever the chats context is modified
   useEffect(() => {
@@ -51,7 +50,7 @@ const ChatBox = (props: ChatBoxProps) => {
       );
       setChat(curr_chat);
     }
-  }, [chats]);
+  }, [chats, current_talking_chat_id]);
 
   const lastMessageTime = formatTimestamp(props.last_message_time);
 
@@ -63,6 +62,7 @@ const ChatBox = (props: ChatBoxProps) => {
       last_message_time={lastMessageTime}
       avatar_img_src={props.avatar_img_src}
       is_direct_chat={props.is_direct_chat}
+      has_new_message={props.has_new_message}
       theme_colors={colors}
     />
   );
