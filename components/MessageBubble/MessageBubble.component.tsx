@@ -9,7 +9,8 @@ import {
 } from "./MessageBubble.styles";
 import BubbleAvatar from "./BubbleAvatar.component";
 import { useTheme } from "@react-navigation/native";
-import { MessageBubbleProps, MessagesProps } from "@/constants/Types";
+import { MessageBubbleProps } from "@/constants/ComponentTypes";
+import { MessagesProps } from "@/constants/ContextTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { ChatsContext } from "@/api/chats/chats.context";
 import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";

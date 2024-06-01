@@ -1,6 +1,6 @@
 import React from "react";
 import { useTheme } from "@react-navigation/native";
-import { OptionBarProps } from "@/constants/Types";
+import { OptionBarProps } from "@/constants/ComponentTypes";
 import { OptionBarCard } from "./OptionBar.styles";
 
 const OptionBar = (props: OptionBarProps) => {

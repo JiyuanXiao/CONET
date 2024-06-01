@@ -1,7 +1,10 @@
 import React from "react";
-import styled from "styled-components/native";
+import styled, { useTheme } from "styled-components/native";
 import { Platform } from "react-native";
-import { ThemeColorsProps, TextInputBarProps } from "@/constants/Types";
+import {
+  ThemeColorsProps,
+  TextInputBarProps,
+} from "@/constants/ComponentTypes";
 
 export const InputBarContainer: React.FC<TextInputBarProps> = styled.KeyboardAvoidingView.attrs(
   {

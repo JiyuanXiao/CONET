@@ -1,8 +1,7 @@
 import React from "react";
 import { useTheme } from "@react-navigation/native";
-import { ChatBoxProps } from "@/constants/Types";
+import { ProfileBarProps } from "@/constants/ComponentTypes";
 import { ProfileBarCard } from "./ProfileBar.styles";
-import { ProfileBarProps } from "@/constants/Types";
 
 const ProfileBar = (props: ProfileBarProps) => {
   const { colors } = useTheme();

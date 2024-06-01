@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext } from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { View, Text } from "react-native";

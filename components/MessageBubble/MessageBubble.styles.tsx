@@ -1,8 +1,10 @@
 import React from "react";
 import styled from "styled-components/native";
 import { moderateScale } from "react-native-size-matters";
-import { MessageBubbleProps } from "@/constants/Types";
-import { ThemeColorsProps } from "@/constants/Types";
+import {
+  MessageBubbleProps,
+  ThemeColorsProps,
+} from "@/constants/ComponentTypes";
 
 export const BubbleContent: React.FC<MessageBubbleProps> = styled.Text.attrs<MessageBubbleProps>(
   (props) => ({

@@ -3,7 +3,7 @@ import { FlatList } from "react-native";
 import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
-import { MessagesProps } from "@/constants/Types";
+import { MessagesProps } from "@/constants/ContextTypes";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
 import { ChatsContext } from "@/api/chats/chats.context";
 

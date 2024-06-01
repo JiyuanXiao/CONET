@@ -1,5 +1,3 @@
-//import { SQLiteDatabase } from "expo-sqlite";
-import { UserProps } from "@/constants/Types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 

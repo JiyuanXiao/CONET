@@ -1,7 +1,7 @@
 import { Button, Dialog, Portal } from "react-native-paper";
 import { Text } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import { ConfirmDialogProps } from "@/constants/Types";
+import { ConfirmDialogProps } from "@/constants/ComponentTypes";
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   visible,

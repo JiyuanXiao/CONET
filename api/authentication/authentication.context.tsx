@@ -1,5 +1,5 @@
 import React, { useState, createContext, useEffect } from "react";
-import { AuthenticationContentProps, UserProps } from "@/constants/Types";
+import { AuthenticationContentProps } from "@/constants/ContextTypes";
 import {
   storeAuthenticatedUser,
   fetchAuthenticatedUser,
@@ -7,7 +7,6 @@ import {
 } from "./authentication.storage";
 import { GetMyAccount } from "./authentication.api";
 import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
-import { updateId } from "expo-updates";
 
 export const AuthenticationContext = createContext<AuthenticationContentProps>({
   isLoading: false,

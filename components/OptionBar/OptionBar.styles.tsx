@@ -2,7 +2,7 @@ import React from "react";
 import { FlexAlignType } from "react-native";
 import styled from "styled-components/native";
 import { Card } from "react-native-paper";
-import { OptionBarProps } from "@/constants/Types";
+import { OptionBarProps } from "@/constants/ComponentTypes";
 import { default_theme } from "@/constants/Colors";
 
 export const OptionBarCard: React.FC<OptionBarProps> = styled(

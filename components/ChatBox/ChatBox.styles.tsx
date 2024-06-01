@@ -3,7 +3,7 @@ import styled from "styled-components/native";
 import { Card, Badge } from "react-native-paper";
 import { Text, View } from "react-native";
 import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar.component";
-import { ChatBoxProps } from "@/constants/Types";
+import { ChatBoxProps } from "@/constants/ComponentTypes";
 import { default_theme } from "@/constants/Colors";
 
 export const ChatBoxCard: React.FC<ChatBoxProps> = styled(

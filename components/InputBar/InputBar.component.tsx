@@ -3,7 +3,7 @@ import { useTheme } from "@react-navigation/native";
 import { InputBarContainer, InputBox, OffsetFooter } from "./InputBar.styles";
 import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
-import { ThemeColorsProps, InputBarProps } from "@/constants/Types";
+import { ThemeColorsProps, InputBarProps } from "@/constants/ComponentTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { useSQLiteContext } from "expo-sqlite";
 import { MessagesContext } from "@/api/messages/messages.context";

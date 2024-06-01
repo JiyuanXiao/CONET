@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "react-native-paper";
-import { UserAvatarProps } from "@/constants/Types";
+import { UserAvatarProps } from "@/constants/ComponentTypes";
 import { default_theme } from "@/constants/Colors";
 import { Image } from "react-native";
 

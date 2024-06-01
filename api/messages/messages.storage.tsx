@@ -1,5 +1,5 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { MessagesProps } from "@/constants/Types";
+import { MessagesProps } from "@/constants/ContextTypes";
 import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
 
 export const messageTableExist = (

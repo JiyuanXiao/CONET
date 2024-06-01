@@ -4,7 +4,7 @@ import { Link, Tabs } from "expo-router";
 import { Pressable } from "react-native";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useTheme } from "@react-navigation/native";
-import { ThemeColorsProps } from "@/constants/Types";
+import { ThemeColorsProps } from "@/constants/ComponentTypes";
 
 // explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 

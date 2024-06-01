@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { ChatsContextProps, ChatProps, UserProps } from "@/constants/Types";
+import { ChatsContextProps } from "@/constants/ContextTypes";
 import * as ChatStorage from "./chats.storage";
 import * as ChatServer from "./chats.api";
 import { AuthenticationContext } from "../authentication/authentication.context";

@@ -1,7 +1,7 @@
 import React from "react";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.component";
 import { BubbleAvatarContainer } from "./BubbleAvatar.styles";
-import { UserAvatarProps } from "@/constants/Types";
+import { UserAvatarProps } from "@/constants/ComponentTypes";
 
 const BubbleAvatar = (props: UserAvatarProps) => {
   return (

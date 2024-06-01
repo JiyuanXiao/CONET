@@ -1,7 +1,7 @@
 import React from "react";
 import { ProfileAvatarIcon } from "./ProfileAvatar.styles";
 import { useTheme } from "@react-navigation/native";
-import { UserAvatarProps } from "@/constants/Types";
+import { UserAvatarProps } from "@/constants/ComponentTypes";
 
 const ProfileAvatar = (props: UserAvatarProps) => {
   const { colors } = useTheme();

@@ -2,37 +2,39 @@ import React from "react";
 import styled from "styled-components/native";
 import { Card } from "react-native-paper";
 import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar.component";
-import { ChatBoxProps } from "@/constants/Types";
 import { default_theme } from "@/constants/Colors";
-import { ProfileBarProps } from "@/constants/Types";
+import { ProfileBarProps } from "@/constants/ComponentTypes";
+import { useTheme } from "styled-components/native";
 
 export const ProfileBarCard: React.FC<ProfileBarProps> = styled(
   Card.Title
-).attrs<ProfileBarProps>((props) => ({
-  title: props.contact_alias,
-  subtitle:
-    (props.contact_id ? `ID: ${props.contact_id}` : ``) +
-    (props.contact_id && props.contact_username ? " | " : "") +
-    (props.contact_username ? `用户名: ${props.contact_username}` : ``),
-  titleStyle: {
-    fontSize: 17,
-    fontWeight: "bold",
-    color: props.theme_colors?.text ?? default_theme.TEXT,
-    paddingLeft: 30,
-  },
-  subtitleStyle: {
-    fontSize: 13,
-    color: props.theme_colors?.text ?? default_theme.TEXT,
-    paddingLeft: 30,
-  },
-  left: () => (
-    <ProfileAvatar
-      img_src={props.avatar_img_src}
-      size={65}
-      is_direct_chat={true}
-    />
-  ),
-}))`
+).attrs<ProfileBarProps>((props) => {
+  return {
+    title: props.contact_alias,
+    subtitle:
+      (props.contact_id ? `ID: ${props.contact_id}` : ``) +
+      (props.contact_id && props.contact_username ? " | " : "") +
+      (props.contact_username ? `用户名: ${props.contact_username}` : ``),
+    titleStyle: {
+      fontSize: 17,
+      fontWeight: "bold",
+      color: props.theme_colors?.text ?? default_theme.TEXT,
+      paddingLeft: 30,
+    },
+    subtitleStyle: {
+      fontSize: 13,
+      color: props.theme_colors?.text ?? default_theme.TEXT,
+      paddingLeft: 30,
+    },
+    left: () => (
+      <ProfileAvatar
+        img_src={props.avatar_img_src}
+        size={65}
+        is_direct_chat={true}
+      />
+    ),
+  };
+})`
   height: 120px;
   width: 100%;
   background-color: ${(props) =>

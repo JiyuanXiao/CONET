@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ChatBoxCard } from "./ChatBox.styles";
 import { useTheme } from "@react-navigation/native";
-import { ChatBoxProps } from "@/constants/Types";
+import { ChatBoxProps } from "@/constants/ComponentTypes";
 import { ChatsContext } from "@/api/chats/chats.context";
 
 import { AuthenticationContext } from "@/api/authentication/authentication.context";

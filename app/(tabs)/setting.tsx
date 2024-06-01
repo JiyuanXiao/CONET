@@ -7,7 +7,6 @@ import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 
 export default function SettngScreen() {
-  const { colors } = useTheme();
   const { user, logOut } = useContext(AuthenticationContext);
   const handleLogout = () => {
     console.log("SettingScreen() in setting.tsx is calling logOut()");

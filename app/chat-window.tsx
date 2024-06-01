@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import InputBar from "@/components/InputBar/InputBar.component";
 import { useTheme, useRoute, useNavigation } from "@react-navigation/native";
 import { ChatList } from "@/components/ChatList/ChatList.component";
-import { ThemeColorsProps } from "@/constants/Types";
+import { ThemeColorsProps } from "@/constants/ComponentTypes";
 import { Feather } from "@expo/vector-icons";
 import { ChatsContext } from "@/api/chats/chats.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
