@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { View, Text } from "react-native";
@@ -18,8 +18,10 @@ export default function ChatListScreen() {
     has_new_message,
     is_chats_loaded_from_storage,
     is_chats_loading_from_server,
+    is_chats_initialized,
   } = useContext(ChatsContext);
   const { user } = useContext(AuthenticationContext);
+  const [_, forceUpdate] = useState<number>();
 
   const getChatTitle = (chat: CE_ChatProps) => {
     if (chat.is_direct_chat) {
@@ -67,6 +69,12 @@ export default function ChatListScreen() {
       last_message_time: "",
     };
   };
+
+  useEffect(() => {
+    if (is_chats_initialized) {
+      forceUpdate(Math.random());
+    }
+  }, [is_chats_initialized]);
 
   // useEffect(() => {
   //   const initializeLastReadMap = async () => {

@@ -9,6 +9,7 @@ import { AuthenticationContextProvider } from "@/api/authentication/authenticati
 import { SQLiteProvider } from "expo-sqlite";
 import { ChatsContextProvider } from "@/api/chats/chats.context";
 import { MessagesContextProvider } from "@/api/messages/messages.context";
+import { WebSocketProvider } from "@/api/websocket/websocket.context";
 import "react-native-reanimated";
 
 // export {
@@ -58,7 +59,9 @@ function RootLayoutNav() {
           <AuthenticationContextProvider>
             <ChatsContextProvider>
               <MessagesContextProvider>
-                <App />
+                <WebSocketProvider>
+                  <App />
+                </WebSocketProvider>
               </MessagesContextProvider>
             </ChatsContextProvider>
           </AuthenticationContextProvider>
