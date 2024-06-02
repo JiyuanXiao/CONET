@@ -51,10 +51,7 @@ export interface MessageContextObjectProps {
 }
 
 export interface MessageContextProps {
-  messages_object_list: MessageContextObjectProps[];
-  getLoadedMessagesObjectById: (
-    chat_id: number
-  ) => MessageContextObjectProps | undefined;
+  messages: Map<number, MessageContextObjectProps>;
   loadMessagesById: (chat_id: number) => Promise<void>;
   sendMessage: (
     chat_id: number,
@@ -89,8 +86,6 @@ export interface ChatsContextProps {
   current_talking_chat_id: number;
   setCurrentTalkingChatId: React.Dispatch<React.SetStateAction<number>>;
   is_chats_initialized: boolean;
-  is_chats_loaded_from_storage: boolean;
-  is_chats_loading_from_server: boolean;
   addChat: (chat_object: CE_ChatProps) => void;
   updateChat: (chat_object: CE_ChatProps) => void;
   deleteChat: (chat_id: number) => void;

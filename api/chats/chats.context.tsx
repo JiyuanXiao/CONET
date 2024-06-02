@@ -11,8 +11,6 @@ export const ChatsContext = createContext<ChatsContextProps>({
   current_talking_chat_id: -1,
   setCurrentTalkingChatId: () => {},
   is_chats_initialized: false,
-  is_chats_loaded_from_storage: false,
-  is_chats_loading_from_server: true,
   addChat: () => {},
   updateChat: () => {},
   deleteChat: () => {},
@@ -34,10 +32,6 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     useState<number>(-1);
   const [is_chats_initialized, setIsChatsInitialized] =
     useState<boolean>(false);
-  const [is_chats_loaded_from_storage, setIsChatsLoadedFromStorage] =
-    useState<boolean>(false);
-  const [is_chats_loading_from_server, setIsChatLoadFromServer] =
-    useState<boolean>(true);
   const [has_new_message, setHasNewMessage] = useState<Map<number, boolean>>(
     new Map<number, boolean>()
   );
@@ -105,7 +99,6 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
       }
       console.log("Chat data has been loaded from local storage");
-      setIsChatsLoadedFromStorage(true);
 
       const chat_server_connected = true;
       if (chat_server_connected) {
@@ -138,10 +131,8 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         }
 
         console.log("Chat data has been loaded from server");
-        setIsChatLoadFromServer(false);
       } else {
         console.log("Cannot connet to chat server...");
-        setIsChatLoadFromServer(false);
       }
 
       console.log("Initialize chat context successfully...");
@@ -164,8 +155,6 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         current_talking_chat_id,
         setCurrentTalkingChatId,
         is_chats_initialized,
-        is_chats_loaded_from_storage,
-        is_chats_loading_from_server,
         addChat,
         updateChat,
         deleteChat,

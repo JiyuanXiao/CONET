@@ -26,20 +26,18 @@ const SelectPictureIcon = (theme_colors: ThemeColorsProps) => (
 );
 
 const InputBar = (props: InputBarProps) => {
-  const [message, setMessage] = useState("");
+  const [new_message, setNewMessage] = useState("");
   const [inputHeight, setInputHeight] = useState(0);
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
-  const { messages_object_list, sendMessage, getLoadedMessagesObjectById } =
-    useContext(MessagesContext);
-  const db = useSQLiteContext();
+  const { sendMessage } = useContext(MessagesContext);
 
   const handleChangeText = (text: string) => {
     if (text.endsWith("\n")) {
       // let chat-window know a new message is sent
       props.setMessageSent(true);
 
-      if (message.length > 0) {
+      if (new_message.length > 0) {
         if (user) {
           // Update Message Context, Context will store message to local storage for us
           console.log(
@@ -48,7 +46,7 @@ const InputBar = (props: InputBarProps) => {
           sendMessage(
             props.chat_id,
             user.username,
-            message,
+            new_message,
             null,
             Date.now().toString()
           );
@@ -56,9 +54,9 @@ const InputBar = (props: InputBarProps) => {
           console.error("InputBar(): User is undefined");
         }
       }
-      setMessage("");
+      setNewMessage("");
     } else {
-      setMessage(text);
+      setNewMessage(text);
     }
   };
 
@@ -66,16 +64,13 @@ const InputBar = (props: InputBarProps) => {
     setInputHeight(event.nativeEvent.contentSize.height);
   };
 
-  // update chatbox info
-  useEffect(() => {}, [messages_object_list]);
-
   return (
     <>
       <InputBarContainer inputHeight={inputHeight} theme_colors={colors}>
         <InputBox inputHeight={inputHeight} theme_colors={colors}>
           <VoiceMessageIcon {...colors} />
           <TextInput
-            value={message}
+            value={new_message}
             inputHeight={inputHeight}
             theme_colors={colors}
             onChangeText={handleChangeText}

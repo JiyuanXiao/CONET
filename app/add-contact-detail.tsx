@@ -17,8 +17,6 @@ export default function AddContactDetailScreen() {
       avatar_img_src: string;
     };
 
-  // const { addFriend } = useContext(FriendsContext);
-  const { resetLoadedMessagesById } = useContext(MessagesContext);
   const navigation = useNavigation();
 
   const handleAddFriend = () => {

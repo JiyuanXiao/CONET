@@ -16,10 +16,10 @@ export default function ChatListScreen() {
   const {
     chats,
     has_new_message,
-    is_chats_loaded_from_storage,
-    is_chats_loading_from_server,
+
     is_chats_initialized,
   } = useContext(ChatsContext);
+  const { is_messages_initialized } = useContext(MessagesContext);
   const { user } = useContext(AuthenticationContext);
   const [_, forceUpdate] = useState<number>();
 
@@ -74,7 +74,7 @@ export default function ChatListScreen() {
     if (is_chats_initialized) {
       forceUpdate(Math.random());
     }
-  }, [is_chats_initialized]);
+  }, [chats, is_chats_initialized]);
 
   // useEffect(() => {
   //   const initializeLastReadMap = async () => {
@@ -100,15 +100,15 @@ export default function ChatListScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {is_chats_loaded_from_storage ? (
+      {is_chats_initialized ? (
         <>
-          {is_chats_loading_from_server ? (
+          {is_messages_initialized ? null : (
             <ActivityIndicator
               animating={true}
               color={colors.primary}
               style={{ paddingVertical: 20 }}
             />
-          ) : null}
+          )}
           <FlatList
             data={Array.from(chats.values())}
             renderItem={({ item }) => {

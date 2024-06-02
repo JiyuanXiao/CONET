@@ -40,12 +40,12 @@ const ChatBox = (props: ChatBoxProps) => {
   const { colors } = useTheme();
   const { chats, current_talking_chat_id } = useContext(ChatsContext);
   const { user } = useContext(AuthenticationContext);
-  const [chat, setChat] = useState<CE_ChatProps>();
+  const [_, forceUpdate] = useState<number>();
 
   // Get the chat's last message and timestamp whenever the chats context is modified
   useEffect(() => {
     if (current_talking_chat_id.toString() === props.chat_id.toString()) {
-      setChat(chats.get(Number(props.chat_id)));
+      forceUpdate(Math.random());
     }
   }, [chats, current_talking_chat_id]);
 

@@ -15,14 +15,10 @@ export const ChatList = (props: {
   messageSent: boolean;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const [messages, setMessages] = useState<MessagesProps[]>([]);
+  const [loaded_messages, setLoadedMessages] = useState<MessagesProps[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const {
-    messages_object_list,
-    getLoadedMessagesObjectById,
-    resetLoadedMessagesById,
-    loadMessagesById,
-  } = useContext(MessagesContext);
+  const { messages, resetLoadedMessagesById, loadMessagesById } =
+    useContext(MessagesContext);
   const resetLoadedMessagesByIdRef = useRef(resetLoadedMessagesById);
   const { user } = useContext(AuthenticationContext);
   const { chats } = useContext(ChatsContext);
@@ -49,19 +45,18 @@ export const ChatList = (props: {
       "ChatList(): calling getLoadedMessagesObjectById() for " + props.chat_id
     );
 
-    const current_messages_object = getLoadedMessagesObjectById(
-      Number(props.chat_id)
-    );
-    const current_messages = current_messages_object?.loaded_messages || [];
-    setMessages(current_messages);
+    const current_messages_object = messages.get(Number(props.chat_id));
+    const current_loaded_messages =
+      current_messages_object?.loaded_messages || [];
+    setLoadedMessages(current_loaded_messages);
 
     // let the function recapture the current props and state of the context
     resetLoadedMessagesByIdRef.current = resetLoadedMessagesById;
-  }, [messages_object_list]);
+  }, [messages]);
 
   // Scroll to the bottom of the message if user sent a new message
   useEffect(() => {
-    if (props.messageSent && messages.length > 0) {
+    if (props.messageSent && loaded_messages.length > 0) {
       flatListRef.current?.scrollToIndex({ index: 0, animated: true });
       props.setMessageSent(false);
     }
@@ -97,7 +92,7 @@ export const ChatList = (props: {
     <FlatList
       inverted
       ref={flatListRef}
-      data={messages}
+      data={loaded_messages}
       renderItem={({ item }: { item: MessagesProps }) => (
         <MessageBubble
           chat_id={Number(props.chat_id)}
