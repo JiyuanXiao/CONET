@@ -45,10 +45,7 @@ const ChatBox = (props: ChatBoxProps) => {
   // Get the chat's last message and timestamp whenever the chats context is modified
   useEffect(() => {
     if (current_talking_chat_id.toString() === props.chat_id.toString()) {
-      const curr_chat = chats.find(
-        (chat) => chat.id.toString() === props.chat_id.toString()
-      );
-      setChat(curr_chat);
+      setChat(chats.get(Number(props.chat_id)));
     }
   }, [chats, current_talking_chat_id]);
 

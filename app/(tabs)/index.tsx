@@ -45,9 +45,7 @@ export default function ChatListScreen() {
   const getLastMessageInfo = (
     chat_id: number
   ): { last_message: string; last_message_time: string } => {
-    const target_chat = chats.find(
-      (chat) => chat.id.toString() === chat_id.toString()
-    );
+    const target_chat = chats.get(chat_id);
 
     if (target_chat) {
       const result = {
@@ -104,7 +102,7 @@ export default function ChatListScreen() {
             />
           ) : null}
           <FlatList
-            data={chats}
+            data={Array.from(chats.values())}
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity

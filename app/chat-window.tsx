@@ -37,9 +37,36 @@ export default function ChatWindowScreen() {
     avatar_img_src: string;
   };
 
-  const target_chat = chats.find(
-    (chat) => chat.id.toString() === chat_id.toString()
-  );
+  const updateLastReadMessage = async (chat: CE_ChatProps | undefined) => {
+    if (chat) {
+      await ChatStorage.setLastRead(
+        user?.username,
+        chat_id,
+        chat.last_message.id
+      );
+      console.log(
+        `Chat ${chat.id} last read message update to latest message: ${chat.last_message.id}`
+      );
+      setHasNewMessageStatus(chat.id, false);
+    } else {
+      console.error(
+        "at updateLastReadMessage() in chat-window.tsx: chat not find chat with chat_id: " +
+          chat_id
+      );
+    }
+  };
+
+  useEffect(() => {
+    setCurrentTalkingChatId(Number(chat_id));
+
+    updateLastReadMessage(chats.get(Number(chat_id)));
+  }, []);
+
+  useEffect(() => {
+    if (chat_id.toString() === current_talking_chat_id.toString()) {
+      updateLastReadMessage(chats.get(Number(chat_id)));
+    }
+  }, [chats]);
 
   // Display the name on the header
   useLayoutEffect(() => {
@@ -61,36 +88,6 @@ export default function ChatWindowScreen() {
       ),
     });
   }, [navigation, name]);
-
-  const updateLastReadMessage = async (chat: CE_ChatProps | undefined) => {
-    if (chat) {
-      await ChatStorage.setLastRead(
-        user?.username,
-        chat_id,
-        chat.last_message.id
-      );
-      console.log(
-        `Chat ${chat.id} last read message update to latest message: ${chat.last_message.id}`
-      );
-      setHasNewMessageStatus(chat.id, false);
-    } else {
-      console.error(
-        "at useEffect() in chat-window.tsx: chat not find chat with chat_id: " +
-          chat_id
-      );
-    }
-  };
-
-  useEffect(() => {
-    setCurrentTalkingChatId(chat_id);
-    updateLastReadMessage(target_chat);
-  }, []);
-
-  useEffect(() => {
-    if (chat_id.toString() === current_talking_chat_id.toString()) {
-      updateLastReadMessage(target_chat);
-    }
-  }, [chats]);
 
   return (
     <View

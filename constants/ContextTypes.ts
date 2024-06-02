@@ -84,8 +84,8 @@ export interface ChatProps {
 }
 
 export interface ChatsContextProps {
-  chats: CE_ChatProps[];
-  setChats: React.Dispatch<React.SetStateAction<CE_ChatProps[]>>;
+  chats: Map<number, CE_ChatProps>;
+  setChatMap: (chat_id: number, chat: CE_ChatProps) => void;
   current_talking_chat_id: number;
   setCurrentTalkingChatId: React.Dispatch<React.SetStateAction<number>>;
   is_chats_initialized: boolean;

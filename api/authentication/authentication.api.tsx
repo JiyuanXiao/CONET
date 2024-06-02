@@ -24,3 +24,5 @@ export const GetMyAccount = async (
     return null;
   }
 };
+
+export const UpdateMyAccount = async () => {};

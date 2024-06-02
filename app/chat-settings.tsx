@@ -16,12 +16,8 @@ export default function ChatSettingsScreen() {
     chat_id: number;
   };
 
-  const {
-    messages_object_list,
-    getLoadedMessagesObjectById,
-    ClearAllMessagesById,
-  } = useContext(MessagesContext);
-  const { chats, setChats, deleteChat } = useContext(ChatsContext);
+  const { ClearAllMessagesById } = useContext(MessagesContext);
+  const { chats, deleteChat } = useContext(ChatsContext);
   const [chat_members, setChatMembers] = useState<CE_ChatMemberProps[]>([]);
   const { user } = useContext(AuthenticationContext);
   const [is_direct_chat, setIsDirectChat] = useState<boolean>(false);
@@ -37,7 +33,7 @@ export default function ChatSettingsScreen() {
       "FriendSettingsScreen(): Start to clear chat history for chat: " +
         chat_id.toString()
     );
-    ClearAllMessagesById(chat_id);
+    ClearAllMessagesById(Number(chat_id));
     console.log(
       "FriendSettingsScreen(): Successfully cleared chat history for chat: " +
         chat_id.toString()
@@ -50,7 +46,7 @@ export default function ChatSettingsScreen() {
     console.log(
       "ChatSettingsScreen(): Start to delete friend: " + chat_id.toString()
     );
-    deleteChat(chat_id);
+    deleteChat(Number(chat_id));
     console.log(
       "ChatSettingsScreen(): Deleted friend " +
         chat_id.toString() +
@@ -69,9 +65,7 @@ export default function ChatSettingsScreen() {
   }, [isConfirm]);
 
   useEffect(() => {
-    const current_chat = chats.find(
-      (chat) => chat.id.toString() === chat_id.toString()
-    );
+    const current_chat = chats.get(Number(chat_id));
     if (current_chat) {
       setChatMembers(current_chat.people);
       setIsDirectChat(current_chat.is_direct_chat);

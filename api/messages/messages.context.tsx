@@ -321,7 +321,7 @@ export const MessagesContextProvider = (props: {
           "Start to get messages data from server and update to storage for " +
             user.username
         );
-        for (const chat of chats) {
+        for (const chat of chats.values()) {
           const last_read = await ChatStorage.getLastRead(
             user.username,
             chat.id
@@ -375,7 +375,7 @@ export const MessagesContextProvider = (props: {
       let initialMessagesObjectList: MessageContextObjectProps[] = [];
 
       // Fetach all messages from loacl storage for each friend
-      for (const chat of chats) {
+      for (const chat of chats.values()) {
         let initial_messages_object = {
           chat_id: chat.id,
           loaded_messages: [],
