@@ -14,7 +14,7 @@ export const BubbleContent: React.FC<MessageBubbleProps> = styled.Text.attrs<Mes
 )`
   font-size: 16px;
   justify-content: center;
-  color: ${(props) => props.theme_colors?.text};
+  color: ${(props) => (props.isReceived ? props.theme_colors?.text : "black")};
 `;
 
 export const BubbleConatiner: React.FC<MessageBubbleProps> = styled.View`

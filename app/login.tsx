@@ -11,10 +11,16 @@ import { Text, View } from "react-native";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { Entypo } from "@expo/vector-icons";
 
+const light = "#ffe178";
+const main = "#fcc404";
+const dark = "#c49800";
+
 export default function LoginScreen() {
   const { colors } = useTheme();
   const [username, setUsername] = useState("");
   const [passwrod, setPasswrod] = useState("");
+  const [username_focus, setUsernameFocus] = useState(false);
+  const [password_focus, setPasswordFocus] = useState(false);
   const [password_invisiable, setPasswordInvisiable] = useState(true);
   const [helpertext_visiable, setHelperTextVisiable] = useState(false);
   const [helpertext, setHelperText] = useState("");
@@ -56,7 +62,7 @@ export default function LoginScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={[styles.background, { backgroundColor: "#fcc404" }]}>
+      <View style={[styles.background, { backgroundColor: main }]}>
         <View style={styles.container}>
           <Image
             style={styles.logo}
@@ -68,14 +74,20 @@ export default function LoginScreen() {
             onChangeText={onChangeId}
             value={username}
             placeholder="用户名"
-            outlineColor="black"
-            activeOutlineColor={colors.primary}
+            outlineColor={dark}
+            activeOutlineColor={light}
             textColor="black"
-            outlineStyle={{ borderRadius: 15, borderWidth: 4 }}
+            outlineStyle={{ borderRadius: 15, borderWidth: 2 }}
+            onFocus={() => {
+              setUsernameFocus(true);
+            }}
+            onBlur={() => {
+              setUsernameFocus(false);
+            }}
             left={
               <TextInput.Icon
                 icon="account"
-                color="black"
+                color={username_focus ? light : dark}
                 size={30}
                 style={styles.input_icon}
               />
@@ -88,14 +100,20 @@ export default function LoginScreen() {
             value={passwrod}
             placeholder="密码"
             secureTextEntry={password_invisiable}
-            outlineColor="black"
-            activeOutlineColor={colors.primary}
+            outlineColor={dark}
+            activeOutlineColor={light}
             textColor="black"
-            outlineStyle={{ borderRadius: 15, borderWidth: 4 }}
+            outlineStyle={{ borderRadius: 15, borderWidth: 2 }}
+            onFocus={() => {
+              setPasswordFocus(true);
+            }}
+            onBlur={() => {
+              setPasswordFocus(false);
+            }}
             left={
               <TextInput.Icon
                 icon="lock"
-                color="black"
+                color={password_focus ? light : dark}
                 size={28}
                 style={styles.input_icon}
               />
@@ -113,19 +131,18 @@ export default function LoginScreen() {
           <HelperText
             type="error"
             visible={helpertext_visiable}
-            style={{ color: colors.notification }}
+            style={{ color: colors.notification, height: 35 }}
           >
             {helpertext}
           </HelperText>
           <Button
             onPress={() => handleOnPress()}
             mode="contained"
-            buttonColor={colors.primary}
+            buttonColor="#041130"
             textColor="white"
             style={styles.button}
           >
-            <Entypo name="login" size={20} color="black" />
-            <Text style={styles.button_text}> LOGIN</Text>
+            <Entypo name="login" size={20} color={dark} />
           </Button>
         </View>
       </View>
@@ -149,6 +166,7 @@ const styles = StyleSheet.create({
   logo: {
     width: "100%",
     height: 150,
+    marginBottom: 10,
     resizeMode: "contain",
   },
   title: {
@@ -157,7 +175,8 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    marginVertical: 15,
+    marginTop: 30,
+    marginBottom: 0,
     backgroundColor: "white",
     fontSize: 18,
     fontWeight: "bold",
@@ -168,17 +187,19 @@ const styles = StyleSheet.create({
     height: 30,
   },
   button: {
-    width: "100%",
-    borderRadius: 15,
+    width: "60%",
+    height: 60,
+    borderRadius: 30,
 
     justifyContent: "center",
     alignSelf: "center",
-    borderColor: "black",
-    borderWidth: 4,
-    paddingVertical: 3,
+    borderColor: "#c49800",
+    borderWidth: 2,
+    paddingVertical: 4,
+    marginTop: 10,
   },
   button_text: {
-    color: "black",
+    color: dark,
     fontWeight: "bold",
     fontSize: 18,
   },
