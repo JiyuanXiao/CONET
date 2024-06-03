@@ -22,6 +22,32 @@ export interface AuthenticationContentProps {
   logOut: () => Promise<void>;
 }
 
+/////////////////////////////////////// CHAT CONTEXT ////////////////////////////////////////////////
+
+export interface ChatProps {
+  chat_id: number;
+  chat_name: string;
+  avatar_img_src: string;
+  last_message: string;
+  last_message_timestamp: string;
+}
+
+export interface ChatsContextProps {
+  chats: Map<number, CE_ChatProps>;
+  setChatMap: (chat_id: number, chat: CE_ChatProps) => void;
+  current_talking_chat_id: number;
+  setCurrentTalkingChatId: React.Dispatch<React.SetStateAction<number>>;
+  has_new_message: Map<number, boolean>;
+  setHasNewMessageStatus: (chat_id: number, read_status: boolean) => void;
+  is_chats_initialized: boolean;
+  addChat: (chat_object: CE_ChatProps) => Promise<void>;
+  updateChat: (chat_object: CE_ChatProps) => Promise<void>;
+  deleteChat: (chat_id: number) => Promise<void>;
+  getLastRead: (chat_id: number) => Promise<number>;
+  setLastRead: (chat_id: number, last_read_message_id: number) => Promise<void>;
+  resetChatContext: () => void;
+}
+
 /////////////////////////////////////// MESSAGE CONTEXT ////////////////////////////////////////////////
 
 export interface MessagesDateabseProps {
@@ -63,29 +89,11 @@ export interface MessageContextProps {
   resetLoadedMessagesById: (chat_id: number) => Promise<void>;
   ClearAllMessagesById: (chat_id: number) => void;
   is_messages_initialized: boolean;
+  resetMessageContext: () => void;
 }
 
-/////////////////////////////////////// CHAT CONTEXT ////////////////////////////////////////////////
+///////////////////////////////////////// WEBSOCKET //////////////////////////////////////////////
 
-export interface ChatProps {
-  chat_id: number;
-  chat_name: string;
-  avatar_img_src: string;
-  last_message: string;
-  last_message_timestamp: string;
-}
-
-export interface ChatsContextProps {
-  chats: Map<number, CE_ChatProps>;
-  setChatMap: (chat_id: number, chat: CE_ChatProps) => void;
-  current_talking_chat_id: number;
-  setCurrentTalkingChatId: React.Dispatch<React.SetStateAction<number>>;
-  has_new_message: Map<number, boolean>;
-  setHasNewMessageStatus: (chat_id: number, read_status: boolean) => void;
-  is_chats_initialized: boolean;
-  addChat: (chat_object: CE_ChatProps) => Promise<void>;
-  updateChat: (chat_object: CE_ChatProps) => Promise<void>;
-  deleteChat: (chat_id: number) => Promise<void>;
-  getLastRead: (chat_id: number) => Promise<number>;
-  setLastRead: (chat_id: number, last_read_message_id: number) => Promise<void>;
+export interface WebsocketContextProps {
+  resetWebSocket: () => void;
 }

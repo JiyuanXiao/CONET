@@ -11,13 +11,16 @@ import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
 import * as MessagesStorage from "@/api/messages/messages.storage";
 import { useSQLiteContext } from "expo-sqlite";
 import { ChatsContext } from "../chats/chats.context";
+import { WebsocketContextProps } from "@/constants/ContextTypes";
 
 interface MessageResponseProps {
   id: number;
   message: CE_MessageProps;
 }
 
-export const WebSocketContext = createContext({});
+export const WebSocketContext = createContext<WebsocketContextProps>({
+  resetWebSocket: () => {},
+});
 
 export const WebSocketProvider = ({
   children,
@@ -31,50 +34,71 @@ export const WebSocketProvider = ({
     useContext(MessagesContext);
   const [response_message, setResponseMessage] =
     useState<MessageResponseProps | null>();
+  const isLoggedIn = useRef(true);
   const db = useSQLiteContext();
 
-  useEffect(() => {
-    const connectWebSocket = () => {
-      if (user && is_messages_initialized) {
-        ws.current = new WebSocket(
-          `${process.env.EXPO_PUBLIC_WEBSOCKET_BASE_URL}/person/?publicKey=${process.env.EXPO_PUBLIC_PROJECT_ID}&username=${user?.username}&secret=${user?.secret}`
-        );
+  const connectWebSocket = () => {
+    if (user && is_messages_initialized && isLoggedIn.current) {
+      ws.current = new WebSocket(
+        `${process.env.EXPO_PUBLIC_WEBSOCKET_BASE_URL}/person/?publicKey=${process.env.EXPO_PUBLIC_PROJECT_ID}&username=${user?.username}&secret=${user?.secret}`
+      );
 
-        ws.current.onopen = () => {
-          console.log("WebSocket connection opened");
-        };
+      ws.current.onopen = () => {
+        console.log(`[WebSocket] connection opened for ${user?.username}`);
+      };
 
-        ws.current.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          if (message.action === "new_message") {
-            const recevie_success = receiveMessage(
-              message.data.id,
-              message.data.message
-            );
+      ws.current.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        if (message.action === "new_message") {
+          const recevie_success = receiveMessage(
+            message.data.id,
+            message.data.message
+          );
 
-            if (recevie_success) {
-              setResponseMessage(message.data);
-            }
-            console.log(JSON.stringify(message.data, null, 2));
+          if (recevie_success) {
+            setResponseMessage(message.data);
           }
-        };
+          console.log(JSON.stringify(message.data, null, 2));
+        }
+      };
 
-        ws.current.onclose = () => {
-          console.log("WebSocket connection closed");
-          // Reconnect after a delay
+      ws.current.onclose = () => {
+        console.log("[WebSocket] connection closed");
+        // Reconnect after a delay
+        if (user && is_messages_initialized && isLoggedIn.current) {
           setTimeout(connectWebSocket, 1000);
-        };
+        }
+      };
 
-        ws.current.onerror = (error) => {
-          console.error("WebSocket error", error);
-        };
-      }
-    };
+      ws.current.onerror = (error) => {
+        console.error("[WebSocket] error", error);
+      };
+    }
+  };
+
+  useEffect(() => {
     connectWebSocket();
     return () => {
       ws.current?.close();
     };
+  }, [user, is_messages_initialized, isLoggedIn]);
+
+  useEffect(() => {
+    if (user && is_messages_initialized) {
+      isLoggedIn.current = true;
+      connectWebSocket();
+    }
   }, [user, is_messages_initialized]);
+
+  const resetWebSocket = () => {
+    isLoggedIn.current = false;
+    if (ws.current) {
+      ws.current.close();
+      ws.current = null;
+    }
+
+    console.log(`[WebSocket] clean up connection and data`);
+  };
 
   useEffect(() => {
     if (response_message) {
@@ -92,6 +116,8 @@ export const WebSocketProvider = ({
   }, [response_message]);
 
   return (
-    <WebSocketContext.Provider value={{}}>{children}</WebSocketContext.Provider>
+    <WebSocketContext.Provider value={{ resetWebSocket }}>
+      {children}
+    </WebSocketContext.Provider>
   );
 };

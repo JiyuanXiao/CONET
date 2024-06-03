@@ -21,6 +21,7 @@ export const MessagesContext = createContext<MessageContextProps>({
   resetLoadedMessagesById: async () => {},
   ClearAllMessagesById: async () => {},
   is_messages_initialized: false,
+  resetMessageContext: () => {},
 });
 
 export const MessagesContextProvider = (props: {
@@ -433,6 +434,12 @@ export const MessagesContextProvider = (props: {
     }
   };
 
+  const resetMessageContext = () => {
+    setMessages(new Map<number, MessageContextObjectProps>());
+    setIsMessagesInitialized(false);
+    console.log(`[Message Context] all messages context data has been cleaned`);
+  };
+
   useEffect(() => {
     if (is_chats_initialized) {
       initialSetUpObjectList();
@@ -449,6 +456,7 @@ export const MessagesContextProvider = (props: {
         resetLoadedMessagesById,
         ClearAllMessagesById,
         is_messages_initialized,
+        resetMessageContext,
       }}
     >
       {props.children}

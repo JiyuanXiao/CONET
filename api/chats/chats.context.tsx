@@ -18,6 +18,7 @@ export const ChatsContext = createContext<ChatsContextProps>({
   deleteChat: async () => {},
   getLastRead: async () => 0,
   setLastRead: async () => {},
+  resetChatContext: () => {},
 });
 
 // Friends context provides friend log such as last message and last message timestamp
@@ -221,6 +222,15 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
+  const resetChatContext = () => {
+    setChats(new Map<number, CE_ChatProps>());
+    setCurrentTalkingChatId(-1);
+    setIsChatsInitialized(false);
+    setHasNewMessage(new Map<number, boolean>());
+    setLastReadNeedUpdate(false);
+    console.log(`[Chat Context] all chat context data has been cleaned`);
+  };
+
   useEffect(() => {
     if (is_authentication_initialized) {
       initializeChatsContext();
@@ -249,6 +259,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         deleteChat,
         getLastRead,
         setLastRead,
+        resetChatContext,
       }}
     >
       {props.children}
