@@ -5,6 +5,7 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
+import { ChatsContext } from "@/api/chats/chats.context";
 
 export default function SettngScreen() {
   const { user, logOut } = useContext(AuthenticationContext);

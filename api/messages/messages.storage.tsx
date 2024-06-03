@@ -38,13 +38,11 @@ export const createMessageTableIfNotExists = (
       //`CREATE TABLE IF NOT EXISTS ${username}_messages_${chat_id} (id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id TEXT, receiver_id TEXT, content TEXT, content_type TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);`
       `CREATE TABLE IF NOT EXISTS ${username}_messages_${chat_id} (message_id INTEGER PRIMARY KEY, sender_username TEXT, text_content TEXT, file_url TEXT, content_type TEXT, timestamp TEXT);`
     );
-    console.info(
-      `Table [${username}_messages_${chat_id}] is created successfully...`
+    console.log(
+      `[Message Storage] Table [${username}_messages_${chat_id}] is created successfully...`
     );
   } catch (err) {
-    console.error(
-      "at CreateMessageTableIfNotExists() in messages.storage.tsx: " + err
-    );
+    console.error("[Message Storage] CreateMessageTableIfNotExists(): " + err);
   }
 };
 
@@ -61,7 +59,7 @@ export const deleteMessageTableIfExists = (
   }
   try {
     db.execSync(`DROP TABLE IF EXISTS ${username}_messages_${chat_id};`);
-    console.info(
+    console.log(
       `Table [${username}_messages_${chat_id}] is deleted successfully...`
     );
   } catch (err) {
@@ -77,9 +75,7 @@ export const fetchLatestMessage = (
   db: SQLiteDatabase
 ) => {
   if (!username || username.length === 0) {
-    console.error(
-      "at fetchLatestMessage() in messages.storage.tsx: username is empty"
-    );
+    console.error("[Message Storage] fetchLatestMessage(): username is empty");
     return;
   }
   try {
@@ -87,13 +83,13 @@ export const fetchLatestMessage = (
       `SELECT message_id, sender_username, text_content, file_url, content_type, timestamp FROM ${username}_messages_${chat_id} ORDER BY message_id DESC LIMIT 1;`
     ) as MessagesProps;
     if (lastest_message) {
-      console.info(
-        `Fetched latest message in table [${username}_messages_${chat_id}] successfully...`
+      console.log(
+        `[Message Storage] Fetched latest message in table [${username}_messages_${chat_id}] successfully...`
       );
     }
     return lastest_message;
   } catch (err) {
-    console.error("at fetchLatestMessage() in messages.storage.tsx: " + err);
+    console.error("[Message Storage] fetchLatestMessage(): " + err);
   }
 };
 
@@ -104,9 +100,7 @@ export const storeMessage = (
   db: SQLiteDatabase
 ) => {
   if (!username || username.length === 0) {
-    console.error(
-      "at storeMessage() in messages.storage.tsx: username is empty"
-    );
+    console.error("[Message Storage] storeMessage(): username is empty");
     return;
   }
 
@@ -123,13 +117,11 @@ export const storeMessage = (
       message_object.text ? "text" : "file",
       message_object.created
     );
-    console.info(
-      `Insert new message into table [${username}_messages_${chat_id}]: ${message_object.id}`
+    console.log(
+      `[Message Storage] Insert new message into table [${username}_messages_${chat_id}]: ${message_object.id}`
     );
   } catch (err) {
-    console.error(
-      `at storeMessage() in messages.storage.tsx: chat-${chat_id}: ` + err
-    );
+    console.error(`[Message Storage] storeMessage(): chat-${chat_id}: ` + err);
   }
 
   const lastest_message = fetchLatestMessage(username, chat_id, db);
@@ -142,9 +134,7 @@ export const fetchAllMessages = async (
   db: SQLiteDatabase
 ) => {
   if (!username || username.length === 0) {
-    console.error(
-      "at fetchAllMessages() in messages.storage.tsx: username is empty"
-    );
+    console.error("[Message Storage]fetchAllMessages(): username is empty");
     return [];
   }
 
@@ -153,13 +143,13 @@ export const fetchAllMessages = async (
       `SELECT message_id, sender_username, text_content, file_url, content_type, timestamp FROM ${username}_messages_${chat_id} ORDER BY message_id DESC;`
     )) as MessagesProps[];
     if (all_msg) {
-      console.info(
-        `Fetched all message from table [${username}_messages_${chat_id}] successfully...`
+      console.log(
+        `[Message Storage] Fetched all message from table [${username}_messages_${chat_id}] successfully...`
       );
     }
     return all_msg;
   } catch (err) {
-    console.error("at fetchAllMessages() in messages.storage.tsx: " + err);
+    console.error("[Message Storage] fetchAllMessages(): " + err);
     return [];
   }
 };

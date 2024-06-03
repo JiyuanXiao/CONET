@@ -17,10 +17,10 @@ export const GetMyAccount = async (
 
   try {
     const response = await axios.get(url, { headers });
-    console.log(`GET Request: GetMyAccount() for ${username}`);
+    console.log(`[Auth API] GET: GetMyAccount() for ${username}`);
     return response.data;
   } catch (err) {
-    console.error(`GET Request: GetMyAccount() ERROR:`, err);
+    console.error(`[Auth API] GET: GetMyAccount() ERROR:`, err);
     return null;
   }
 };

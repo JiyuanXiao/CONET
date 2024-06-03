@@ -28,14 +28,12 @@ export const getLoadedMessages = async (
   ) {
     const start_index = messages_object.current_index;
 
-    console.info(
-      "getLoadedMessages() at messages.context.tsx is calling: fetchAllMessages()"
-    );
     const all_messages = await MessagesStorage.fetchAllMessages(
       username,
       chat_id,
       db
     );
+    console.log("[Message Context] fetched all messages from storage ");
 
     const msg_list_len = all_messages.length;
 
@@ -44,7 +42,7 @@ export const getLoadedMessages = async (
       messages_object.total_messages_amount !== msg_list_len
     ) {
       console.warn(
-        "LOAD_MESSAGES: Message Context messages amount does not match with Local Storage message list length"
+        "[Message Context] getLoadedMessages(): Message Context messages amount does not match with Local Storage message list length"
       );
     }
 

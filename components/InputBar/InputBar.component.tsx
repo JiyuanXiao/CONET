@@ -44,13 +44,7 @@ const InputBar = (props: InputBarProps) => {
             "InputBar(): calling sendMessage() for " + user?.username
           );
 
-          sendMessage(
-            props.chat_id,
-            user.username,
-            new_message,
-            null,
-            Date.now().toString()
-          );
+          sendMessage(props.chat_id, new_message, null, Date.now().toString());
         } else {
           console.error("InputBar(): User is undefined");
         }

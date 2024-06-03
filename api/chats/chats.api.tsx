@@ -21,10 +21,10 @@ export const GetMyChats = async (
 
   try {
     const response = await axios.get(url, { headers });
-    console.log(`GET Request: GetMyChats() for ${username}`);
+    console.log(`[Chat API] GET: GetMyChats() for ${username}`);
     return response.data;
   } catch (err) {
-    console.error(`GET Request: GetMyChats() ERROR:`, err);
+    console.error(`[Chat API] GET: GetMyChats() ERROR:`, err);
     return [];
   }
 };

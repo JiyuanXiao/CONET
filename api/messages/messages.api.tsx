@@ -11,13 +11,13 @@ export const SendChatMessage = async (
 ) => {
   if (username.length === 0 || secret.length === 0) {
     console.warn(
-      `at SendChatMessage() in messages.api.tsx: username or secret is undefined: ${chat_id}`
+      `[Message API] SendChatMessage(): username or secret is undefined: ${chat_id}`
     );
     return false;
   }
   if (!text && !file) {
     console.warn(
-      `at SendChatMessage() in messages.api.tsx: text and file cannot be both empty: ${chat_id}`
+      `[Message API] SendChatMessage(): text and file cannot be both empty: ${chat_id}`
     );
     return false;
   }
@@ -39,10 +39,10 @@ export const SendChatMessage = async (
 
   try {
     const response = await axios.post(url, data, { headers });
-    console.log(`POST Request: SendChatMessage() for ${username}`);
+    console.log(`[Message API] POST: SendChatMessage() for ${username}`);
     return true;
   } catch (err) {
-    console.error(`POST Request: SendChatMessage() ERROR: ${err}`);
+    console.error(`[Message API] POST: SendChatMessage() ERROR: ${err}`);
     return false;
   }
 };
@@ -63,10 +63,10 @@ export const GetLatestChatMessages = async (
 
   try {
     const response = await axios.get(url, { headers });
-    console.log(`GET Request: GetLatestChatMessages() for ${username}`);
+    console.log(`[Message API] GET: GetLatestChatMessages() for ${username}`);
     return response.data;
   } catch (err) {
-    console.error(`GET Request: GetLatestChatMessages() ERROR:`, err);
+    console.error(`[Message API] GET: GetLatestChatMessages() ERROR:`, err);
     return [];
   }
 };
@@ -100,7 +100,7 @@ export const GetUnreadChatMessages = async (
         (message) => message.id > last_read_message_id
       );
       console.log(
-        `${unread_messages.length} unread messages has been fected from server for chat ${chat_id}`
+        `[Message API] ${unread_messages.length} unread messages has been fected from server for chat ${chat_id}`
       );
       return unread_messages;
     }

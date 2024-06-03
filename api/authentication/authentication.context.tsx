@@ -29,27 +29,29 @@ export const AuthenticationContextProvider = (props: {
   const logIn = async (username: string, pw: string) => {
     const curr_user = await GetMyAccount(username, pw);
     if (curr_user) {
-      console.info("User " + curr_user.username + " loging in...");
+      console.log(
+        "[Auth Context] User " + curr_user.username + " loging in..."
+      );
       curr_user.secret = pw;
       await storeAuthenticatedUser(curr_user);
       setUser(curr_user);
       setIsAuthenticationInitialized(true);
       return true;
     }
-    console.warn("Username or password incorrect");
+    console.warn("[Auth Context] Username or password incorrect");
     setIsAuthenticationInitialized(false);
     return false;
   };
 
   const logOut = async () => {
-    console.info("User loging out...");
+    console.log("[Auth Context] User loging out...");
     setIsAuthenticationInitialized(false);
     await removeAuthenticatedUser();
     setUser(null);
   };
 
   const initializeUserData = async () => {
-    console.info("Start to initialize authentication context");
+    console.log("[Auth Context] Start to initialize authentication context");
     const curr_user = await fetchAuthenticatedUser();
     if (curr_user) {
       const updated_user = await GetMyAccount(
@@ -61,11 +63,14 @@ export const AuthenticationContextProvider = (props: {
         setUser(updated_user);
       }
       setIsAuthenticationInitialized(true);
-      console.info(
-        "Initialize authentication context successfully: " + curr_user?.username
+      console.log(
+        "[Auth Context] Initialize authentication context successfully: " +
+          curr_user?.username
       );
     } else {
-      console.log("No user info in storage. Waiting for login...");
+      console.log(
+        "[Auth Context] No user log in storage. Waiting for login..."
+      );
       setIsAuthenticationInitialized(false);
     }
   };

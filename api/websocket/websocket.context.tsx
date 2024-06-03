@@ -48,7 +48,6 @@ export const WebSocketProvider = ({
           const message = JSON.parse(event.data);
           if (message.action === "new_message") {
             const recevie_success = receiveMessage(
-              user.username,
               message.data.id,
               message.data.message
             );

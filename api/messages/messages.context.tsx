@@ -49,38 +49,41 @@ export const MessagesContextProvider = (props: {
 
     if (target_messages_object) {
       //Load messages
-      const is_initial_load = false;
-      console.info(
-        "loadMessagesById() at messages.context.tsx is calling: getLoadedMessages()"
-      );
-      const newly_loaded_messages_object = await getLoadedMessages(
-        user?.username || "",
-        chat_id,
-        target_messages_object,
-        NUM_OF_MESSAGES_LOAD_AT_ONCE,
-        db,
-        is_initial_load
-      );
+      try {
+        const is_initial_load = false;
 
-      // Replace the target message object by the loaded one
-      setMessageMap(chat_id, newly_loaded_messages_object);
+        const newly_loaded_messages_object = await getLoadedMessages(
+          user?.username || "",
+          chat_id,
+          target_messages_object,
+          NUM_OF_MESSAGES_LOAD_AT_ONCE,
+          db,
+          is_initial_load
+        );
+        // Replace the target message object by the loaded one
+        setMessageMap(chat_id, newly_loaded_messages_object);
+        console.log(`[Message Context] load message for chat ${chat_id}`);
+      } catch (err) {
+        console.error(
+          `[Message Context] getLoadedMessagesObjectById(): chat ${chat_id}: ${err}`
+        );
+      }
     } else {
       console.warn(
-        `at getLoadedMessagesObjectById() in messages.context.tsx: chat_id:${chat_id} DOES NOT EXIST`
+        `[Message Context] getLoadedMessagesObjectById(): chat ${chat_id} does not exit in message context`
       );
     }
   };
 
   const sendMessage = async (
     chat_id: number,
-    username: string,
     text_content: string | null,
     file_url: string | null,
     temp_timestamp: string
   ) => {
     const new_message = {
       message_id: -1,
-      sender_username: username,
+      sender_username: user?.username || "",
       text_content: text_content || "",
       file_url: file_url || "",
       content_type: text_content ? "text" : "file",
@@ -103,67 +106,34 @@ export const MessagesContextProvider = (props: {
 
       // Replace the target message object by the loaded one
       setMessageMap(chat_id, updated_messages_object);
-      const success = await MessageServer.SendChatMessage(
-        user?.username || "",
-        user?.secret || "",
-        chat_id,
-        text_content,
-        file_url,
-        temp_timestamp
-      );
-      return success;
+
+      try {
+        const success = await MessageServer.SendChatMessage(
+          user?.username || "",
+          user?.secret || "",
+          chat_id,
+          text_content,
+          file_url,
+          temp_timestamp
+        );
+        console.log(
+          `[Message Context] chat ${chat_id}: sent message to server successfully...`
+        );
+        return success;
+      } catch (err) {
+        console.error(
+          `[Message Context] chat ${chat_id}: sent message to server failed: ${err}`
+        );
+      }
     } else {
       console.warn(
-        `at addMessageById() in messages.context.tsx: chat_id ${chat_id} DOES NOT EXIST`
+        `[Message Context] addMessageById(): chat_id ${chat_id} DOES NOT EXIST`
       );
       return false;
     }
   };
 
-  // Add a newly sent or recevied message to local storage and context
-  // const conformMessageIsSent = async (
-  //   username: string,
-  //   chat_id: number,
-  //   ce_message: CE_MessageProps
-  // ) => {
-  //   // store new message to local storage
-  //   console.info(
-  //     "addMessageById() at messages.context.tsx is calling: storeMessage()"
-  //   );
-  //   const new_message = MessagesStorage.storeMessage(
-  //     username,
-  //     chat_id,
-  //     ce_message,
-  //     db
-  //   );
-
-  //   if (new_message) {
-  //     // find the index of original message object
-  //     const target_messages_object = messages.get(Number(chat_id));
-
-  //     if (target_messages_object) {
-  //       const target_message_index =
-  //         target_messages_object.loaded_messages.findIndex((message) => {
-  //           message.timestamp === ce_message.custom_json;
-  //         });
-
-  //       target_messages_object.loaded_messages[target_message_index] =
-  //         new_message;
-
-  //       // Replace the target message object by the loaded one
-  //       setMessageMap(chat_id, target_messages_object);
-
-  //       await MessagesStorage.storeMessage(username, chat_id, ce_message, db);
-  //     } else {
-  //       console.warn(
-  //         `at addMessageById() in messages.context.tsx: chat_id ${chat_id} DOES NOT EXIST`
-  //       );
-  //     }
-  //   }
-  // };
-
   const receiveMessage = (
-    username: string,
     chat_id: number,
     ce_message: CE_MessageProps
   ): boolean => {
@@ -171,7 +141,7 @@ export const MessagesContextProvider = (props: {
 
     if (!target_messages_object) {
       console.log(
-        `in receiveMessage() at messages.context.tsx: messgae send to unknown chat: ${chat_id}`
+        `[Message Context] receiveMessage(): messgae send to unknown chat: ${chat_id}`
       );
       return false;
     }
@@ -195,7 +165,9 @@ export const MessagesContextProvider = (props: {
 
     // This new message is sent by myself
     if (target_message_index !== -1) {
-      console.log(`Confirmed a message ${ce_message.id} is sent by myself`);
+      console.log(
+        `[Message Context] Confirmed a message ${ce_message.id} is sent by myself`
+      );
 
       const updated_loaded_messages = target_messages_object.loaded_messages;
 
@@ -213,7 +185,7 @@ export const MessagesContextProvider = (props: {
     // This message is sent by other
     else {
       console.log(
-        `A new message ${ce_message.id} is sent from ${ce_message.sender_username}`
+        `[Message Context] A new message ${ce_message.id} is sent from ${ce_message.sender_username}`
       );
       const updated_messages_object = {
         chat_id: target_messages_object.chat_id,
@@ -227,7 +199,7 @@ export const MessagesContextProvider = (props: {
       setMessageMap(chat_id, updated_messages_object);
     }
     //await MessagesStorage.storeMessage(username, chat_id, ce_message, db);
-    console.log(`New message ${ce_message.id} is received`);
+    console.log(`[Message Context] New message ${ce_message.id} is received`);
     return true;
   };
 
@@ -259,11 +231,11 @@ export const MessagesContextProvider = (props: {
       setMessageMap(chat_id, updated_messages_object);
     } else {
       try {
-        console.info(
-          `Message ojbect with chat_id: ${chat_id} does not exist in message context`
+        console.log(
+          `[Message Context] resetLoadedMessagesById(): Message ojbect with chat_id: ${chat_id} does not exist in message context`
         );
-        console.info(
-          `Creating a new message object with chat_id: ${chat_id}...`
+        console.log(
+          `[Message Context] resetLoadedMessagesById(): Creating a new message object with chat_id: ${chat_id}...`
         );
         const initial_messages_object = {
           chat_id: chat_id,
@@ -274,9 +246,7 @@ export const MessagesContextProvider = (props: {
 
         // First load
         const is_initial_load = true;
-        console.info(
-          "resetLoadedMessagesById() at messages.context.tsx is calling: getLoadedMessages()"
-        );
+
         const newly_loaded_messages_object = await getLoadedMessages(
           user?.username || "",
           chat_id,
@@ -288,19 +258,19 @@ export const MessagesContextProvider = (props: {
 
         // Append new messages object to object list
         setMessageMap(chat_id, newly_loaded_messages_object);
-        console.info(
-          `New message object with chat_id: ${chat_id} is created successfully...`
+        console.log(
+          `[Message Context] New message object with chat_id: ${chat_id} is created successfully...`
         );
       } catch (err) {
-        console.error(
-          "at resetLoadedMessagesById() in messages.context.tsx: " + err
-        );
+        console.error("[Message Context] resetLoadedMessagesById(): " + err);
       }
     }
   };
 
-  const ClearAllMessagesById = async (chat_id: number) => {
-    console.log("Start to clear all messages data for " + chat_id);
+  const ClearAllMessagesById = (chat_id: number) => {
+    console.log(
+      "[Message Context] Start to clear all messages data for " + chat_id
+    );
     MessagesStorage.deleteMessageTableIfExists(
       user?.username || "",
       chat_id,
@@ -311,7 +281,9 @@ export const MessagesContextProvider = (props: {
       chat_id,
       db
     );
-
+    console.log(
+      "[Message Context] cleared messages from local storage for " + chat_id
+    );
     // find the index of original message object
     const target_messages_object = messages.get(Number(chat_id));
 
@@ -326,57 +298,82 @@ export const MessagesContextProvider = (props: {
 
       // Replace the target message object by the loaded one
       setMessageMap(chat_id, cleared_messages_object);
+      console.log(
+        "[Message Context] cleared messages from context for " + chat_id
+      );
     } else {
       console.warn(
-        `at ClearAllMessagesById() in messages.context.tsx: chat_id ${chat_id} DOES NOT EXIST`
+        `[Message Context] ClearAllMessagesById(): chat_id ${chat_id} DOES NOT EXIST`
       );
     }
   };
 
   const initialSetUpObjectList = async () => {
     if (user) {
-      console.info("Start to initialize message context...");
+      console.log("[Message Context] Start to initialize message context...");
 
       const chat_server_connected = true;
 
       if (chat_server_connected) {
         console.log(
-          "Start to get messages data from server and update to storage for " +
+          "[Message Context] Start to get messages data from server and update to storage for " +
             user.username
         );
         for (const chat of chats.values()) {
-          const last_read = await getLastRead(chat.id);
-          const ce_message_object_list =
-            await MessageServer.GetUnreadChatMessages(
-              user.username,
-              user.secret,
-              chat.id,
-              last_read
-            );
+          const latest = MessagesStorage.fetchLatestMessage(
+            user.username,
+            chat.id,
+            db
+          );
 
-          if (!MessagesStorage.messageTableExist(user.username, chat.id, db)) {
-            MessagesStorage.createMessageTableIfNotExists(
-              user.username,
-              chat.id,
-              db
-            );
-          }
-          for (const ce_message_object of ce_message_object_list) {
-            if (ce_message_object.id > last_read) {
-              MessagesStorage.storeMessage(
+          try {
+            let last_read = await getLastRead(chat.id);
+            if (latest) {
+              last_read = Math.min(last_read, latest.message_id);
+            }
+            const ce_message_object_list =
+              await MessageServer.GetUnreadChatMessages(
+                user.username,
+                user.secret,
+                chat.id,
+                last_read
+              );
+
+            if (
+              !MessagesStorage.messageTableExist(user.username, chat.id, db)
+            ) {
+              MessagesStorage.createMessageTableIfNotExists(
                 user.username,
                 chat.id,
-                ce_message_object,
                 db
               );
             }
+            for (const ce_message_object of ce_message_object_list) {
+              if (ce_message_object.id > last_read) {
+                MessagesStorage.storeMessage(
+                  user.username,
+                  chat.id,
+                  ce_message_object,
+                  db
+                );
+              }
+            }
+            console.log(
+              `[Message Context] update chat ${chat.id} new messages to storage`
+            );
+          } catch (err) {
+            console.error(
+              `[Message Context] update chat ${chat.id} new messages to storage failed`
+            );
           }
         }
-        console.log("Finish updating messages storage data from server...");
+        console.log(
+          "[Message Context] Finish updating messages storage data from server..."
+        );
       }
 
       console.log(
-        "Start to fetch messages data from local storage to context..."
+        "[Message Context] Start to fetch messages data from local storage to context..."
       );
 
       // Fetach all messages from loacl storage for each friend
@@ -390,24 +387,30 @@ export const MessagesContextProvider = (props: {
 
         // If message data existed already, load the data
         if (MessagesStorage.messageTableExist(user.username, chat.id, db)) {
-          const is_initial_load = true;
-          console.info(
-            "initialSetUpObjectList() at messages.context.tsx is calling: getLoadedMessages() for " +
-              chat.id
-          );
-          initial_messages_object = await getLoadedMessages(
-            user.username,
-            chat.id,
-            initial_messages_object,
-            NUM_OF_MESSAGES_LOAD_AT_ONCE,
-            db,
-            is_initial_load
-          );
+          try {
+            const is_initial_load = true;
+
+            initial_messages_object = await getLoadedMessages(
+              user.username,
+              chat.id,
+              initial_messages_object,
+              NUM_OF_MESSAGES_LOAD_AT_ONCE,
+              db,
+              is_initial_load
+            );
+            console.log(
+              `[Message Context] initially loaded message for chat ${chat.id} successfully`
+            );
+          } catch (err) {
+            console.error(
+              `[Message Context] initially loaded message for chat ${chat.id} failed: ${err}`
+            );
+          }
         }
         // If message data doesn't exist, create one in local storage
         else {
-          console.info(
-            "initialSetUpObjectList() at messages.context.tsx is calling: createMessageTableIfNotExists()"
+          console.log(
+            `[Message Context] message table for chat ${chat.id} do not exist, start creating...`
           );
           MessagesStorage.createMessageTableIfNotExists(
             user.username,
@@ -420,10 +423,12 @@ export const MessagesContextProvider = (props: {
         setMessageMap(chat.id, initial_messages_object);
       }
       console.log(
-        "Finish fetching messages data from local storage to context..."
+        "[Message Context] Finish fetching messages data from local storage to context..."
       );
 
-      console.info("Initialize message context successfully...");
+      console.log(
+        "[Message Context] Initialize message context successfully..."
+      );
       setIsMessagesInitialized(true);
     }
   };

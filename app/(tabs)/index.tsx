@@ -14,7 +14,7 @@ export default function ChatListScreen() {
   const { colors } = useTheme();
   const { chats, has_new_message, is_chats_initialized } =
     useContext(ChatsContext);
-  const { is_messages_initialized } = useContext(MessagesContext);
+  const { is_messages_initialized, messages } = useContext(MessagesContext);
   const { user } = useContext(AuthenticationContext);
   const [_, forceUpdate] = useState<number>();
 
@@ -42,27 +42,43 @@ export default function ChatListScreen() {
   const getLastMessageInfo = (
     chat_id: number
   ): { last_message: string; last_message_time: string } => {
-    const target_chat = chats.get(chat_id);
+    // const target_chat = chats.get(chat_id);
 
-    if (target_chat) {
-      const result = {
-        last_message: target_chat.last_message.text
-          ? target_chat.last_message.text
-          : "[媒体文件]",
-        last_message_time: target_chat.last_message.created,
+    // if (target_chat) {
+    //   const result = {
+    //     last_message: target_chat.last_message.text
+    //       ? target_chat.last_message.text
+    //       : "[媒体文件]",
+    //     last_message_time: target_chat.last_message.created,
+    //   };
+    //   return result;
+    // } else {
+    //   console.log(
+    //     "at getLastMessageInfo() in index.tsx: chat " +
+    //       chat_id +
+    //       " is not in chat context"
+    //   );
+    // }
+    // return {
+    //   last_message: "",
+    //   last_message_time: "",
+    // };
+    const target_messages = messages.get(Number(chat_id));
+    if (!target_messages || target_messages?.loaded_messages.length === 0) {
+      return {
+        last_message: "",
+        last_message_time: "",
       };
-      return result;
-    } else {
-      console.log(
-        "at getLastMessageInfo() in index.tsx: chat " +
-          chat_id +
-          " is not in chat context"
-      );
     }
-    return {
-      last_message: "",
-      last_message_time: "",
+
+    const result = {
+      last_message:
+        target_messages.loaded_messages[0].content_type === "text"
+          ? target_messages.loaded_messages[0].text_content
+          : "[媒体文件]",
+      last_message_time: target_messages.loaded_messages[0].timestamp,
     };
+    return result;
   };
 
   useEffect(() => {

@@ -55,18 +55,13 @@ export interface MessageContextProps {
   loadMessagesById: (chat_id: number) => Promise<void>;
   sendMessage: (
     chat_id: number,
-    username: string,
     text_content: string | null,
     file_url: string | null,
     timestamp: string
   ) => void;
-  receiveMessage: (
-    username: string,
-    chat_id: number,
-    ce_message: CE_MessageProps
-  ) => boolean;
+  receiveMessage: (chat_id: number, ce_message: CE_MessageProps) => boolean;
   resetLoadedMessagesById: (chat_id: number) => Promise<void>;
-  ClearAllMessagesById: (chat_id: number) => Promise<void>;
+  ClearAllMessagesById: (chat_id: number) => void;
   is_messages_initialized: boolean;
 }
 
