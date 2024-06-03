@@ -19,6 +19,7 @@ interface MessageResponseProps {
 }
 
 export const WebSocketContext = createContext<WebsocketContextProps>({
+  websocket_connected: false,
   resetWebSocket: () => {},
 });
 
@@ -34,6 +35,7 @@ export const WebSocketProvider = ({
     useContext(MessagesContext);
   const [response_message, setResponseMessage] =
     useState<MessageResponseProps | null>();
+  const [websocket_connected, setWebSocketConnected] = useState(false);
   const isLoggedIn = useRef(true);
   const db = useSQLiteContext();
 
@@ -45,6 +47,7 @@ export const WebSocketProvider = ({
 
       ws.current.onopen = () => {
         console.log(`[WebSocket] connection opened for ${user?.username}`);
+        setWebSocketConnected(true);
       };
 
       ws.current.onmessage = (event) => {
@@ -64,6 +67,7 @@ export const WebSocketProvider = ({
 
       ws.current.onclose = () => {
         console.log("[WebSocket] connection closed");
+        setWebSocketConnected(false);
         // Reconnect after a delay
         if (user && is_messages_initialized && isLoggedIn.current) {
           setTimeout(connectWebSocket, 1000);
@@ -72,12 +76,15 @@ export const WebSocketProvider = ({
 
       ws.current.onerror = (error) => {
         console.error("[WebSocket] error", error);
+        setWebSocketConnected(false);
       };
     }
   };
 
   useEffect(() => {
-    connectWebSocket();
+    if (!websocket_connected) {
+      connectWebSocket();
+    }
     return () => {
       ws.current?.close();
     };
@@ -86,7 +93,6 @@ export const WebSocketProvider = ({
   useEffect(() => {
     if (user && is_messages_initialized) {
       isLoggedIn.current = true;
-      connectWebSocket();
     }
   }, [user, is_messages_initialized]);
 
@@ -96,7 +102,7 @@ export const WebSocketProvider = ({
       ws.current.close();
       ws.current = null;
     }
-
+    setResponseMessage(null);
     console.log(`[WebSocket] clean up connection and data`);
   };
 
@@ -116,7 +122,7 @@ export const WebSocketProvider = ({
   }, [response_message]);
 
   return (
-    <WebSocketContext.Provider value={{ resetWebSocket }}>
+    <WebSocketContext.Provider value={{ websocket_connected, resetWebSocket }}>
       {children}
     </WebSocketContext.Provider>
   );

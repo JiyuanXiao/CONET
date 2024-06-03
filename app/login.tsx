@@ -11,9 +11,11 @@ import { Text, View } from "react-native";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { Entypo } from "@expo/vector-icons";
 
-const light = "#ffe178";
+//const focus = "#ffe178";
+const focus = "#041130";
 const main = "#fcc404";
-const dark = "#c49800";
+const blur = "#c49800";
+//const blur = "#ffe178";
 
 export default function LoginScreen() {
   const { colors } = useTheme();
@@ -74,10 +76,10 @@ export default function LoginScreen() {
             onChangeText={onChangeId}
             value={username}
             placeholder="用户名"
-            outlineColor={dark}
-            activeOutlineColor={light}
+            outlineColor={blur}
+            activeOutlineColor={focus}
             textColor="black"
-            outlineStyle={{ borderRadius: 15, borderWidth: 2 }}
+            outlineStyle={{ borderRadius: 15, borderWidth: 3 }}
             onFocus={() => {
               setUsernameFocus(true);
             }}
@@ -87,7 +89,7 @@ export default function LoginScreen() {
             left={
               <TextInput.Icon
                 icon="account"
-                color={username_focus ? light : dark}
+                color={username_focus ? focus : blur}
                 size={30}
                 style={styles.input_icon}
               />
@@ -100,10 +102,10 @@ export default function LoginScreen() {
             value={passwrod}
             placeholder="密码"
             secureTextEntry={password_invisiable}
-            outlineColor={dark}
-            activeOutlineColor={light}
+            outlineColor={blur}
+            activeOutlineColor={focus}
             textColor="black"
-            outlineStyle={{ borderRadius: 15, borderWidth: 2 }}
+            outlineStyle={{ borderRadius: 15, borderWidth: 3 }}
             onFocus={() => {
               setPasswordFocus(true);
             }}
@@ -113,7 +115,7 @@ export default function LoginScreen() {
             left={
               <TextInput.Icon
                 icon="lock"
-                color={password_focus ? light : dark}
+                color={password_focus ? focus : blur}
                 size={28}
                 style={styles.input_icon}
               />
@@ -142,7 +144,7 @@ export default function LoginScreen() {
             textColor="white"
             style={styles.button}
           >
-            <Entypo name="login" size={20} color={dark} />
+            <Entypo name="login" size={20} color={blur} />
           </Button>
         </View>
       </View>
@@ -193,13 +195,13 @@ const styles = StyleSheet.create({
 
     justifyContent: "center",
     alignSelf: "center",
-    borderColor: "#c49800",
+    borderColor: blur,
     borderWidth: 2,
     paddingVertical: 4,
     marginTop: 10,
   },
   button_text: {
-    color: dark,
+    color: blur,
     fontWeight: "bold",
     fontSize: 18,
   },

@@ -95,5 +95,6 @@ export interface MessageContextProps {
 ///////////////////////////////////////// WEBSOCKET //////////////////////////////////////////////
 
 export interface WebsocketContextProps {
+  websocket_connected: boolean;
   resetWebSocket: () => void;
 }
