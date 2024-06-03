@@ -60,11 +60,11 @@ export interface MessageContextProps {
     file_url: string | null,
     timestamp: string
   ) => void;
-  conformMessageIsSent: (
+  receiveMessage: (
     username: string,
     chat_id: number,
     ce_message: CE_MessageProps
-  ) => void;
+  ) => boolean;
   resetLoadedMessagesById: (chat_id: number) => Promise<void>;
   ClearAllMessagesById: (chat_id: number) => Promise<void>;
   is_messages_initialized: boolean;
@@ -85,10 +85,12 @@ export interface ChatsContextProps {
   setChatMap: (chat_id: number, chat: CE_ChatProps) => void;
   current_talking_chat_id: number;
   setCurrentTalkingChatId: React.Dispatch<React.SetStateAction<number>>;
-  is_chats_initialized: boolean;
-  addChat: (chat_object: CE_ChatProps) => void;
-  updateChat: (chat_object: CE_ChatProps) => void;
-  deleteChat: (chat_id: number) => void;
   has_new_message: Map<number, boolean>;
   setHasNewMessageStatus: (chat_id: number, read_status: boolean) => void;
+  is_chats_initialized: boolean;
+  addChat: (chat_object: CE_ChatProps) => Promise<void>;
+  updateChat: (chat_object: CE_ChatProps) => Promise<void>;
+  deleteChat: (chat_id: number) => Promise<void>;
+  getLastRead: (chat_id: number) => Promise<number>;
+  setLastRead: (chat_id: number, last_read_message_id: number) => Promise<void>;
 }

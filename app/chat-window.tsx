@@ -8,7 +8,6 @@ import { ThemeColorsProps } from "@/constants/ComponentTypes";
 import { Feather } from "@expo/vector-icons";
 import { ChatsContext } from "@/api/chats/chats.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
-import * as ChatStorage from "@/api/chats/chats.storage";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
 
 const MoreIcon = (props: { theme_colors: ThemeColorsProps }) => {
@@ -26,6 +25,7 @@ export default function ChatWindowScreen() {
     setCurrentTalkingChatId,
     setHasNewMessageStatus,
     current_talking_chat_id,
+    setLastRead,
   } = useContext(ChatsContext);
   const { user } = useContext(AuthenticationContext);
 
@@ -39,15 +39,10 @@ export default function ChatWindowScreen() {
 
   const updateLastReadMessage = async (chat: CE_ChatProps | undefined) => {
     if (chat) {
-      await ChatStorage.setLastRead(
-        user?.username,
-        chat_id,
-        chat.last_message.id
-      );
+      await setLastRead(chat_id, chat.last_message.id);
       console.log(
         `Chat ${chat.id} last read message update to latest message: ${chat.last_message.id}`
       );
-      setHasNewMessageStatus(chat.id, false);
     } else {
       console.error(
         "at updateLastReadMessage() in chat-window.tsx: chat not find chat with chat_id: " +
@@ -60,6 +55,10 @@ export default function ChatWindowScreen() {
     setCurrentTalkingChatId(Number(chat_id));
 
     updateLastReadMessage(chats.get(Number(chat_id)));
+
+    return () => {
+      setCurrentTalkingChatId(-1);
+    };
   }, []);
 
   useEffect(() => {

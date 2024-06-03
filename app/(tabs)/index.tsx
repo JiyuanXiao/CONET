@@ -9,16 +9,11 @@ import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
-import * as ChatStorage from "@/api/chats/chats.storage";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
-  const {
-    chats,
-    has_new_message,
-
-    is_chats_initialized,
-  } = useContext(ChatsContext);
+  const { chats, has_new_message, is_chats_initialized } =
+    useContext(ChatsContext);
   const { is_messages_initialized } = useContext(MessagesContext);
   const { user } = useContext(AuthenticationContext);
   const [_, forceUpdate] = useState<number>();

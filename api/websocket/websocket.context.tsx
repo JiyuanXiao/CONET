@@ -1,6 +1,21 @@
-import React, { createContext, useEffect, useRef, useContext } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useRef,
+  useContext,
+  useState,
+} from "react";
 import { AuthenticationContext } from "../authentication/authentication.context";
 import { MessagesContext } from "../messages/messages.context";
+import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
+import * as MessagesStorage from "@/api/messages/messages.storage";
+import { useSQLiteContext } from "expo-sqlite";
+import { ChatsContext } from "../chats/chats.context";
+
+interface MessageResponseProps {
+  id: number;
+  message: CE_MessageProps;
+}
 
 export const WebSocketContext = createContext({});
 
@@ -11,7 +26,12 @@ export const WebSocketProvider = ({
 }) => {
   const ws = useRef<WebSocket | null>(null);
   const { user } = useContext(AuthenticationContext);
-  const { is_messages_initialized } = useContext(MessagesContext);
+  const { setLastRead } = useContext(ChatsContext);
+  const { is_messages_initialized, receiveMessage } =
+    useContext(MessagesContext);
+  const [response_message, setResponseMessage] =
+    useState<MessageResponseProps | null>();
+  const db = useSQLiteContext();
 
   useEffect(() => {
     const connectWebSocket = () => {
@@ -27,6 +47,15 @@ export const WebSocketProvider = ({
         ws.current.onmessage = (event) => {
           const message = JSON.parse(event.data);
           if (message.action === "new_message") {
+            const recevie_success = receiveMessage(
+              user.username,
+              message.data.id,
+              message.data.message
+            );
+
+            if (recevie_success) {
+              setResponseMessage(message.data);
+            }
             console.log(JSON.stringify(message.data, null, 2));
           }
         };
@@ -47,6 +76,21 @@ export const WebSocketProvider = ({
       ws.current?.close();
     };
   }, [user, is_messages_initialized]);
+
+  useEffect(() => {
+    if (response_message) {
+      MessagesStorage.storeMessage(
+        user?.username,
+        response_message.id,
+        response_message.message,
+        db
+      );
+      if (response_message.message.sender.username === user?.username) {
+        setLastRead(response_message.id, response_message.message.id);
+      }
+      setResponseMessage(null);
+    }
+  }, [response_message]);
 
   return (
     <WebSocketContext.Provider value={{}}>{children}</WebSocketContext.Provider>

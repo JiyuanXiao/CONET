@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import * as ChatStorage from "../chats/chats.storage";
 import * as MessagesStorage from "./messages.storage";
 import * as ChatServer from "@/api/chats/chats.api";
 import * as MessageServer from "@/api/messages/messages.api";
@@ -7,6 +6,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import {
   MessageContextObjectProps,
   MessageContextProps,
+  MessagesProps,
 } from "@/constants/ContextTypes";
 import { AuthenticationContext } from "../authentication/authentication.context";
 import { ChatsContext } from "../chats/chats.context";
@@ -17,7 +17,7 @@ export const MessagesContext = createContext<MessageContextProps>({
   messages: new Map<number, MessageContextObjectProps>(),
   loadMessagesById: async () => {},
   sendMessage: () => {},
-  conformMessageIsSent: () => {},
+  receiveMessage: () => false,
   resetLoadedMessagesById: async () => {},
   ClearAllMessagesById: async () => {},
   is_messages_initialized: false,
@@ -33,7 +33,7 @@ export const MessagesContextProvider = (props: {
   const [is_messages_initialized, setIsMessagesInitialized] =
     useState<boolean>(false);
   const { user } = useContext(AuthenticationContext);
-  const { chats, is_chats_initialized } = useContext(ChatsContext);
+  const { chats, is_chats_initialized, getLastRead } = useContext(ChatsContext);
   const db = useSQLiteContext();
 
   const setMessageMap = (
@@ -71,12 +71,12 @@ export const MessagesContextProvider = (props: {
     }
   };
 
-  const sendMessage = (
+  const sendMessage = async (
     chat_id: number,
     username: string,
     text_content: string | null,
     file_url: string | null,
-    timestamp: string
+    temp_timestamp: string
   ) => {
     const new_message = {
       message_id: -1,
@@ -84,7 +84,7 @@ export const MessagesContextProvider = (props: {
       text_content: text_content || "",
       file_url: file_url || "",
       content_type: text_content ? "text" : "file",
-      timestamp: timestamp,
+      timestamp: temp_timestamp,
     };
 
     const target_messages_object = messages.get(Number(chat_id));
@@ -103,51 +103,132 @@ export const MessagesContextProvider = (props: {
 
       // Replace the target message object by the loaded one
       setMessageMap(chat_id, updated_messages_object);
+      const success = await MessageServer.SendChatMessage(
+        user?.username || "",
+        user?.secret || "",
+        chat_id,
+        text_content,
+        file_url,
+        temp_timestamp
+      );
+      return success;
     } else {
       console.warn(
         `at addMessageById() in messages.context.tsx: chat_id ${chat_id} DOES NOT EXIST`
       );
+      return false;
     }
   };
 
   // Add a newly sent or recevied message to local storage and context
-  const conformMessageIsSent = (
+  // const conformMessageIsSent = async (
+  //   username: string,
+  //   chat_id: number,
+  //   ce_message: CE_MessageProps
+  // ) => {
+  //   // store new message to local storage
+  //   console.info(
+  //     "addMessageById() at messages.context.tsx is calling: storeMessage()"
+  //   );
+  //   const new_message = MessagesStorage.storeMessage(
+  //     username,
+  //     chat_id,
+  //     ce_message,
+  //     db
+  //   );
+
+  //   if (new_message) {
+  //     // find the index of original message object
+  //     const target_messages_object = messages.get(Number(chat_id));
+
+  //     if (target_messages_object) {
+  //       const target_message_index =
+  //         target_messages_object.loaded_messages.findIndex((message) => {
+  //           message.timestamp === ce_message.custom_json;
+  //         });
+
+  //       target_messages_object.loaded_messages[target_message_index] =
+  //         new_message;
+
+  //       // Replace the target message object by the loaded one
+  //       setMessageMap(chat_id, target_messages_object);
+
+  //       await MessagesStorage.storeMessage(username, chat_id, ce_message, db);
+  //     } else {
+  //       console.warn(
+  //         `at addMessageById() in messages.context.tsx: chat_id ${chat_id} DOES NOT EXIST`
+  //       );
+  //     }
+  //   }
+  // };
+
+  const receiveMessage = (
     username: string,
     chat_id: number,
     ce_message: CE_MessageProps
-  ) => {
-    // store new message to local storage
-    console.info(
-      "addMessageById() at messages.context.tsx is calling: storeMessage()"
-    );
-    const new_message = MessagesStorage.storeMessage(
-      username,
-      chat_id,
-      ce_message,
-      db
-    );
+  ): boolean => {
+    const target_messages_object = messages.get(Number(chat_id));
 
-    if (new_message) {
-      // find the index of original message object
-      const target_messages_object = messages.get(Number(chat_id));
-
-      if (target_messages_object) {
-        const target_message_index =
-          target_messages_object.loaded_messages.findIndex((message) => {
-            message.timestamp === ce_message.custom_json;
-          });
-
-        target_messages_object.loaded_messages[target_message_index] =
-          new_message;
-
-        // Replace the target message object by the loaded one
-        setMessageMap(chat_id, target_messages_object);
-      } else {
-        console.warn(
-          `at addMessageById() in messages.context.tsx: chat_id ${chat_id} DOES NOT EXIST`
-        );
-      }
+    if (!target_messages_object) {
+      console.log(
+        `in receiveMessage() at messages.context.tsx: messgae send to unknown chat: ${chat_id}`
+      );
+      return false;
     }
+
+    const received_message = {
+      message_id: ce_message.id,
+      sender_username: ce_message.sender_username,
+      text_content: ce_message.text || "",
+      file_url:
+        !ce_message.text && ce_message.attachments.length > 0
+          ? ce_message.attachments[0]
+          : "",
+      content_type: ce_message.text ? "text" : "file",
+      timestamp: ce_message.created,
+    } as MessagesProps;
+
+    const target_message_index =
+      target_messages_object.loaded_messages.findIndex((msg) => {
+        return msg.timestamp === ce_message.custom_json;
+      });
+
+    // This new message is sent by myself
+    if (target_message_index !== -1) {
+      console.log(`Confirmed a message ${ce_message.id} is sent by myself`);
+
+      const updated_loaded_messages = target_messages_object.loaded_messages;
+
+      updated_loaded_messages[target_message_index] = received_message;
+
+      const updated_messages_object = {
+        chat_id: target_messages_object.chat_id,
+        loaded_messages: updated_loaded_messages,
+        current_index: target_messages_object.current_index,
+        total_messages_amount: target_messages_object.total_messages_amount,
+      } as MessageContextObjectProps;
+
+      setMessageMap(chat_id, updated_messages_object);
+    }
+    // This message is sent by other
+    else {
+      console.log(
+        `A new message ${ce_message.id} is sent from ${ce_message.sender_username}`
+      );
+      const updated_messages_object = {
+        chat_id: target_messages_object.chat_id,
+        loaded_messages: [
+          received_message,
+          ...target_messages_object.loaded_messages,
+        ],
+        current_index: target_messages_object.current_index + 1,
+        total_messages_amount: target_messages_object.total_messages_amount + 1,
+      } as MessageContextObjectProps;
+      setMessageMap(chat_id, updated_messages_object);
+    }
+    //await MessagesStorage.storeMessage(username, chat_id, ce_message, db);
+    console.log(`New message ${ce_message.id} is received`);
+    return true;
   };
 
   // Use for switching back from chat screen to chat list screen
@@ -264,10 +345,7 @@ export const MessagesContextProvider = (props: {
             user.username
         );
         for (const chat of chats.values()) {
-          const last_read = await ChatStorage.getLastRead(
-            user.username,
-            chat.id
-          );
+          const last_read = await getLastRead(chat.id);
           const ce_message_object_list =
             await MessageServer.GetUnreadChatMessages(
               user.username,
@@ -283,7 +361,6 @@ export const MessagesContextProvider = (props: {
               db
             );
           }
-          let latest_message_id = last_read;
           for (const ce_message_object of ce_message_object_list) {
             if (ce_message_object.id > last_read) {
               MessagesStorage.storeMessage(
@@ -292,7 +369,6 @@ export const MessagesContextProvider = (props: {
                 ce_message_object,
                 db
               );
-              latest_message_id = ce_message_object.id;
             }
           }
         }
@@ -302,8 +378,6 @@ export const MessagesContextProvider = (props: {
       console.log(
         "Start to fetch messages data from local storage to context..."
       );
-
-      let initialMessagesObjectList: MessageContextObjectProps[] = [];
 
       // Fetach all messages from loacl storage for each friend
       for (const chat of chats.values()) {
@@ -345,8 +419,6 @@ export const MessagesContextProvider = (props: {
         // Append new messages object to object list
         setMessageMap(chat.id, initial_messages_object);
       }
-
-      //setMessagesObjectList(initialMessagesObjectList);
       console.log(
         "Finish fetching messages data from local storage to context..."
       );
@@ -368,7 +440,7 @@ export const MessagesContextProvider = (props: {
         messages,
         loadMessagesById,
         sendMessage,
-        conformMessageIsSent,
+        receiveMessage,
         resetLoadedMessagesById,
         ClearAllMessagesById,
         is_messages_initialized,

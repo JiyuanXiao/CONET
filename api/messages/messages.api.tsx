@@ -1,14 +1,51 @@
 import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
 import axios from "axios";
 
-export const SendChatMessage = (
+export const SendChatMessage = async (
   username: string,
   secret: string,
   chat_id: number,
   text: string | null,
   file: string | null,
   temp_timestamp: string
-) => {};
+) => {
+  if (username.length === 0 || secret.length === 0) {
+    console.warn(
+      `at SendChatMessage() in messages.api.tsx: username or secret is undefined: ${chat_id}`
+    );
+    return false;
+  }
+  if (!text && !file) {
+    console.warn(
+      `at SendChatMessage() in messages.api.tsx: text and file cannot be both empty: ${chat_id}`
+    );
+    return false;
+  }
+
+  const url = `${process.env.EXPO_PUBLIC_BASE_URL}/chats/${chat_id}/messages/`;
+
+  const headers = {
+    "Project-ID": process.env.EXPO_PUBLIC_PROJECT_ID || "",
+    "User-Name": username,
+    "User-Secret": secret,
+    "Content-Type": "application/json",
+  };
+
+  const data = {
+    text: text,
+    attachment_urls: file ? [file] : [],
+    custom_json: temp_timestamp,
+  };
+
+  try {
+    const response = await axios.post(url, data, { headers });
+    console.log(`POST Request: SendChatMessage() for ${username}`);
+    return true;
+  } catch (err) {
+    console.error(`POST Request: SendChatMessage() ERROR: ${err}`);
+    return false;
+  }
+};
 
 export const GetLatestChatMessages = async (
   username: string,

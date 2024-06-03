@@ -101,7 +101,7 @@ export const ChatList = (props: {
           is_direct_chat={current_chat?.is_direct_chat || false}
         />
       )}
-      keyExtractor={(item) => item.message_id.toString()}
+      keyExtractor={(item) => item.timestamp}
       onEndReached={() => {
         console.log(
           "ChatList(): calling loadMessagesById() for " + props.chat_id

@@ -43,6 +43,7 @@ const InputBar = (props: InputBarProps) => {
           console.log(
             "InputBar(): calling sendMessage() for " + user?.username
           );
+
           sendMessage(
             props.chat_id,
             user.username,

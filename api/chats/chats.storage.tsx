@@ -85,6 +85,10 @@ export const setLastRead = async (
   last_read_message_id: number
 ) => {
   if (last_read_message_id < 0) {
+    console.log(
+      "at setLastRead() in chats.storage.tsx: invalid last read id: " +
+        last_read_message_id
+    );
     return;
   }
   if (!username) {
