@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FontAwesome5, FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
 import { Pressable } from "react-native";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useTheme } from "@react-navigation/native";
 import { ThemeColorsProps } from "@/constants/ComponentTypes";
+import { WebSocketContext } from "@/api/websocket/websocket.context";
 
 // explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 
@@ -54,6 +55,7 @@ const AddUserIcon = (props: {
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const { websocket_connected } = useContext(WebSocketContext);
 
   return (
     <Tabs
@@ -71,7 +73,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "CONET",
+          title: websocket_connected ? "CONET" : "连接中...",
           headerTitleAlign: "center",
           tabBarIcon: ({ focused }) => (
             <ChatsTabIcon focused={focused} theme_colors={colors} />

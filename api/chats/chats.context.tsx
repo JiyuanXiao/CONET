@@ -38,15 +38,18 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
   const [has_new_message, setHasNewMessage] = useState<Map<number, boolean>>(
     new Map<number, boolean>()
   );
-  const [last_read_need_update, setLastReadNeedUpdate] =
-    useState<boolean>(false);
 
   const setChatMap = (chat_id: number, chat: CE_ChatProps) => {
-    setChats(new Map(chats.set(chat_id, chat)));
+    setChats(new Map(chats.set(Number(chat_id), chat)));
   };
 
   const setHasNewMessageStatus = (chat_id: number, read_status: boolean) => {
-    setHasNewMessage(new Map(has_new_message.set(chat_id, read_status)));
+    setHasNewMessage(
+      new Map(has_new_message.set(Number(chat_id), read_status))
+    );
+    console.log(
+      `[Chat Context] set chat ${chat_id} has new message status to ${read_status}`
+    );
   };
 
   const addChat = async (new_chat: CE_ChatProps) => {
@@ -136,7 +139,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         chat_id,
         last_read_message_id
       );
-      setLastReadNeedUpdate(true);
+      setHasNewMessageStatus(chat_id, false);
       console.log(
         `[Chat Context] set last read as ${last_read_message_id} for chat ${chat_id}`
       );
@@ -213,21 +216,11 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
-  const updateNewMessageStatus = async () => {
-    console.log("[Chat Context] start update new messages status...");
-    for (const chat of chats.values()) {
-      const last_message = chat.last_message.id;
-      const last_read = await getLastRead(chat.id);
-      setHasNewMessageStatus(chat.id, last_message > last_read);
-    }
-  };
-
   const resetChatContext = () => {
     setChats(new Map<number, CE_ChatProps>());
     setCurrentTalkingChatId(-1);
     setIsChatsInitialized(false);
     setHasNewMessage(new Map<number, boolean>());
-    setLastReadNeedUpdate(false);
     console.log(`[Chat Context] all chat context data has been cleaned`);
   };
 
@@ -237,12 +230,18 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     }
   }, [is_authentication_initialized]);
 
+  // useEffect(() => {
+  //   if (last_read_need_update) {
+  //     updateNewMessageStatus();
+  //     setLastReadNeedUpdate(false);
+  //   }
+  // }, [chats, last_read_need_update]);
+
   useEffect(() => {
-    if (last_read_need_update) {
-      updateNewMessageStatus();
-      setLastReadNeedUpdate(false);
-    }
-  }, [chats, last_read_need_update]);
+    console.log(
+      `[Chat Context] current talking chat: ${current_talking_chat_id}`
+    );
+  }, [current_talking_chat_id]);
 
   return (
     <ChatsContext.Provider

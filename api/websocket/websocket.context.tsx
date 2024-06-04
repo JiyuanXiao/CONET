@@ -30,12 +30,12 @@ export const WebSocketProvider = ({
 }) => {
   const ws = useRef<WebSocket | null>(null);
   const { user } = useContext(AuthenticationContext);
-  const { setLastRead } = useContext(ChatsContext);
+  const { has_new_message, setLastRead, setHasNewMessageStatus } =
+    useContext(ChatsContext);
   const { is_messages_initialized, receiveMessage } =
     useContext(MessagesContext);
-  const [response_message, setResponseMessage] =
-    useState<MessageResponseProps | null>();
   const [websocket_connected, setWebSocketConnected] = useState(false);
+  const setHasNewMessageStatusRef = useRef(setHasNewMessageStatus);
   const isLoggedIn = useRef(true);
   const db = useSQLiteContext();
 
@@ -53,13 +53,34 @@ export const WebSocketProvider = ({
       ws.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
         if (message.action === "new_message") {
+          // update message context
           const recevie_success = receiveMessage(
             message.data.id,
             message.data.message
           );
 
           if (recevie_success) {
-            setResponseMessage(message.data);
+            // update message storage
+            const response_message = message.data;
+            MessagesStorage.storeMessage(
+              user?.username,
+              response_message.id,
+              response_message.message,
+              db
+            );
+
+            // update last read
+            if (response_message.message.sender.username === user?.username) {
+              setLastRead(
+                Number(response_message.id),
+                Number(response_message.message.id)
+              );
+            } else {
+              setHasNewMessageStatusRef.current(
+                Number(response_message.id),
+                true
+              );
+            }
           }
           console.log(JSON.stringify(message.data, null, 2));
         }
@@ -96,30 +117,18 @@ export const WebSocketProvider = ({
     }
   }, [user, is_messages_initialized]);
 
+  useEffect(() => {
+    setHasNewMessageStatusRef.current = setHasNewMessageStatus;
+  }, [has_new_message]);
+
   const resetWebSocket = () => {
     isLoggedIn.current = false;
     if (ws.current) {
       ws.current.close();
       ws.current = null;
     }
-    setResponseMessage(null);
     console.log(`[WebSocket] clean up connection and data`);
   };
-
-  useEffect(() => {
-    if (response_message) {
-      MessagesStorage.storeMessage(
-        user?.username,
-        response_message.id,
-        response_message.message,
-        db
-      );
-      if (response_message.message.sender.username === user?.username) {
-        setLastRead(response_message.id, response_message.message.id);
-      }
-      setResponseMessage(null);
-    }
-  }, [response_message]);
 
   return (
     <WebSocketContext.Provider value={{ websocket_connected, resetWebSocket }}>

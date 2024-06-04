@@ -42,27 +42,6 @@ export default function ChatListScreen() {
   const getLastMessageInfo = (
     chat_id: number
   ): { last_message: string; last_message_time: string } => {
-    // const target_chat = chats.get(chat_id);
-
-    // if (target_chat) {
-    //   const result = {
-    //     last_message: target_chat.last_message.text
-    //       ? target_chat.last_message.text
-    //       : "[媒体文件]",
-    //     last_message_time: target_chat.last_message.created,
-    //   };
-    //   return result;
-    // } else {
-    //   console.log(
-    //     "at getLastMessageInfo() in index.tsx: chat " +
-    //       chat_id +
-    //       " is not in chat context"
-    //   );
-    // }
-    // return {
-    //   last_message: "",
-    //   last_message_time: "",
-    // };
     const target_messages = messages.get(Number(chat_id));
     if (!target_messages || target_messages?.loaded_messages.length === 0) {
       return {
@@ -82,32 +61,13 @@ export default function ChatListScreen() {
   };
 
   useEffect(() => {
-    if (is_chats_initialized) {
-      forceUpdate(Math.random());
+    forceUpdate(Math.random());
+    let i = 0;
+    for (const iten of has_new_message) {
+      console.log(`${i}: chat ${iten[0]}: ${has_new_message.get(iten[0])}`);
+      i = i + 1;
     }
-  }, [chats, is_chats_initialized]);
-
-  // useEffect(() => {
-  //   const initializeLastReadMap = async () => {
-  //     console.log("initializeLastReadMap");
-  //     for (const chat of chats) {
-  //       const last_read_message_id = await ChatStorage.getLastRead(
-  //         user?.username,
-  //         chat.id
-  //       );
-  //       const map = last_read_map;
-  //       map.set(chat.id, last_read_message_id);
-
-  //       setLastReadMap(map);
-  //     }
-  //   };
-
-  //   if (is_messages_initialized) {
-  //     initializeLastReadMap();
-
-  //     setIsLoading(false);
-  //   }
-  // });
+  }, [has_new_message]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

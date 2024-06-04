@@ -4,9 +4,6 @@ import { useTheme } from "@react-navigation/native";
 import { ChatBoxProps } from "@/constants/ComponentTypes";
 import { ChatsContext } from "@/api/chats/chats.context";
 
-import { AuthenticationContext } from "@/api/authentication/authentication.context";
-import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
-
 const formatTimestamp = (utc_timestamp: string) => {
   if (utc_timestamp.length === 0) {
     return "";
@@ -39,7 +36,6 @@ const formatTimestamp = (utc_timestamp: string) => {
 const ChatBox = (props: ChatBoxProps) => {
   const { colors } = useTheme();
   const { chats, current_talking_chat_id } = useContext(ChatsContext);
-  const { user } = useContext(AuthenticationContext);
   const [_, forceUpdate] = useState<number>();
 
   // Get the chat's last message and timestamp whenever the chats context is modified

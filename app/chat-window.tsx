@@ -9,6 +9,7 @@ import { Feather } from "@expo/vector-icons";
 import { ChatsContext } from "@/api/chats/chats.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 const MoreIcon = (props: { theme_colors: ThemeColorsProps }) => {
   return (
@@ -21,13 +22,12 @@ export default function ChatWindowScreen() {
 
   const [messageSent, setMessageSent] = useState<boolean>(false);
   const {
-    chats,
     setCurrentTalkingChatId,
-    setHasNewMessageStatus,
     current_talking_chat_id,
     setLastRead,
+    setHasNewMessageStatus,
   } = useContext(ChatsContext);
-  const { user } = useContext(AuthenticationContext);
+  const { messages } = useContext(MessagesContext);
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -37,16 +37,17 @@ export default function ChatWindowScreen() {
     avatar_img_src: string;
   };
 
-  const updateLastReadMessage = async (chat: CE_ChatProps | undefined) => {
-    if (chat) {
-      await setLastRead(chat_id, chat.last_message.id);
+  const updateLastReadMessage = async () => {
+    const current_chat_messages = messages.get(Number(chat_id));
+    if (
+      current_chat_messages &&
+      current_chat_messages.loaded_messages.length > 0
+    ) {
+      const latest_message_id =
+        current_chat_messages.loaded_messages[0].message_id;
+      await setLastRead(chat_id, Number(latest_message_id));
       console.log(
-        `Chat ${chat.id} last read message update to latest message: ${chat.last_message.id}`
-      );
-    } else {
-      console.error(
-        "at updateLastReadMessage() in chat-window.tsx: chat not find chat with chat_id: " +
-          chat_id
+        `Chat ${chat_id} last read message update to latest message: ${latest_message_id}`
       );
     }
   };
@@ -54,18 +55,17 @@ export default function ChatWindowScreen() {
   useEffect(() => {
     setCurrentTalkingChatId(Number(chat_id));
 
-    updateLastReadMessage(chats.get(Number(chat_id)));
-
     return () => {
       setCurrentTalkingChatId(-1);
     };
   }, []);
 
   useEffect(() => {
-    if (chat_id.toString() === current_talking_chat_id.toString()) {
-      updateLastReadMessage(chats.get(Number(chat_id)));
+    if (current_talking_chat_id === Number(chat_id)) {
+      console.log("CHAT WINDOW: update latest read message for " + chat_id);
+      updateLastReadMessage();
     }
-  }, [chats]);
+  }, [messages, current_talking_chat_id]);
 
   // Display the name on the header
   useLayoutEffect(() => {
