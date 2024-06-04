@@ -42,7 +42,7 @@ export const WebSocketProvider = ({
   const { messages, is_messages_initialized, receiveMessage } =
     useContext(MessagesContext);
   const [websocket_connected, setWebSocketConnected] = useState(false);
-  //const receiveMessageRef = useRef(receiveMessage);
+  const receiveMessageRef = useRef(receiveMessage);
   const setHasNewMessageStatusRef = useRef(setHasNewMessageStatus);
   const setChatMapRef = useRef(setChatMap);
   const isLoggedIn = useRef(true);
@@ -51,7 +51,7 @@ export const WebSocketProvider = ({
   const handleNewMessage = async (message_data: MessageDataProps) => {
     console.log(`[WebSocket] action: new_message for chat ${message_data.id}`);
     // update message context
-    const recevie_success = receiveMessage(
+    const recevie_success = receiveMessageRef.current(
       message_data.id,
       message_data.message
     );
@@ -156,9 +156,9 @@ export const WebSocketProvider = ({
     setChatMapRef.current = setChatMap;
   }, [chats]);
 
-  // useEffect(() => {
-  //   receiveMessageRef.current = receiveMessage;
-  // }, [messages])
+  useEffect(() => {
+    receiveMessageRef.current = receiveMessage;
+  }, [messages]);
 
   const resetWebSocket = () => {
     isLoggedIn.current = false;
