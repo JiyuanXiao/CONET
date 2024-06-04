@@ -41,6 +41,9 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
 
   const setChatMap = (chat_id: number, chat: CE_ChatProps) => {
     setChats(new Map(chats.set(Number(chat_id), chat)));
+    console.log(
+      `[Chat Context] set chat to map:\n${JSON.stringify(chat, null, 2)}`
+    );
   };
 
   const setHasNewMessageStatus = (chat_id: number, read_status: boolean) => {
