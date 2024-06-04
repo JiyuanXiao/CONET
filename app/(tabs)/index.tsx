@@ -22,7 +22,10 @@ export default function ChatListScreen() {
     if (chat.is_direct_chat) {
       const name_1 = chat.people[0].person.first_name;
       const name_2 = chat.people[1].person.first_name;
-      return name_1 === user?.username ? name_2 : name_1;
+
+      return chat.people[0].person.username === user?.username
+        ? name_2
+        : name_1;
     } else {
       return chat.title;
     }
@@ -62,11 +65,6 @@ export default function ChatListScreen() {
 
   useEffect(() => {
     forceUpdate(Math.random());
-    let i = 0;
-    for (const iten of has_new_message) {
-      console.log(`${i}: chat ${iten[0]}: ${has_new_message.get(iten[0])}`);
-      i = i + 1;
-    }
   }, [has_new_message]);
 
   return (
