@@ -22,6 +22,13 @@ export interface AuthenticationContentProps {
   logOut: () => Promise<void>;
 }
 
+export interface MyAccountResponseProps {
+  success: boolean;
+  status: number;
+  data: CE_UserProps | null;
+  error: any;
+}
+
 /////////////////////////////////////// CHAT CONTEXT ////////////////////////////////////////////////
 
 export interface ChatProps {

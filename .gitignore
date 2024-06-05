@@ -43,3 +43,6 @@ expo-env.d.ts
 
 # mock data
 mock_data/
+
+# EAS
+eas.json

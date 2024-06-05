@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import {
   StyleSheet,
   Image,
@@ -6,6 +6,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { TextInput, Button, HelperText } from "react-native-paper";
+import { Dialog, Portal } from "react-native-paper";
 import { useTheme } from "@react-navigation/native";
 import { Text, View } from "react-native";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
@@ -26,14 +27,16 @@ export default function LoginScreen() {
   const [password_invisiable, setPasswordInvisiable] = useState(true);
   const [helpertext_visiable, setHelperTextVisiable] = useState(false);
   const [helpertext, setHelperText] = useState("");
-  const { logIn } = useContext(AuthenticationContext);
+  const { logIn, error } = useContext(AuthenticationContext);
+  const errorRef = useRef(error);
 
   const handleOnPress = async () => {
     if (username.length > 0 && passwrod.length > 0) {
       console.log("LoginScreen(): calls logIn() for: " + username);
       const login_success = await logIn(username, passwrod);
       if (!login_success) {
-        setHelperText("用户名或密码错误");
+        // showDialog();
+        setHelperText(errorRef.current);
         setHelperTextVisiable(true);
       } else {
         setUsername("");
@@ -62,10 +65,31 @@ export default function LoginScreen() {
     setHelperTextVisiable(false);
   };
 
+  useEffect(() => {
+    errorRef.current = error;
+  }, [error]);
+
+  // const [visible, setVisible] = useState(false);
+
+  // const showDialog = () => setVisible(true);
+
+  // const hideDialog = () => setVisible(false);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={[styles.background, { backgroundColor: main }]}>
         <View style={styles.container}>
+          {/* <Portal>
+            <Dialog visible={visible} onDismiss={hideDialog}>
+              <Dialog.Title>Alert</Dialog.Title>
+              <Dialog.Content>
+                <Text>{`base url: ${process.env.EXPO_PUBLIC_BASE_URL}\nwb: ${process.env.EXPO_PUBLIC_WEBSOCKET_BASE_URL}\nID: ${process.env.EXPO_PUBLIC_PROJECT_ID}\n${errorRef.current}`}</Text>
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button onPress={hideDialog}>Done</Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal> */}
           <Image
             style={styles.logo}
             source={require("@/assets/images/full-logo-transparent.png")}

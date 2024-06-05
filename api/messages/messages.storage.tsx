@@ -120,8 +120,16 @@ export const storeMessage = (
     console.log(
       `[Message Storage] Insert new message into table [${username}_messages_${chat_id}]: ${message_object.id}`
     );
-  } catch (err) {
-    console.error(`[Message Storage] storeMessage(): chat-${chat_id}: ` + err);
+  } catch (err: any) {
+    if (err.message.includes("UNIQUE constraint failed")) {
+      console.log(
+        `[Message Storage] message ${message_object.id} in chat: ${chat_id} exists in storage: storing rejected`
+      );
+    } else {
+      console.error(
+        `[Message Storage] storeMessage(): error in chat ${chat_id}: ` + err
+      );
+    }
   }
 
   const lastest_message = fetchLatestMessage(username, chat_id, db);
