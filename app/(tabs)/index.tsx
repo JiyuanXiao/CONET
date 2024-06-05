@@ -20,6 +20,7 @@ import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
+import { WebSocketContext } from "@/api/websocket/websocket.context";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
@@ -36,6 +37,7 @@ export default function ChatListScreen() {
     resetMessageContext,
   } = useContext(MessagesContext);
   const { user } = useContext(AuthenticationContext);
+  const { resetWebSocket } = useContext(WebSocketContext);
   const [refreshing, setRefreshing] = useState(false);
   //const fetchChatDataFromServerRef = useRef(fetchChatDataFromServer);
   const initializeMessageContextRef = useRef(initializeMessageContext);
@@ -93,6 +95,7 @@ export default function ChatListScreen() {
       await fetchChatDataFromServer(user);
       //resetMessageContext();
       await initializeMessageContextRef.current();
+      resetWebSocket();
     }
 
     setRefreshing(false);

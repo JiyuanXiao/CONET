@@ -106,4 +106,5 @@ export interface MessageContextProps {
 export interface WebsocketContextProps {
   websocket_connected: boolean;
   resetWebSocket: () => void;
+  closeWebSocket: () => void;
 }

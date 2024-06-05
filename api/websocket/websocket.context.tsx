@@ -23,6 +23,7 @@ interface MessageDataProps {
 export const WebSocketContext = createContext<WebsocketContextProps>({
   websocket_connected: false,
   resetWebSocket: () => {},
+  closeWebSocket: () => {},
 });
 
 export const WebSocketProvider = ({
@@ -30,7 +31,7 @@ export const WebSocketProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const ws = useRef<WebSocket | null>(null);
+  const web_socket = useRef<WebSocket | null>(null);
   const { user } = useContext(AuthenticationContext);
   const {
     chats,
@@ -93,16 +94,16 @@ export const WebSocketProvider = ({
 
   const connectWebSocket = () => {
     if (user && is_messages_initialized && isLoggedIn.current) {
-      ws.current = new WebSocket(
+      web_socket.current = new WebSocket(
         `${process.env.EXPO_PUBLIC_WEBSOCKET_BASE_URL}/person/?publicKey=${process.env.EXPO_PUBLIC_PROJECT_ID}&username=${user?.username}&secret=${user?.secret}`
       );
 
-      ws.current.onopen = () => {
+      web_socket.current.onopen = () => {
         console.log(`[WebSocket] connection opened for ${user?.username}`);
         setWebSocketConnected(true);
       };
 
-      ws.current.onmessage = (event) => {
+      web_socket.current.onmessage = (event) => {
         const response = JSON.parse(event.data);
 
         switch (response.action) {
@@ -117,7 +118,7 @@ export const WebSocketProvider = ({
         }
       };
 
-      ws.current.onclose = () => {
+      web_socket.current.onclose = () => {
         console.log("[WebSocket] connection closed");
         setWebSocketConnected(false);
         // Reconnect after a delay
@@ -126,7 +127,7 @@ export const WebSocketProvider = ({
         }
       };
 
-      ws.current.onerror = (error) => {
+      web_socket.current.onerror = (error) => {
         console.error("[WebSocket] error", error);
         setWebSocketConnected(false);
       };
@@ -138,7 +139,7 @@ export const WebSocketProvider = ({
       connectWebSocket();
     }
     return () => {
-      ws.current?.close();
+      web_socket.current?.close();
     };
   }, [user, is_messages_initialized, isLoggedIn]);
 
@@ -160,17 +161,37 @@ export const WebSocketProvider = ({
     receiveMessageRef.current = receiveMessage;
   }, [messages]);
 
+  const closeWebSocket = () => {
+    isLoggedIn.current = false;
+    if (web_socket.current) {
+      web_socket.current.close();
+      web_socket.current = null;
+    }
+    console.log(
+      `[WebSocket] clean up connection and data for ${user?.username}`
+    );
+  };
+
   const resetWebSocket = () => {
     isLoggedIn.current = false;
-    if (ws.current) {
-      ws.current.close();
-      ws.current = null;
+    if (web_socket.current) {
+      web_socket.current.close();
+      web_socket.current = null;
     }
-    console.log(`[WebSocket] clean up connection and data`);
+    console.log(
+      `[WebSocket] clean up connection and data for ${user?.username}`
+    );
+    isLoggedIn.current = true; // this will trigger the first useEffect to connect websocket
   };
 
   return (
-    <WebSocketContext.Provider value={{ websocket_connected, resetWebSocket }}>
+    <WebSocketContext.Provider
+      value={{
+        websocket_connected,
+        resetWebSocket,
+        closeWebSocket,
+      }}
+    >
       {children}
     </WebSocketContext.Provider>
   );
