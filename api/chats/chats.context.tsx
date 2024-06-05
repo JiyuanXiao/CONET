@@ -3,7 +3,7 @@ import { ChatsContextProps } from "@/constants/ContextTypes";
 import * as ChatStorage from "./chats.storage";
 import * as ChatServer from "./chats.api";
 import { AuthenticationContext } from "../authentication/authentication.context";
-import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
+import { CE_ChatProps, CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 
 export const ChatsContext = createContext<ChatsContextProps>({
   chats: new Map<number, CE_ChatProps>(),
@@ -18,6 +18,7 @@ export const ChatsContext = createContext<ChatsContextProps>({
   deleteChat: async () => {},
   getLastRead: async () => 0,
   setLastRead: async () => {},
+  fetchChatDataFromServer: async () => {},
   resetChatContext: () => {},
 });
 
@@ -148,63 +149,67 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     }
   };
 
+  const fetchChatDataFromStorage = async (user: CE_UserProps) => {
+    console.log(
+      "[Chat Context] Start to fetch chats' data from local storage..."
+    );
+    const all_chats = await ChatStorage.fetchAllChats(user.username);
+
+    console.log("[Chat Context] Start to update loacl chat data to context");
+    for (const chat of all_chats) {
+      setChatMap(chat.id, chat);
+
+      const last_read = await ChatStorage.getLastRead(user.username, chat.id);
+      setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
+    }
+    console.log("[Chat Context] Chat data has been loaded from local storage");
+  };
+
+  const fetchChatDataFromServer = async (user: CE_UserProps) => {
+    console.log("[Chat Context] Start to fetch chats' data from server...");
+    const new_chats = await ChatServer.GetMyChats(user.username, user.secret);
+
+    console.log(
+      "[Chat Context] Start to update new chat data to local storage and context..."
+    );
+
+    const init_chats = new Map<number, CE_ChatProps>();
+    const init_has_new_message = new Map<number, boolean>();
+    for (const chat of new_chats) {
+      //setChatMap(chat.id, chat);
+      init_chats.set(chat.id, chat);
+
+      const last_read = await ChatStorage.getLastRead(user.username, chat.id);
+      init_has_new_message.set(chat.id, chat.last_message.id > last_read);
+      //setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
+
+      console.log(
+        `[Chat Context] chat ${chat.id}: New message: ${chat.last_message.id} -> Last read: ${last_read}`
+      );
+      console.log(
+        `[Chat Context] chat ${chat.id} has new message: ${has_new_message.get(
+          chat.id
+        )}`
+      );
+
+      ChatStorage.setChat(user.username, chat.id, chat);
+    }
+
+    setChats(init_chats);
+    setHasNewMessage(init_has_new_message);
+
+    console.log("[Chat Context] Chat data has been loaded from server");
+  };
+
   const initializeChatsContext = async () => {
     if (user) {
       console.log("[Chat Context] Start to initialize chat context...");
 
-      console.log(
-        "[Chat Context] Start to fetch chats' data from local storage..."
-      );
-      const all_chats = await ChatStorage.fetchAllChats(user.username);
-
-      console.log("[Chat Context] Start to update loacl chat data to context");
-      for (const chat of all_chats) {
-        setChatMap(chat.id, chat);
-
-        const last_read = await ChatStorage.getLastRead(user.username, chat.id);
-        setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
-      }
-      console.log(
-        "[Chat Context] Chat data has been loaded from local storage"
-      );
+      await fetchChatDataFromStorage(user);
 
       const chat_server_connected = true;
       if (chat_server_connected) {
-        console.log("[Chat Context] Start to fetch chats' data from server...");
-        const new_chats = await ChatServer.GetMyChats(
-          user.username,
-          user.secret
-        );
-
-        console.log(
-          "[Chat Context] Start to update new chat data to local storage and context..."
-        );
-
-        for (const chat of new_chats) {
-          setChatMap(chat.id, chat);
-
-          const last_read = await ChatStorage.getLastRead(
-            user.username,
-            chat.id
-          );
-
-          setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
-          console.log(
-            `[Chat Context] chat ${chat.id}: New message: ${chat.last_message.id}`
-          );
-          console.log(
-            `[Chat Context] chat ${chat.id}: Last read: ${last_read}`
-          );
-          console.log(
-            `[Chat Context] chat ${
-              chat.id
-            } has new message: ${has_new_message.get(chat.id)}`
-          );
-
-          ChatStorage.setChat(user.username, chat.id, chat);
-        }
-
-        console.log("[Chat Context] Chat data has been loaded from server");
+        await fetchChatDataFromServer(user);
       } else {
         console.log("[Chat Context] Cannot connet to chat server...");
       }
@@ -258,6 +263,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         deleteChat,
         getLastRead,
         setLastRead,
+        fetchChatDataFromServer,
         resetChatContext,
       }}
     >

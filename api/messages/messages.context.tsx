@@ -21,6 +21,7 @@ export const MessagesContext = createContext<MessageContextProps>({
   resetLoadedMessagesById: async () => {},
   ClearAllMessagesById: async () => {},
   is_messages_initialized: false,
+  initializeMessageContext: async () => {},
   resetMessageContext: () => {},
 });
 
@@ -309,7 +310,7 @@ export const MessagesContextProvider = (props: {
     }
   };
 
-  const initialSetUpObjectList = async () => {
+  const initializeMessageContext = async () => {
     if (user) {
       console.log("[Message Context] Start to initialize message context...");
 
@@ -377,6 +378,7 @@ export const MessagesContextProvider = (props: {
         "[Message Context] Start to fetch messages data from local storage to context..."
       );
 
+      const init_messages = new Map<number, MessageContextObjectProps>();
       // Fetach all messages from loacl storage for each friend
       for (const chat of chats.values()) {
         let initial_messages_object = {
@@ -421,8 +423,10 @@ export const MessagesContextProvider = (props: {
         }
 
         // Append new messages object to object list
-        setMessageMap(chat.id, initial_messages_object);
+        init_messages.set(chat.id, initial_messages_object);
+        //setMessageMap(chat.id, initial_messages_object);
       }
+      setMessages(init_messages);
       console.log(
         "[Message Context] Finish fetching messages data from local storage to context..."
       );
@@ -442,7 +446,7 @@ export const MessagesContextProvider = (props: {
 
   useEffect(() => {
     if (is_chats_initialized) {
-      initialSetUpObjectList();
+      initializeMessageContext();
     }
   }, [is_chats_initialized]);
 
@@ -456,6 +460,7 @@ export const MessagesContextProvider = (props: {
         resetLoadedMessagesById,
         ClearAllMessagesById,
         is_messages_initialized,
+        initializeMessageContext,
         resetMessageContext,
       }}
     >

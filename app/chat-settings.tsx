@@ -112,7 +112,8 @@ export default function ChatSettingsScreen() {
         onPress={() => {
           setDialogVisible(true);
           setConfrimMessage("确认清空聊天记录?");
-          setActionFunction(() => ClearChatHistory);
+          //setActionFunction(() => ClearChatHistory);
+          setActionFunction(() => {});
         }}
       >
         <OptionBar content="清空聊天记录" />
@@ -121,7 +122,8 @@ export default function ChatSettingsScreen() {
         onPress={() => {
           setDialogVisible(true);
           setConfrimMessage("确认删除聊天?");
-          setActionFunction(() => DeleteChat);
+          //setActionFunction(() => DeleteChat);
+          setActionFunction(() => {});
         }}
       >
         <OptionBar content="删除联聊天" />

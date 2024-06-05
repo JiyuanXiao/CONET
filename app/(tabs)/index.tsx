@@ -1,5 +1,16 @@
-import React, { useContext, useState, useEffect } from "react";
-import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
+import {
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
 import { router } from "expo-router";
 import { View, Text } from "react-native";
 import ChatBox from "@/components/ChatBox/ChatBox.component";
@@ -12,11 +23,22 @@ import { ActivityIndicator } from "react-native-paper";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
-  const { chats, has_new_message, is_chats_initialized } =
-    useContext(ChatsContext);
-  const { is_messages_initialized, messages } = useContext(MessagesContext);
+  const {
+    chats,
+    has_new_message,
+    is_chats_initialized,
+    fetchChatDataFromServer,
+  } = useContext(ChatsContext);
+  const {
+    is_messages_initialized,
+    messages,
+    initializeMessageContext,
+    resetMessageContext,
+  } = useContext(MessagesContext);
   const { user } = useContext(AuthenticationContext);
-  const [_, forceUpdate] = useState<number>();
+  const [refreshing, setRefreshing] = useState(false);
+  //const fetchChatDataFromServerRef = useRef(fetchChatDataFromServer);
+  const initializeMessageContextRef = useRef(initializeMessageContext);
 
   const getChatTitle = (chat: CE_ChatProps) => {
     if (chat.is_direct_chat) {
@@ -63,9 +85,24 @@ export default function ChatListScreen() {
     return result;
   };
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+
+    if (user) {
+      console.log("refreshing...");
+      await fetchChatDataFromServer(user);
+      //resetMessageContext();
+      await initializeMessageContextRef.current();
+    }
+
+    setRefreshing(false);
+  }, []);
+
   useEffect(() => {
-    forceUpdate(Math.random());
-  }, [has_new_message]);
+    if (user) {
+      initializeMessageContextRef.current = initializeMessageContext;
+    }
+  }, [chats, user]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -110,6 +147,9 @@ export default function ChatListScreen() {
               );
             }}
             keyExtractor={(item) => item.id.toString()}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           />
         </>
       ) : (

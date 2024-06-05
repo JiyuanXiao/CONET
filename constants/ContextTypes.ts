@@ -52,6 +52,7 @@ export interface ChatsContextProps {
   deleteChat: (chat_id: number) => Promise<void>;
   getLastRead: (chat_id: number) => Promise<number>;
   setLastRead: (chat_id: number, last_read_message_id: number) => Promise<void>;
+  fetchChatDataFromServer: (user: CE_UserProps) => Promise<void>;
   resetChatContext: () => void;
 }
 
@@ -96,6 +97,7 @@ export interface MessageContextProps {
   resetLoadedMessagesById: (chat_id: number) => Promise<void>;
   ClearAllMessagesById: (chat_id: number) => void;
   is_messages_initialized: boolean;
+  initializeMessageContext: () => Promise<void>;
   resetMessageContext: () => void;
 }
 
