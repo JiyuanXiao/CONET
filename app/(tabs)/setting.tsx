@@ -16,9 +16,9 @@ export default function SettngScreen() {
   const { closeWebSocket } = useContext(WebSocketContext);
   const handleLogout = () => {
     console.log("SettingScreen() in setting.tsx is calling logOut()");
-    closeWebSocket();
     resetMessageContext();
     resetChatContext();
+    closeWebSocket();
     logOut();
   };
 

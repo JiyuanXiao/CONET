@@ -68,7 +68,7 @@ export default function ChatSettingsScreen() {
     const current_chat = chats.get(Number(chat_id));
     if (current_chat) {
       setChatMembers(current_chat.people);
-      setIsDirectChat(current_chat.is_direct_chat);
+      setIsDirectChat(current_chat.people.length <= 2);
       if (current_chat.is_direct_chat) {
         const member_1 = current_chat.people[0];
         const member_2 = current_chat.people[1];

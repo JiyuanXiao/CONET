@@ -322,6 +322,13 @@ export const MessagesContextProvider = (props: {
             user.username
         );
         for (const chat of chats.values()) {
+          if (!MessagesStorage.messageTableExist(user.username, chat.id, db)) {
+            MessagesStorage.createMessageTableIfNotExists(
+              user.username,
+              chat.id,
+              db
+            );
+          }
           const latest = MessagesStorage.fetchLatestMessage(
             user.username,
             chat.id,
@@ -341,15 +348,6 @@ export const MessagesContextProvider = (props: {
                 last_read
               );
 
-            if (
-              !MessagesStorage.messageTableExist(user.username, chat.id, db)
-            ) {
-              MessagesStorage.createMessageTableIfNotExists(
-                user.username,
-                chat.id,
-                db
-              );
-            }
             for (const ce_message_object of ce_message_object_list) {
               if (ce_message_object.id > last_read) {
                 MessagesStorage.storeMessage(

@@ -46,7 +46,8 @@ export const WebSocketProvider = ({
   const receiveMessageRef = useRef(receiveMessage);
   const setHasNewMessageStatusRef = useRef(setHasNewMessageStatus);
   const setChatMapRef = useRef(setChatMap);
-  const isLoggedIn = useRef(true);
+  const is_messages_initialized_Ref = useRef(is_messages_initialized);
+  const user_Ref = useRef(user);
   const db = useSQLiteContext();
 
   const handleNewMessage = async (message_data: MessageDataProps) => {
@@ -93,60 +94,58 @@ export const WebSocketProvider = ({
   };
 
   const connectWebSocket = () => {
-    if (user && is_messages_initialized && isLoggedIn.current) {
-      web_socket.current = new WebSocket(
-        `${process.env.EXPO_PUBLIC_WEBSOCKET_BASE_URL}/person/?publicKey=${process.env.EXPO_PUBLIC_PROJECT_ID}&username=${user?.username}&secret=${user?.secret}`
-      );
+    web_socket.current = new WebSocket(
+      `${process.env.EXPO_PUBLIC_WEBSOCKET_BASE_URL}/person/?publicKey=${process.env.EXPO_PUBLIC_PROJECT_ID}&username=${user?.username}&secret=${user?.secret}`
+    );
 
-      web_socket.current.onopen = () => {
-        console.log(`[WebSocket] connection opened for ${user?.username}`);
-        setWebSocketConnected(true);
-      };
+    web_socket.current.onopen = () => {
+      console.log(`[WebSocket] connection opened for ${user?.username}`);
+      setWebSocketConnected(true);
+    };
 
-      web_socket.current.onmessage = (event) => {
-        const response = JSON.parse(event.data);
+    web_socket.current.onmessage = (event) => {
+      const response = JSON.parse(event.data);
 
-        switch (response.action) {
-          case "new_message":
-            handleNewMessage(response.data);
-            break;
-          case "edit_chat":
-            handleEditChat(response.data);
-            break;
-          default:
-            console.log(`Unknow action: ${response.action}`);
-        }
-      };
+      switch (response.action) {
+        case "new_message":
+          handleNewMessage(response.data);
+          break;
+        case "edit_chat":
+          handleEditChat(response.data);
+          break;
+        default:
+          console.log(`Unknow action: ${response.action}`);
+      }
+    };
 
-      web_socket.current.onclose = () => {
-        console.log("[WebSocket] connection closed");
-        setWebSocketConnected(false);
-        // Reconnect after a delay
-        if (user && is_messages_initialized && isLoggedIn.current) {
-          setTimeout(connectWebSocket, 1000);
-        }
-      };
+    web_socket.current.onclose = () => {
+      console.log("[WebSocket] connection closed");
+      setWebSocketConnected(false);
+      // Reconnect after a delay
+      if (user_Ref.current && is_messages_initialized_Ref.current) {
+        console.log(
+          `[WebSocket-onclose] User: ${user_Ref.current ? "true" : "false"}`
+        );
+        console.log(
+          `[WebSocket-onclose] message initialize: ${is_messages_initialized_Ref.current}`
+        );
+        setTimeout(connectWebSocket, 1000);
+      }
+    };
 
-      web_socket.current.onerror = (error) => {
-        console.error("[WebSocket] error", error);
-        setWebSocketConnected(false);
-      };
-    }
+    web_socket.current.onerror = (error) => {
+      console.error("[WebSocket] error", error);
+      setWebSocketConnected(false);
+    };
   };
 
   useEffect(() => {
-    if (!websocket_connected) {
+    if (!websocket_connected && user && is_messages_initialized) {
       connectWebSocket();
     }
     return () => {
       web_socket.current?.close();
     };
-  }, [user, is_messages_initialized, isLoggedIn]);
-
-  useEffect(() => {
-    if (user && is_messages_initialized) {
-      isLoggedIn.current = true;
-    }
   }, [user, is_messages_initialized]);
 
   useEffect(() => {
@@ -162,7 +161,6 @@ export const WebSocketProvider = ({
   }, [messages]);
 
   const closeWebSocket = () => {
-    isLoggedIn.current = false;
     if (web_socket.current) {
       web_socket.current.close();
       web_socket.current = null;
@@ -173,16 +171,30 @@ export const WebSocketProvider = ({
   };
 
   const resetWebSocket = () => {
-    isLoggedIn.current = false;
     if (web_socket.current) {
       web_socket.current.close();
       web_socket.current = null;
+      console.log(
+        `[WebSocket] clean up connection and data for ${user?.username}`
+      );
+    } else {
+      connectWebSocket();
     }
-    console.log(
-      `[WebSocket] clean up connection and data for ${user?.username}`
-    );
-    isLoggedIn.current = true; // this will trigger the first useEffect to connect websocket
   };
+
+  useEffect(() => {
+    user_Ref.current = user;
+    console.log(`[WebSocket] User: ${user ? "true" : "false"}`);
+  }, [user]);
+
+  useEffect(() => {
+    console.log(`[WebSocket] websocket connected: ${websocket_connected}`);
+  }, [websocket_connected]);
+
+  useEffect(() => {
+    is_messages_initialized_Ref.current = is_messages_initialized;
+    console.log(`[WebSocket] message initialize: ${is_messages_initialized}`);
+  }, [is_messages_initialized]);
 
   return (
     <WebSocketContext.Provider
