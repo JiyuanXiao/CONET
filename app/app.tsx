@@ -33,6 +33,13 @@ const App = () => {
         }}
       />
       <Stack.Screen
+        name="create-group-chat"
+        options={{
+          title: "创建群聊",
+          headerBackTitleVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="chat-settings"
         options={{
           title: "聊天设置",

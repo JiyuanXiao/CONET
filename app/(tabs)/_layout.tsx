@@ -1,5 +1,11 @@
 import React, { useContext } from "react";
-import { FontAwesome5, FontAwesome6, FontAwesome } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  FontAwesome6,
+  FontAwesome,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
 import { Pressable } from "react-native";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
@@ -16,7 +22,22 @@ const SettingTabIcon = (props: {
   return (
     <FontAwesome
       name="gear"
-      size={28}
+      size={25}
+      color={
+        props.focused ? props.theme_colors.primary : props.theme_colors.text
+      }
+    />
+  );
+};
+
+const ContactTabIcon = (props: {
+  theme_colors: ThemeColorsProps;
+  focused: boolean;
+}) => {
+  return (
+    <FontAwesome6
+      name="contact-book"
+      size={20}
       color={
         props.focused ? props.theme_colors.primary : props.theme_colors.text
       }
@@ -31,7 +52,7 @@ const ChatsTabIcon = (props: {
   return (
     <FontAwesome6
       name="comment-dollar"
-      size={25}
+      size={22}
       color={
         props.focused ? props.theme_colors.primary : props.theme_colors.text
       }
@@ -39,16 +60,16 @@ const ChatsTabIcon = (props: {
   );
 };
 
-const AddUserIcon = (props: {
+const CreateChatIcon = (props: {
   theme_colors: ThemeColorsProps;
   pressed: boolean;
 }) => {
   return (
-    <FontAwesome5
-      name="user-plus"
-      size={18}
+    <Ionicons
+      name="chatbubbles-outline"
+      size={25}
       color={props.theme_colors.text}
-      style={{ marginRight: 15, opacity: props.pressed ? 0.5 : 1 }}
+      style={{ marginRight: 20, opacity: props.pressed ? 0.5 : 1 }}
     />
   );
 };
@@ -63,7 +84,9 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text,
         headerTintColor: colors.text,
-        headerStyle: { backgroundColor: colors.background },
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
         tabBarStyle: { backgroundColor: colors.background },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
@@ -79,10 +102,10 @@ export default function TabLayout() {
             <ChatsTabIcon focused={focused} theme_colors={colors} />
           ),
           headerRight: () => (
-            <Link href="/add-contact" asChild>
+            <Link href="/create-group-chat" asChild>
               <Pressable>
                 {({ pressed }) => (
-                  <AddUserIcon theme_colors={colors} pressed={pressed} />
+                  <CreateChatIcon theme_colors={colors} pressed={pressed} />
                 )}
               </Pressable>
             </Link>
@@ -90,9 +113,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="contact"
+        options={{
+          title: "通讯录",
+          headerTitleAlign: "center",
+          tabBarIcon: ({ focused }) => (
+            <ContactTabIcon focused={focused} theme_colors={colors} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="setting"
         options={{
           title: "设置",
+          headerTitleAlign: "center",
           tabBarIcon: ({ focused }) => (
             <SettingTabIcon focused={focused} theme_colors={colors} />
           ),

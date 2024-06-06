@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import { Searchbar, Card } from "react-native-paper";
+import { Searchbar, Card, Button } from "react-native-paper";
 import { router } from "expo-router";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
@@ -39,16 +39,28 @@ export default function AddContactScreen() {
 
   return (
     <View style={styles.container}>
-      <Searchbar
-        mode="bar"
-        placeholder="输入对方ID"
-        onChangeText={setSearchQuery}
-        onSubmitEditing={handleSearch}
-        onFocus={() => setDoesSearch(false)}
-        onClearIconPress={handleClearText}
-        value={searchQuery}
-        style={[styles.search_bar, { backgroundColor: colors.card }]}
-      />
+      <View style={styles.search_bar}>
+        <Searchbar
+          mode="bar"
+          placeholder="输入对方ID"
+          onChangeText={setSearchQuery}
+          onSubmitEditing={handleSearch}
+          onFocus={() => setDoesSearch(false)}
+          onClearIconPress={handleClearText}
+          value={searchQuery}
+          style={[styles.search_input, { backgroundColor: colors.card }]}
+        />
+        <Button
+          mode="contained"
+          buttonColor={colors.primary}
+          textColor="black"
+          disabled={searchQuery.length === 0}
+          style={[styles.button]}
+          onPress={() => console.log("Pressed")}
+        >
+          搜索
+        </Button>
+      </View>
       {searchResult ? (
         <TouchableOpacity
           onPress={() =>
@@ -90,9 +102,22 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   search_bar: {
-    width: "96%",
+    width: "100%",
+    height: 76,
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 15,
+  },
+  search_input: {
+    width: "70%",
     borderRadius: 10,
     margin: 10,
+  },
+  button: {
+    height: "70%",
+    alignSelf: "center",
+    justifyContent: "center",
+    borderRadius: 10,
   },
   card: {
     alignItems: "center",

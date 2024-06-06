@@ -40,7 +40,7 @@ export default function AddContactDetailScreen() {
         avatar_img_src={[avatar_img_src]}
       />
       <TouchableOpacity onPress={handleAddFriend}>
-        <OptionBar content="添加联系人" align_self="center" />
+        <OptionBar content="添加到通讯录" align_self="center" />
       </TouchableOpacity>
     </>
   );
