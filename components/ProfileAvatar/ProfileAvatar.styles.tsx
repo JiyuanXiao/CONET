@@ -2,26 +2,26 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "react-native-paper";
 import { UserAvatarProps } from "@/constants/ComponentTypes";
-import { default_theme } from "@/constants/Colors";
-import { Image } from "react-native";
+import { Image } from "expo-image";
 
 export const ProfileAvatarIcon: React.FC<UserAvatarProps> = (props) => {
-  const [source, setSource] = useState(
-    props.is_direct_chat
-      ? { uri: props.img_src }
-      : require("@/assets/avatars/group_chat_avatar.png")
-  );
+  const [source, setSource] = useState(props.img_src);
 
   const handleError = () => {
     setSource(require("@/assets/avatars/avatar_default.png"));
   };
 
   return (
-    <Avatar.Image
+    <Image
       {...props}
       source={source}
-      size={props.size}
-      style={{ backgroundColor: "transparent" }}
+      contentFit="contain"
+      style={{
+        backgroundColor: "transparent",
+        width: props.size,
+        height: props.size,
+        borderRadius: 5,
+      }}
       onError={handleError}
     />
   );

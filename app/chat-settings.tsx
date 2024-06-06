@@ -102,7 +102,7 @@ export default function ChatSettingsScreen() {
       {is_direct_chat ? (
         <ProfileBar
           contact_alias={friend?.person.first_name || ""}
-          avatar_img_src={friend?.person.avatar || ""}
+          avatar_img_src={friend ? [friend.person.avatar] : [""]}
         />
       ) : (
         <></>

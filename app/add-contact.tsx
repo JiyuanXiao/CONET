@@ -67,7 +67,7 @@ export default function AddContactScreen() {
             contact_id={searchResult.id}
             contact_alias={searchResult.first_name}
             contact_username={searchResult.username}
-            avatar_img_src={searchResult.avatar}
+            avatar_img_src={[searchResult.avatar]}
           />
         </TouchableOpacity>
       ) : (

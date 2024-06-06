@@ -3,6 +3,7 @@ import styled from "styled-components/native";
 import { Card, Badge } from "react-native-paper";
 import { Text, View } from "react-native";
 import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar.component";
+import GroupAvatar from "@/components/ProfileAvatar/GroupAvatar.component";
 import { ChatBoxProps } from "@/constants/ComponentTypes";
 import { default_theme } from "@/constants/Colors";
 
@@ -15,20 +16,20 @@ export const ChatBoxCard: React.FC<ChatBoxProps> = styled(
     fontSize: 17,
     fontWeight: "bold",
     color: props.theme_colors?.text ?? default_theme.TEXT,
-    paddingLeft: 25,
+    paddingLeft: 15,
   },
   subtitleStyle: {
     fontSize: 13,
     color: props.theme_colors?.text ?? default_theme.TEXT,
-    paddingLeft: 25,
+    paddingLeft: 15,
   },
   left: () => (
     <View style={{ flexDirection: "row" }}>
-      <ProfileAvatar
-        img_src={props.avatar_img_src}
-        size={60}
-        is_direct_chat={props.is_direct_chat}
-      />
+      {props.avatar_img_src.length > 2 ? (
+        <GroupAvatar avatars={props.avatar_img_src} size={55} />
+      ) : (
+        <ProfileAvatar img_src={props.avatar_img_src} size={55} />
+      )}
       <View style={{ left: -5 }}>
         <Badge
           visible={props.has_new_message}

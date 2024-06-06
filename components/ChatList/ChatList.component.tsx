@@ -98,7 +98,9 @@ export const ChatList = (props: {
           chat_id={Number(props.chat_id)}
           chat_member={chat_members.get(item.sender_username)}
           message_object={item}
-          is_direct_chat={current_chat?.is_direct_chat || false}
+          is_direct_chat={
+            current_chat ? Number(current_chat.people.length) <= 2 : false
+          }
         />
       )}
       keyExtractor={(item) => item.timestamp}

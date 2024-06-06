@@ -43,26 +43,46 @@ export default function ChatListScreen() {
   const initializeMessageContextRef = useRef(initializeMessageContext);
 
   const getChatTitle = (chat: CE_ChatProps) => {
-    if (chat.is_direct_chat) {
-      const name_1 = chat.people[0].person.first_name;
-      const name_2 = chat.people[1].person.first_name;
-
-      return chat.people[0].person.username === user?.username
-        ? name_2
-        : name_1;
-    } else {
-      return chat.title;
+    switch (chat.people.length) {
+      case 0:
+        return "";
+      case 1:
+        return chat.people[0].person.first_name;
+      case 2:
+        const name_1 = chat.people[0].person.first_name;
+        const name_2 = chat.people[1].person.first_name;
+        return chat.people[0].person.username === user?.username
+          ? name_2
+          : name_1;
+      default:
+        return chat.title;
     }
   };
 
   const getChatAvatar = (chat: CE_ChatProps) => {
-    if (chat.is_direct_chat) {
-      const name_1 = chat.people[0].person.username;
-      const avatar_1 = chat.people[0].person.avatar;
-      const avatar_2 = chat.people[1].person.avatar;
-      return name_1 === user?.username ? avatar_2 : avatar_1;
-    } else {
-      return "@/assets/avatars/group_chat_avatar.png";
+    switch (chat.people.length) {
+      case 0:
+        return ["@/assets/avatars/avatar_default.png"];
+      case 1:
+        return [chat.people[0].person.avatar];
+      case 2:
+        const name_1 = chat.people[0].person.username;
+        const avatar_1 = chat.people[0].person.avatar;
+        const avatar_2 = chat.people[1].person.avatar;
+        return name_1 === user?.username ? [avatar_2] : [avatar_1];
+      default:
+        let count = 0;
+        const avatar_list = [];
+        for (const member of chat.people) {
+          if (count < 9) {
+            avatar_list.push(member.person.avatar);
+            count += 1;
+          } else {
+            break;
+          }
+        }
+
+        return avatar_list;
     }
   };
 
@@ -142,7 +162,6 @@ export default function ChatListScreen() {
                     last_message_time={
                       getLastMessageInfo(item.id).last_message_time
                     }
-                    is_direct_chat={item.is_direct_chat}
                     has_new_message={has_new_message.get(item.id) || false}
                     avatar_img_src={getChatAvatar(item)}
                   />

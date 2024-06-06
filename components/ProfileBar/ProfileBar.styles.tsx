@@ -26,13 +26,7 @@ export const ProfileBarCard: React.FC<ProfileBarProps> = styled(
       color: props.theme_colors?.text ?? default_theme.TEXT,
       paddingLeft: 30,
     },
-    left: () => (
-      <ProfileAvatar
-        img_src={props.avatar_img_src}
-        size={65}
-        is_direct_chat={true}
-      />
-    ),
+    left: () => <ProfileAvatar img_src={props.avatar_img_src} size={65} />,
   };
 })`
   height: 120px;

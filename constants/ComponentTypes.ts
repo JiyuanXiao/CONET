@@ -14,8 +14,7 @@ export interface ChatBoxProps {
   chat_title: string;
   last_message: string;
   last_message_time: string;
-  avatar_img_src: string;
-  is_direct_chat?: boolean;
+  avatar_img_src: string[];
   has_new_message: boolean;
   theme_colors?: ThemeColorsProps;
 }
@@ -39,7 +38,7 @@ export interface InputBarProps {
 export interface MessageBubbleProps {
   isReceived: boolean;
   message_content?: string;
-  avatar_img_src?: string;
+  avatar_img_src?: string[];
   theme_colors?: ThemeColorsProps;
   timestamp?: string;
   children?: React.ReactNode;
@@ -47,9 +46,8 @@ export interface MessageBubbleProps {
 
 // Avatar Components props
 export interface UserAvatarProps {
-  img_src: string;
+  img_src: string[];
   size: number;
-  is_direct_chat?: boolean;
   theme_colors?: ThemeColorsProps;
 }
 
@@ -71,6 +69,6 @@ export interface ProfileBarProps {
   contact_id?: number;
   contact_alias: string;
   contact_username?: string;
-  avatar_img_src: string;
+  avatar_img_src: string[];
   theme_colors?: ThemeColorsProps;
 }

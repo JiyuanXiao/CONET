@@ -54,7 +54,6 @@ const ChatBox = (props: ChatBoxProps) => {
       last_message={props.last_message}
       last_message_time={lastMessageTime}
       avatar_img_src={props.avatar_img_src}
-      is_direct_chat={props.is_direct_chat}
       has_new_message={props.has_new_message}
       theme_colors={colors}
     />

@@ -80,12 +80,7 @@ const MessageBubble = ({
             {chat_member.person.first_name}
           </BubbleAlias>
         )}
-        <BubbleAvatar
-          img_src={
-            chat_member.person.avatar || "../../assets/avatars/avatar_1.png"
-          }
-          size={40}
-        />
+        <BubbleAvatar img_src={[chat_member.person.avatar]} size={40} />
       </View>
     </BubbleConatiner>
   ) : (

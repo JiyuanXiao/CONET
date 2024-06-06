@@ -6,11 +6,7 @@ import { UserAvatarProps } from "@/constants/ComponentTypes";
 const BubbleAvatar = (props: UserAvatarProps) => {
   return (
     <BubbleAvatarContainer>
-      <ProfileAvatar
-        img_src={props.img_src}
-        size={props.size}
-        is_direct_chat={true}
-      />
+      <ProfileAvatar img_src={props.img_src} size={props.size} />
     </BubbleAvatarContainer>
   );
 };
