@@ -11,6 +11,7 @@ export const ContactsContext = createContext<ContactContextProps>({
   removeContact: async () => {},
   searchContact: async () => null,
   updateContacts: async () => {},
+  resetContacts: () => {},
 });
 
 export const ContactsContextProvider = (props: {
@@ -102,6 +103,10 @@ export const ContactsContextProvider = (props: {
     }
   };
 
+  const resetContacts = () => {
+    setContacts(new Map<number, CE_PersonProps>());
+  };
+
   useEffect(() => {
     if (is_authentication_initialized) {
       initializeContactContext();
@@ -116,6 +121,7 @@ export const ContactsContextProvider = (props: {
         removeContact,
         searchContact,
         updateContacts,
+        resetContacts,
       }}
     >
       {props.children}

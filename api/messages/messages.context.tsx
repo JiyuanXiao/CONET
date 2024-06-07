@@ -15,6 +15,7 @@ import { getLoadedMessages } from "./messages.context.util";
 
 export const MessagesContext = createContext<MessageContextProps>({
   messages: new Map<number, MessageContextObjectProps>(),
+  createMeesageObjectForNewChat: async () => {},
   loadMessagesById: async () => {},
   sendMessage: () => {},
   receiveMessage: () => false,
@@ -43,6 +44,21 @@ export const MessagesContextProvider = (props: {
     messages_object: MessageContextObjectProps
   ) => {
     setMessages(new Map(messages.set(Number(chat_id), messages_object)));
+  };
+
+  const createMeesageObjectForNewChat = async (chat_id: number) => {
+    const initial_messages_object = {
+      chat_id: chat_id,
+      loaded_messages: [],
+      current_index: 0,
+      total_messages_amount: 0,
+    };
+    setMessageMap(Number(chat_id), initial_messages_object);
+    await MessagesStorage.createMessageTableIfNotExists(
+      user?.username,
+      chat_id,
+      db
+    );
   };
 
   // Take the "load" action for a friend's chat
@@ -452,6 +468,7 @@ export const MessagesContextProvider = (props: {
     <MessagesContext.Provider
       value={{
         messages,
+        createMeesageObjectForNewChat,
         loadMessagesById,
         sendMessage,
         receiveMessage,

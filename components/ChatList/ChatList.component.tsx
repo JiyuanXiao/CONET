@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { FlatList } from "react-native";
+import { useNavigation } from "expo-router";
+import { StackActions } from "@react-navigation/native";
 import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
@@ -26,6 +28,7 @@ export const ChatList = (props: {
   const [chat_members, setChatMembers] = useState<
     Map<string, CE_ChatMemberProps>
   >(new Map<string, CE_ChatMemberProps>());
+  const navigation = useNavigation();
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -80,11 +83,12 @@ export const ChatList = (props: {
         addNewChatMemberToMap(member.person.username, member);
       }
     } else {
-      console.error(
+      console.warn(
         "at useEffect() in ChatList.component.tsx: chat " +
           props.chat_id.toString() +
           " is not in chat context"
       );
+      navigation.dispatch(StackActions.popToTop());
     }
   }, [chats]);
 

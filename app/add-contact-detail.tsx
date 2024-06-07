@@ -42,7 +42,7 @@ export default function AddContactDetailScreen() {
       console.log(
         `AddContactDetailScreen(): Added new contact ${contact_first_name} successfully: `
       );
-      navigation.dispatch(StackActions.popToTop());
+      navigation.dispatch(StackActions.pop(2));
     } catch (err) {
       console.error(`AddContactDetailScreen(): ERROR: ${err}`);
     }

@@ -13,7 +13,7 @@ export const ProfileBarCard: React.FC<ProfileBarProps> = styled(
     title: props.contact_alias,
     subtitle:
       (props.contact_id ? `ID: ${props.contact_id}` : ``) +
-      (props.contact_id && props.contact_username ? " | " : "") +
+      (props.contact_id && props.contact_username ? "\n" : "") +
       (props.contact_username ? `用户名: ${props.contact_username}` : ``),
     titleStyle: {
       fontSize: 17,
@@ -26,6 +26,7 @@ export const ProfileBarCard: React.FC<ProfileBarProps> = styled(
       color: props.theme_colors?.text ?? default_theme.TEXT,
       paddingLeft: 30,
     },
+    subtitleNumberOfLines: 2,
     left: () => <ProfileAvatar img_src={props.avatar_img_src} size={65} />,
   };
 })`

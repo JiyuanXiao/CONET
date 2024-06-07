@@ -38,14 +38,24 @@ export const WebSocketProvider = ({
     has_new_message,
     setLastRead,
     setHasNewMessageStatus,
-    setChatMap,
+    // setChatMap,
+    updateChat,
+    deleteChat,
   } = useContext(ChatsContext);
-  const { messages, is_messages_initialized, receiveMessage } =
-    useContext(MessagesContext);
+  const {
+    messages,
+    is_messages_initialized,
+    receiveMessage,
+    createMeesageObjectForNewChat,
+  } = useContext(MessagesContext);
   const [websocket_connected, setWebSocketConnected] = useState(false);
   const receiveMessageRef = useRef(receiveMessage);
   const setHasNewMessageStatusRef = useRef(setHasNewMessageStatus);
-  const setChatMapRef = useRef(setChatMap);
+  const updateChatRef = useRef(updateChat);
+  const deleteChatRef = useRef(deleteChat);
+  const createMeesageObjectForNewChatRef = useRef(
+    createMeesageObjectForNewChat
+  );
   const is_messages_initialized_Ref = useRef(is_messages_initialized);
   const user_Ref = useRef(user);
   const db = useSQLiteContext();
@@ -80,17 +90,35 @@ export const WebSocketProvider = ({
     );
   };
 
-  const handleEditChat = async (chat_data: CE_ChatProps) => {
-    console.log(`[WebSocket] action: edit_chat for chat ${chat_data.id}`);
+  const handleChatsUpdate = async (chat_data: CE_ChatProps) => {
     // update chat context
-    setChatMapRef.current(chat_data.id, chat_data);
-
-    // update chat storage
-    ChatStorage.setChat(user?.username, chat_data.id, chat_data);
+    await updateChatRef.current(chat_data);
 
     console.log(
-      `[WebSocket] finished edit_chat action for chat ${chat_data.id}`
+      `[WebSocket] finished handling action for chat ${chat_data.id}`
     );
+  };
+
+  const handleNewChat = async (chat_data: CE_ChatProps) => {
+    // update chat context
+    await updateChatRef.current(chat_data);
+
+    // create message contact and table for new chat
+    await createMeesageObjectForNewChatRef.current(chat_data.id);
+
+    console.log(
+      `[WebSocket] finished handling action for chat ${chat_data.id}`
+    );
+  };
+
+  const handleDeleteChat = async (chat_data: CE_ChatProps) => {
+    await deleteChatRef.current(chat_data.id);
+    MessagesStorage.deleteMessageTableIfExists(
+      user?.username,
+      chat_data.id,
+      db
+    );
+    console.log(`[WebSocket] finished deleting chat ${chat_data.id}`);
   };
 
   const connectWebSocket = () => {
@@ -108,10 +136,28 @@ export const WebSocketProvider = ({
 
       switch (response.action) {
         case "new_message":
+          console.log(`[WebSocket] ACTION: new_message`);
           handleNewMessage(response.data);
           break;
         case "edit_chat":
-          handleEditChat(response.data);
+          console.log(`[WebSocket] ACTION: edit_chat`);
+          handleChatsUpdate(response.data);
+          break;
+        case "new_chat":
+          console.log(`[WebSocket] ACTION: new_chat`);
+          handleNewChat(response.data);
+          break;
+        case "add_person":
+          console.log(`[WebSocket] ACTION: add_person`);
+          handleChatsUpdate(response.data);
+          break;
+        case "remove_person":
+          console.log(`[WebSocket] ACTION: remove_person`);
+          handleChatsUpdate(response.data);
+          break;
+        case "delete_chat":
+          console.log(`[WebSocket] ACTION: delete_chat`);
+          handleDeleteChat(response.data);
           break;
         default:
           console.log(`Unknow action: ${response.action}`);
@@ -153,11 +199,13 @@ export const WebSocketProvider = ({
   }, [has_new_message]);
 
   useEffect(() => {
-    setChatMapRef.current = setChatMap;
+    updateChatRef.current = updateChat;
+    deleteChatRef.current = deleteChat;
   }, [chats]);
 
   useEffect(() => {
     receiveMessageRef.current = receiveMessage;
+    createMeesageObjectForNewChatRef.current = createMeesageObjectForNewChat;
   }, [messages]);
 
   const closeWebSocket = () => {

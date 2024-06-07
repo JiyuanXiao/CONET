@@ -8,16 +8,19 @@ import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import { ChatsContext } from "@/api/chats/chats.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { WebSocketContext } from "@/api/websocket/websocket.context";
+import { ContactsContext } from "@/api/contacts/contacts.context";
 
 export default function SettngScreen() {
   const { user, logOut } = useContext(AuthenticationContext);
   const { resetChatContext } = useContext(ChatsContext);
   const { resetMessageContext } = useContext(MessagesContext);
   const { closeWebSocket } = useContext(WebSocketContext);
+  const { resetContacts } = useContext(ContactsContext);
   const handleLogout = () => {
     console.log("SettingScreen() in setting.tsx is calling logOut()");
     resetMessageContext();
     resetChatContext();
+    resetContacts();
     closeWebSocket();
     logOut();
   };

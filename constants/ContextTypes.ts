@@ -48,7 +48,7 @@ export interface ChatsContextProps {
   has_new_message: Map<number, boolean>;
   setHasNewMessageStatus: (chat_id: number, read_status: boolean) => void;
   is_chats_initialized: boolean;
-  addChat: (chat_object: CE_ChatProps) => Promise<void>;
+  // addChat: (chat_object: CE_ChatProps) => Promise<void>;
   updateChat: (chat_object: CE_ChatProps) => Promise<void>;
   deleteChat: (chat_id: number) => Promise<void>;
   getLastRead: (chat_id: number) => Promise<number>;
@@ -87,6 +87,7 @@ export interface MessageContextObjectProps {
 
 export interface MessageContextProps {
   messages: Map<number, MessageContextObjectProps>;
+  createMeesageObjectForNewChat: (chat_id: number) => Promise<void>;
   loadMessagesById: (chat_id: number) => Promise<void>;
   sendMessage: (
     chat_id: number,
@@ -123,4 +124,5 @@ export interface ContactContextProps {
   removeContact: (contact_id: number) => Promise<void>;
   searchContact: (contact_id: number) => Promise<ContactStorageProps | null>;
   updateContacts: () => Promise<void>;
+  resetContacts: () => void;
 }

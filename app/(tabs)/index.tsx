@@ -148,8 +148,6 @@ export default function ChatListScreen() {
                       pathname: "/chat-window",
                       params: {
                         chat_id: item.id,
-                        name: getChatTitle(item),
-                        avatar_img_src: getChatAvatar(item),
                       },
                     });
                   }}

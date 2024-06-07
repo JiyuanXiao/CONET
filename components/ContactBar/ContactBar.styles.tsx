@@ -11,12 +11,12 @@ export const ContactBarCard: React.FC<ProfileBarProps> = styled(
   return {
     title: props.contact_alias,
     titleStyle: {
-      fontSize: 17,
+      fontSize: 15,
       fontWeight: "medium",
       color: props.theme_colors?.text ?? default_theme.TEXT,
       paddingLeft: 10,
     },
-    left: () => <ProfileAvatar img_src={props.avatar_img_src} size={45} />,
+    left: () => <ProfileAvatar img_src={props.avatar_img_src} size={40} />,
   };
 })`
   height: 70px;
@@ -26,7 +26,7 @@ export const ContactBarCard: React.FC<ProfileBarProps> = styled(
     props.theme_colors?.card ?? default_theme.CARD};
   border-color: ${(props) => props.theme_colors?.card ?? default_theme.CARD};
   border-style: solid;
-  border-width: 2px;
+  border-width: 1px;
   border-radius: 10px;
   margin-top: 10px;
 `;

@@ -13,7 +13,7 @@ export const ChatsContext = createContext<ChatsContextProps>({
   has_new_message: new Map<number, boolean>(),
   setHasNewMessageStatus: () => {},
   is_chats_initialized: false,
-  addChat: async () => {},
+  // addChat: async () => {},
   updateChat: async () => {},
   deleteChat: async () => {},
   getLastRead: async () => 0,
@@ -53,22 +53,22 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     );
   };
 
-  const addChat = async (new_chat: CE_ChatProps) => {
-    try {
-      // add chat to local storage
-      await ChatStorage.setChat(user?.username, new_chat.id, new_chat);
+  // const addChat = async (new_chat: CE_ChatProps) => {
+  //   try {
+  //     // add chat to local storage
+  //     await ChatStorage.setChat(user?.username, new_chat.id, new_chat);
 
-      // add chat to conext
-      setChatMap(new_chat.id, new_chat);
-      console.log(
-        "[Chat Context] New chat " +
-          new_chat.id +
-          " has been added to chat context"
-      );
-    } catch (err) {
-      console.error(`[Chat Context] addChat(): ${err}`);
-    }
-  };
+  //     // add chat to conext
+  //     setChatMap(new_chat.id, new_chat);
+  //     console.log(
+  //       "[Chat Context] New chat " +
+  //         new_chat.id +
+  //         " has been added to chat context"
+  //     );
+  //   } catch (err) {
+  //     console.error(`[Chat Context] addChat(): ${err}`);
+  //   }
+  // };
 
   const updateChat = async (chat_object: CE_ChatProps) => {
     try {
@@ -258,7 +258,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         has_new_message,
         setHasNewMessageStatus,
         is_chats_initialized,
-        addChat,
+        // addChat,
         updateChat,
         deleteChat,
         getLastRead,

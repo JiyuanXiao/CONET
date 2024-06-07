@@ -13,6 +13,7 @@ import {
 } from "@/constants/ChatEngineObjectTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import AvatarListBar from "@/components/AvatarListBar/AvatarListBar.component";
+import * as ChatServer from "@/api/chats/chats.api";
 
 export default function ChatSettingsScreen() {
   const route = useRoute();
@@ -48,18 +49,21 @@ export default function ChatSettingsScreen() {
     navigation.goBack();
   };
 
-  const DeleteChat = () => {
-    console.log(
-      "ChatSettingsScreen(): Start to delete friend: " + chat_id.toString()
-    );
-    deleteChat(Number(chat_id));
-    console.log(
-      "ChatSettingsScreen(): Deleted friend " +
-        chat_id.toString() +
-        " successfully..."
-    );
+  const DeleteChat = async () => {
+    try {
+      await ChatServer.DeleteChat(
+        user?.username || "",
+        user?.secret || "",
+        chat_id
+      );
+      console.log("Deleted chat " + chat_id + " successfully...");
 
-    navigation.dispatch(StackActions.popToTop());
+      //navigation.dispatch(StackActions.popToTop());
+    } catch (err) {
+      console.warn(
+        `ChatSettingsScreen(): delete chat ${chat_id} failed: ${err}`
+      );
+    }
   };
 
   useEffect(() => {
@@ -89,7 +93,7 @@ export default function ChatSettingsScreen() {
         }
       }
     } else {
-      console.error(
+      console.warn(
         "at ChatSettingsScreen() in chat-settings.tsx: chat " +
           chat_id.toString() +
           " is not in chat context"
@@ -121,16 +125,17 @@ export default function ChatSettingsScreen() {
       >
         <OptionBar content="清空聊天记录" />
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          setDialogVisible(true);
-          setConfrimMessage("确认删除聊天?");
-          //setActionFunction(() => DeleteChat);
-          setActionFunction(() => {});
-        }}
-      >
-        <OptionBar content="删除联聊天" />
-      </TouchableOpacity>
+      {chats.get(Number(chat_id))?.admin.username === user?.username && (
+        <TouchableOpacity
+          onPress={() => {
+            setDialogVisible(true);
+            setConfrimMessage("确认删除聊天?");
+            setActionFunction(() => DeleteChat);
+          }}
+        >
+          <OptionBar content="删除聊天" />
+        </TouchableOpacity>
+      )}
       <ConfirmDialog
         visible={dialog_visible}
         setDialogVisible={setDialogVisible}

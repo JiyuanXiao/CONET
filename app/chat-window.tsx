@@ -22,19 +22,18 @@ export default function ChatWindowScreen() {
 
   const [messageSent, setMessageSent] = useState<boolean>(false);
   const {
+    chats,
     setCurrentTalkingChatId,
     current_talking_chat_id,
     setLastRead,
-    setHasNewMessageStatus,
   } = useContext(ChatsContext);
   const { messages } = useContext(MessagesContext);
 
   const navigation = useNavigation();
   const route = useRoute();
-  const { chat_id, name, avatar_img_src } = route.params as {
+  const { user } = useContext(AuthenticationContext);
+  const { chat_id } = route.params as {
     chat_id: number;
-    name: string;
-    avatar_img_src: string;
   };
 
   const updateLastReadMessage = async () => {
@@ -50,6 +49,26 @@ export default function ChatWindowScreen() {
         `Chat ${chat_id} last read message update to latest message: ${latest_message_id}`
       );
     }
+  };
+
+  const getChatTitle = (chat: CE_ChatProps | undefined) => {
+    if (chat) {
+      switch (chat.people.length) {
+        case 0:
+          return "";
+        case 1:
+          return chat.people[0].person.first_name;
+        case 2:
+          const name_1 = chat.people[0].person.first_name;
+          const name_2 = chat.people[1].person.first_name;
+          return chat.people[0].person.username === user?.username
+            ? name_2
+            : name_1;
+        default:
+          return chat.title;
+      }
+    }
+    return "";
   };
 
   useEffect(() => {
@@ -70,7 +89,7 @@ export default function ChatWindowScreen() {
   // Display the name on the header
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: name,
+      title: getChatTitle(chats.get(Number(chat_id))),
       headerRight: () => (
         <TouchableOpacity
           onPress={() => {
@@ -86,7 +105,7 @@ export default function ChatWindowScreen() {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, name]);
+  }, [navigation]);
 
   return (
     <View
