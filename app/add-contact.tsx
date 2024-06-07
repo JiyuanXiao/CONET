@@ -1,10 +1,19 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import React, { useState, useContext } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { Searchbar, Card, Button } from "react-native-paper";
 import { router } from "expo-router";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
-import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
+import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
+import { ContactsContext } from "@/api/contacts/contacts.context";
+import { ContactStorageProps } from "@/constants/ContextTypes";
 
 interface FriendProps {
   id: string;
@@ -20,78 +29,86 @@ export default function AddContactScreen() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [doesSearch, setDoesSearch] = useState(false);
-  const [searchResult, setSearchResult] = useState<CE_UserProps>();
+  const [searchResult, setSearchResult] = useState<ContactStorageProps | null>(
+    null
+  );
+  const { searchContact } = useContext(ContactsContext);
 
-  const handleSearch = () => {
-    // if (searchQuery.length > 0) {
-    //   const result = MOCK_FRIENDS.find(
-    //     (friend) => friend.account_id === searchQuery
-    //   );
-    //   setDoesSearch(true);
-    //   setSearchResult(result);
-    // }
+  const handleSearch = async () => {
+    if (searchQuery.length > 0) {
+      const contact_id = Number(searchQuery);
+      const result = await searchContact(contact_id);
+      setDoesSearch(true);
+      setSearchResult(result);
+    }
   };
 
   const handleClearText = () => {
     setDoesSearch(false);
-    setSearchResult(undefined);
+    setSearchResult(null);
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.search_bar}>
-        <Searchbar
-          mode="bar"
-          placeholder="输入对方ID"
-          onChangeText={setSearchQuery}
-          onSubmitEditing={handleSearch}
-          onFocus={() => setDoesSearch(false)}
-          onClearIconPress={handleClearText}
-          value={searchQuery}
-          style={[styles.search_input, { backgroundColor: colors.card }]}
-        />
-        <Button
-          mode="contained"
-          buttonColor={colors.primary}
-          textColor="black"
-          disabled={searchQuery.length === 0}
-          style={[styles.button]}
-          onPress={() => console.log("Pressed")}
-        >
-          搜索
-        </Button>
-      </View>
-      {searchResult ? (
-        <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/add-contact-detail",
-              params: {
-                contact_id: searchResult.id,
-                contact_alias: searchResult.first_name,
-                contact_username: searchResult.username,
-                avatar_img_src: searchResult.avatar,
-              },
-            })
-          }
-        >
-          <ProfileBar
-            contact_id={searchResult.id}
-            contact_alias={searchResult.first_name}
-            contact_username={searchResult.username}
-            avatar_img_src={[searchResult.avatar]}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <View style={styles.search_bar}>
+          <Searchbar
+            mode="bar"
+            placeholder="输入联系人ID"
+            onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+            onFocus={() => setDoesSearch(false)}
+            onClearIconPress={handleClearText}
+            value={searchQuery}
+            keyboardType="decimal-pad"
+            style={[styles.search_input, { backgroundColor: colors.card }]}
           />
-        </TouchableOpacity>
-      ) : (
-        doesSearch && (
-          <Card.Content style={[styles.card, { backgroundColor: colors.card }]}>
-            <Text style={[styles.card_text, { color: colors.text }]}>
-              该用户不存在
-            </Text>
-          </Card.Content>
-        )
-      )}
-    </View>
+          <Button
+            mode="contained"
+            buttonColor={colors.primary}
+            textColor="black"
+            disabled={searchQuery.length === 0}
+            style={[styles.button]}
+            onPress={handleSearch}
+          >
+            搜索
+          </Button>
+        </View>
+        {searchResult ? (
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: "/add-contact-detail",
+                params: {
+                  contact_id: searchResult.id,
+                  contact_username: searchResult.contact.username,
+                  contact_first_name: searchResult.contact.first_name,
+                  custom_json: searchResult.contact.custom_json,
+                  avatar: searchResult.contact.avatar,
+                },
+              })
+            }
+          >
+            <ProfileBar
+              contact_id={searchResult.id}
+              contact_alias={searchResult.contact.first_name}
+              contact_username={searchResult.contact.last_name}
+              avatar_img_src={[searchResult.contact.avatar]}
+            />
+          </TouchableOpacity>
+        ) : (
+          doesSearch && (
+            <Card.Content
+              style={[styles.card, { backgroundColor: colors.card }]}
+            >
+              <Text style={[styles.card_text, { color: colors.text }]}>
+                该用户不存在
+              </Text>
+            </Card.Content>
+          )
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -7,58 +7,30 @@ import {
   FlatList,
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import { Searchbar, Button, Checkbox } from "react-native-paper";
+import { Searchbar, Button } from "react-native-paper";
 import { router } from "expo-router";
-import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
-import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
+import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
 import { FontAwesome5 } from "@expo/vector-icons";
 import ContactBar from "@/components/ContactBar/ContactBar.component";
-
-interface ContactProps {
-  id: number;
-  username: string;
-  alias: string;
-  avatar: string;
-}
-
-interface FriendProps {
-  id: string;
-  name: string;
-  avatar_icon: string;
-  icon_color: string;
-  icon_background_color: string;
-  icon_border_color: string;
-}
-
-const MOCK_CONTACTS: ContactProps[] = [
-  { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
-  { id: 383302, username: "jichang", alias: "鸡肠", avatar: "" },
-  { id: 383301, username: "shaoji", alias: "烧鸡", avatar: "" },
-  { id: 384817, username: "yejiang", alias: "叶酱", avatar: "" },
-];
-
-// const MOCK_CONTACTS: ContactProps[] = [];
+import { ContactsContext } from "@/api/contacts/contacts.context";
+import AvatarListBar from "@/components/AvatarListBar/AvatarListBar.component";
 
 export default function CreateGroupChatScreen() {
   const { colors } = useTheme();
-
+  const [candidates, setCandidates] = useState<CE_PersonProps[]>([]);
   const [chat_title, setChatTitle] = useState("");
-  const [doesSearch, setDoesSearch] = useState(false);
-  const [searchResult, setSearchResult] = useState<CE_UserProps>();
+  const { contacts } = useContext(ContactsContext);
 
-  const handleCreate = () => {
-    // if (searchQuery.length > 0) {
-    //   const result = MOCK_FRIENDS.find(
-    //     (friend) => friend.account_id === searchQuery
-    //   );
-    //   setDoesSearch(true);
-    //   setSearchResult(result);
-    // }
+  const handleCreate = () => {};
+
+  const handleClearText = () => {};
+
+  const handleContactOnPress = (candidate: CE_PersonProps) => {
+    setCandidates((prev_candidates) => [...prev_candidates, candidate]);
   };
 
-  const handleClearText = () => {
-    setDoesSearch(false);
-    setSearchResult(undefined);
+  const resetCandidates = (newCandidates: CE_PersonProps[]) => {
+    setCandidates(newCandidates);
   };
 
   return (
@@ -69,7 +41,6 @@ export default function CreateGroupChatScreen() {
           placeholder="输入群名"
           onChangeText={setChatTitle}
           onSubmitEditing={handleCreate}
-          onFocus={() => setDoesSearch(false)}
           onClearIconPress={handleClearText}
           value={chat_title}
           style={[styles.title_input, { backgroundColor: colors.card }]}
@@ -89,20 +60,25 @@ export default function CreateGroupChatScreen() {
           创建
         </Button>
       </View>
-      {MOCK_CONTACTS.length > 0 ? (
+      {candidates.length > 0 && (
+        <AvatarListBar members={candidates} resetCandidates={resetCandidates} />
+      )}
+      {contacts.size > 0 ? (
         <FlatList
-          data={MOCK_CONTACTS}
-          renderItem={({ item }: { item: ContactProps }) => {
-            return (
-              <TouchableOpacity onPress={() => {}}>
+          data={Array.from(contacts.values())}
+          renderItem={({ item }: { item: CE_PersonProps }) => {
+            return !candidates.includes(item) ? (
+              <TouchableOpacity onPress={() => handleContactOnPress(item)}>
                 <ContactBar
-                  contact_alias={item.alias}
-                  avatar_img_src={[item.alias]}
+                  contact_alias={item.first_name}
+                  avatar_img_src={[item.avatar]}
                 />
               </TouchableOpacity>
+            ) : (
+              <></>
             );
           }}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.username}
         ></FlatList>
       ) : (
         <View>

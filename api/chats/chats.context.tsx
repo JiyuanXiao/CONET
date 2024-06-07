@@ -100,7 +100,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
       // update context
       const new_chats = new Map(chats);
       if (new_chats.delete(chat_id)) {
-        setChats(new_chats);
+        setChats(new Map<number, CE_ChatProps>(new_chats));
         console.log(`[Chat Context] delete context data for chat: ${chat_id}`);
       }
 

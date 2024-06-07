@@ -1,14 +1,18 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigation } from "expo-router";
-import { ScrollView, FlatList, TouchableOpacity } from "react-native";
+import { ScrollView, FlatList, TouchableOpacity, View } from "react-native";
 import { useRoute, StackActions } from "@react-navigation/native";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { ChatsContext } from "@/api/chats/chats.context";
-import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
+import {
+  CE_ChatMemberProps,
+  CE_PersonProps,
+} from "@/constants/ChatEngineObjectTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
+import AvatarListBar from "@/components/AvatarListBar/AvatarListBar.component";
 
 export default function ChatSettingsScreen() {
   const route = useRoute();
@@ -18,7 +22,7 @@ export default function ChatSettingsScreen() {
 
   const { ClearAllMessagesById } = useContext(MessagesContext);
   const { chats, deleteChat } = useContext(ChatsContext);
-  const [chat_members, setChatMembers] = useState<CE_ChatMemberProps[]>([]);
+  const [chat_members, setChatMembers] = useState<CE_PersonProps[]>([]);
   const { user } = useContext(AuthenticationContext);
   const [is_direct_chat, setIsDirectChat] = useState<boolean>(false);
   const [friend, setFriend] = useState<CE_ChatMemberProps>();
@@ -27,6 +31,8 @@ export default function ChatSettingsScreen() {
   const [isConfirm, setIsConfirm] = useState<boolean>(false);
   const [actionFunction, setActionFunction] = useState<() => void>(() => {});
   const navigation = useNavigation();
+
+  const addChatMember = async () => {};
 
   const ClearChatHistory = () => {
     console.log(
@@ -67,7 +73,11 @@ export default function ChatSettingsScreen() {
   useEffect(() => {
     const current_chat = chats.get(Number(chat_id));
     if (current_chat) {
-      setChatMembers(current_chat.people);
+      for (const person of current_chat.people) {
+        const current_members = chat_members;
+        current_members.push(person.person);
+        setChatMembers(current_members);
+      }
       setIsDirectChat(current_chat.people.length <= 2);
       if (current_chat.is_direct_chat) {
         const member_1 = current_chat.people[0];
@@ -87,27 +97,20 @@ export default function ChatSettingsScreen() {
     }
   }, [chats]);
 
-  // useEffect(() => {
-  //   console.log(
-  //     "FriendSettingsScreen(): Start to update chat history for: " + name
-  //   );
-  //   updateFriendById(id);
-  //   console.log(
-  //     "FriendSettingsScreen(): Successfully updated chat history for: " + name
-  //   );
-  // }, [messages_object_list]);
-
   return (
-    <ScrollView>
+    <>
       {is_direct_chat ? (
         <ProfileBar
           contact_alias={friend?.person.first_name || ""}
           avatar_img_src={friend ? [friend.person.avatar] : [""]}
         />
       ) : (
-        <></>
+        <AvatarListBar members={chat_members} />
+        // <AvatarListBar />
       )}
-
+      <TouchableOpacity onPress={addChatMember}>
+        <OptionBar content="添加成员" />
+      </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
           setDialogVisible(true);
@@ -134,6 +137,6 @@ export default function ChatSettingsScreen() {
         confirm_message={confirm_message}
         setIsConfirm={setIsConfirm}
       />
-    </ScrollView>
+    </>
   );
 }

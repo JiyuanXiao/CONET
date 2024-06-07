@@ -13,13 +13,8 @@ import ContactBar from "@/components/ContactBar/ContactBar.component";
 import ContactActionBar from "@/components/ContactBar/ContactActionBar.component";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-
-interface ContactProps {
-  id: number;
-  username: string;
-  alias: string;
-  avatar: string;
-}
+import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
+import { ContactsContext } from "@/api/contacts/contacts.context";
 
 const MOCK_CONTACTS = [
   { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
@@ -32,9 +27,10 @@ const MOCK_CONTACTS = [
 
 export default function SettngScreen() {
   const { colors } = useTheme();
+  const { contacts } = useContext(ContactsContext);
   return (
     <>
-      <View style={{ marginBottom: 25 }}>
+      <View style={{ marginBottom: 15 }}>
         <TouchableOpacity
           onPress={() => {
             router.push({
@@ -95,19 +91,36 @@ export default function SettngScreen() {
           />
         </TouchableOpacity>
       </View>
-      {MOCK_CONTACTS.length > 0 ? (
-        <FlatList
-          data={MOCK_CONTACTS}
-          renderItem={({ item }: { item: ContactProps }) => (
-            <TouchableOpacity onPress={() => {}}>
-              <ContactBar
-                contact_alias={item.alias}
-                avatar_img_src={[item.alias]}
-              />
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-        ></FlatList>
+      {contacts.size > 0 ? (
+        <>
+          <Text style={[styles.subtitle_text, { color: colors.border }]}>
+            联系人列表
+          </Text>
+          <FlatList
+            data={Array.from(contacts.values())}
+            renderItem={({ item }: { item: CE_PersonProps }) => (
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({
+                    pathname: "/contact-detail",
+                    params: {
+                      contact_username: item.username,
+                      contact_first_name: item.first_name,
+                      avatar: item.avatar,
+                      source: "contact",
+                    },
+                  })
+                }
+              >
+                <ContactBar
+                  contact_alias={item.first_name}
+                  avatar_img_src={[item.avatar]}
+                />
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.username}
+          ></FlatList>
+        </>
       ) : (
         <Text style={[styles.notice_text, { color: colors.border }]}>
           无联系人
@@ -126,6 +139,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "bold",
+  },
+  subtitle_text: {
+    alignSelf: "center",
+    fontSize: 15,
+    margin: 5,
   },
   notice_text: {
     alignSelf: "center",

@@ -21,7 +21,11 @@ const App = () => {
       />
       <Stack.Screen
         name="add-contact"
-        options={{ title: "添加联系人", presentation: "modal" }}
+        options={{
+          headerBackTitleVisible: false,
+          headerTitleAlign: "center",
+          title: "添加联系人",
+        }}
       />
       <Stack.Screen
         name="add-contact-detail"
@@ -36,6 +40,7 @@ const App = () => {
         name="create-group-chat"
         options={{
           title: "创建群聊",
+          headerTitleAlign: "center",
           headerBackTitleVisible: false,
         }}
       />
@@ -43,6 +48,15 @@ const App = () => {
         name="chat-settings"
         options={{
           title: "聊天设置",
+          headerTitleAlign: "center",
+          headerBackTitleVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="contact-detail"
+        options={{
+          title: "详情",
+          headerTitleAlign: "center",
           headerBackTitleVisible: false,
         }}
       />

@@ -3,6 +3,7 @@ import {
   CE_UserProps,
   CE_ChatProps,
   CE_MessageProps,
+  CE_PersonProps,
 } from "./ChatEngineObjectTypes";
 
 /////////////////////////////////////// AUTHENTICATION ACONTEXT ////////////////////////////////////////////////
@@ -107,4 +108,19 @@ export interface WebsocketContextProps {
   websocket_connected: boolean;
   resetWebSocket: () => void;
   closeWebSocket: () => void;
+}
+
+//////////////////////////////////////////// CONTACT //////////////////////////////////////////////
+
+export interface ContactStorageProps {
+  id: number;
+  contact: CE_PersonProps;
+}
+
+export interface ContactContextProps {
+  contacts: Map<number, CE_PersonProps>;
+  addContact: (contact_id: number, contact: CE_PersonProps) => Promise<void>;
+  removeContact: (contact_id: number) => Promise<void>;
+  searchContact: (contact_id: number) => Promise<ContactStorageProps | null>;
+  updateContacts: () => Promise<void>;
 }

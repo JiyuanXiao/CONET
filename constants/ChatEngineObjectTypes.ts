@@ -11,7 +11,7 @@ type CE_SimpleMessageProps = {
   attachments: CE_AttachementProps[];
 };
 
-type CE_PersonProps = {
+export type CE_PersonProps = {
   username: string;
   first_name: string;
   last_name: string;

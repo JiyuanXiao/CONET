@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View } from "react-native";
+import { router } from "expo-router";
+import { TouchableOpacity, View } from "react-native";
 import {
   BubbleContent,
   BubbleConatiner,
@@ -80,7 +81,21 @@ const MessageBubble = ({
             {chat_member.person.first_name}
           </BubbleAlias>
         )}
-        <BubbleAvatar img_src={[chat_member.person.avatar]} size={40} />
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "/contact-detail",
+              params: {
+                contact_username: chat_member.person.username,
+                contact_first_name: chat_member.person.first_name,
+                avatar: chat_member.person.avatar,
+                source: "chat-window",
+              },
+            })
+          }
+        >
+          <BubbleAvatar img_src={[chat_member.person.avatar]} size={40} />
+        </TouchableOpacity>
       </View>
     </BubbleConatiner>
   ) : (

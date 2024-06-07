@@ -10,6 +10,7 @@ import { SQLiteProvider } from "expo-sqlite";
 import { ChatsContextProvider } from "@/api/chats/chats.context";
 import { MessagesContextProvider } from "@/api/messages/messages.context";
 import { WebSocketProvider } from "@/api/websocket/websocket.context";
+import { ContactsContextProvider } from "@/api/contacts/contacts.context";
 import "react-native-reanimated";
 
 // export {
@@ -57,13 +58,15 @@ function RootLayoutNav() {
       <ThemeProvider value={CurrentTheme}>
         <SQLiteProvider databaseName="messages.db">
           <AuthenticationContextProvider>
-            <ChatsContextProvider>
-              <MessagesContextProvider>
-                <WebSocketProvider>
-                  <App />
-                </WebSocketProvider>
-              </MessagesContextProvider>
-            </ChatsContextProvider>
+            <ContactsContextProvider>
+              <ChatsContextProvider>
+                <MessagesContextProvider>
+                  <WebSocketProvider>
+                    <App />
+                  </WebSocketProvider>
+                </MessagesContextProvider>
+              </ChatsContextProvider>
+            </ContactsContextProvider>
           </AuthenticationContextProvider>
         </SQLiteProvider>
       </ThemeProvider>
