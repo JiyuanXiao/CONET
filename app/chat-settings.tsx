@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigation } from "expo-router";
-import { ScrollView, FlatList, TouchableOpacity, View } from "react-native";
-import { useRoute, StackActions } from "@react-navigation/native";
+import { TouchableOpacity } from "react-native";
+import { useRoute } from "@react-navigation/native";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog.component";
+import { router } from "expo-router";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { ChatsContext } from "@/api/chats/chats.context";
 import {
@@ -22,7 +23,7 @@ export default function ChatSettingsScreen() {
   };
 
   const { ClearAllMessagesById } = useContext(MessagesContext);
-  const { chats, deleteChat } = useContext(ChatsContext);
+  const { chats } = useContext(ChatsContext);
   const [chat_members, setChatMembers] = useState<CE_PersonProps[]>([]);
   const { user } = useContext(AuthenticationContext);
   const [is_direct_chat, setIsDirectChat] = useState<boolean>(false);
@@ -33,7 +34,14 @@ export default function ChatSettingsScreen() {
   const [actionFunction, setActionFunction] = useState<() => void>(() => {});
   const navigation = useNavigation();
 
-  const addChatMember = async () => {};
+  const addChatMember = () => {
+    router.push({
+      pathname: "/add-chat-member",
+      params: {
+        chat_id: chat_id,
+      },
+    });
+  };
 
   const ClearChatHistory = () => {
     console.log(

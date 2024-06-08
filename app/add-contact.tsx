@@ -11,18 +11,8 @@ import { useTheme } from "@react-navigation/native";
 import { Searchbar, Card, Button } from "react-native-paper";
 import { router } from "expo-router";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
-import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
 import { ContactsContext } from "@/api/contacts/contacts.context";
 import { ContactStorageProps } from "@/constants/ContextTypes";
-
-interface FriendProps {
-  id: string;
-  name: string;
-  avatar_icon: string;
-  icon_color: string;
-  icon_background_color: string;
-  icon_border_color: string;
-}
 
 export default function AddContactScreen() {
   const { colors } = useTheme();

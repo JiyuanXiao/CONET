@@ -20,6 +20,14 @@ const App = () => {
         options={{ title: "Chats", headerShown: false }}
       />
       <Stack.Screen
+        name="add-chat-member"
+        options={{
+          headerBackTitleVisible: false,
+          headerTitleAlign: "center",
+          title: "添加新成员",
+        }}
+      />
+      <Stack.Screen
         name="add-contact"
         options={{
           headerBackTitleVisible: false,
