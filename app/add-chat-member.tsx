@@ -21,7 +21,7 @@ import { ChatsContext } from "@/api/chats/chats.context";
 export default function AddChatMemberScreen() {
   const { colors } = useTheme();
   const [candidates, setCandidates] = useState<CE_PersonProps[]>([]);
-  const [chat_members, setChatMembers] = useState<CE_PersonProps[]>([]);
+  const [chat_member_names, setChatMemberNames] = useState<string[]>([]);
   const [is_adding, setIsAdding] = useState(false);
   const { contacts } = useContext(ContactsContext);
   const { user } = useContext(AuthenticationContext);
@@ -73,13 +73,13 @@ export default function AddChatMemberScreen() {
   useEffect(() => {
     const current_chat = chats.get(Number(chat_id));
     if (current_chat) {
+      const current_member_names = [];
       for (const person of current_chat.people) {
-        const current_members = chat_members;
-        current_members.push(person.person);
-        setChatMembers(current_members);
+        current_member_names.push(person.person.username);
       }
+      setChatMemberNames(current_member_names);
     }
-  }, []);
+  }, [chats]);
 
   return (
     <View style={styles.container}>
@@ -113,7 +113,7 @@ export default function AddChatMemberScreen() {
           data={Array.from(contacts.values())}
           renderItem={({ item }: { item: CE_PersonProps }) => {
             return !candidates.includes(item) &&
-              !chat_members.includes(item) ? (
+              !chat_member_names.includes(item.username) ? (
               <TouchableOpacity onPress={() => handleContactOnPress(item)}>
                 <ContactBar
                   contact_alias={item.first_name}

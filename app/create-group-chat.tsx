@@ -120,7 +120,7 @@ export default function CreateGroupChatScreen() {
       {candidates.length > 0 && (
         <>
           <Text style={[styles.group_bar_title, { color: colors.border }]}>
-            群成员
+            新添群成员
           </Text>
           <AvatarListBar
             members={candidates}
