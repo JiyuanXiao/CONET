@@ -83,7 +83,7 @@ export default function ChatSettingsScreen() {
         setChatMembers(current_members);
       }
       setIsDirectChat(current_chat.people.length <= 2);
-      if (current_chat.is_direct_chat) {
+      if (current_chat.people.length <= 2) {
         const member_1 = current_chat.people[0];
         const member_2 = current_chat.people[1];
         if (member_1.person.username === user?.username) {
@@ -99,7 +99,7 @@ export default function ChatSettingsScreen() {
           " is not in chat context"
       );
     }
-  }, [chats]);
+  }, []);
 
   return (
     <>
@@ -113,14 +113,13 @@ export default function ChatSettingsScreen() {
         // <AvatarListBar />
       )}
       <TouchableOpacity onPress={addChatMember}>
-        <OptionBar content="添加成员" />
+        <OptionBar content="添加新成员" />
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
           setDialogVisible(true);
           setConfrimMessage("确认清空聊天记录?");
-          //setActionFunction(() => ClearChatHistory);
-          setActionFunction(() => {});
+          setActionFunction(() => ClearChatHistory);
         }}
       >
         <OptionBar content="清空聊天记录" />
