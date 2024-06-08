@@ -69,6 +69,14 @@ const App = () => {
         }}
       />
       <Stack.Screen
+        name="chat-member-setting"
+        options={{
+          title: "群员详情",
+          headerTitleAlign: "center",
+          headerBackTitleVisible: false,
+        }}
+      />
+      <Stack.Screen
         options={{
           headerBackTitleVisible: false,
           headerTitleAlign: "center",

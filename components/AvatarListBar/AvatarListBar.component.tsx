@@ -72,10 +72,22 @@ import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
 
 const AvatarListBar = ({
   members,
+  chat_id,
+  admin_username,
   resetCandidates,
+  OpenChatMemberSetting,
 }: {
   members: CE_PersonProps[];
+  chat_id?: number;
+  admin_username?: string;
   resetCandidates?: (newCandidates: CE_PersonProps[]) => void;
+  OpenChatMemberSetting?: (
+    chat_id: number,
+    admin_username: string,
+    member_username: string,
+    member_first_name: string,
+    avatar: string
+  ) => void;
 }) => {
   const { colors } = useTheme();
   const flatListRef = useRef<FlatList>(null);
@@ -86,6 +98,14 @@ const AvatarListBar = ({
         (member) => member.username !== item.username
       );
       resetCandidates(updated_candidates);
+    } else if (OpenChatMemberSetting) {
+      OpenChatMemberSetting(
+        chat_id || -1,
+        admin_username || "",
+        item.username,
+        item.first_name,
+        item.avatar
+      );
     }
   };
 

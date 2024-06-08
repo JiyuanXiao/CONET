@@ -118,7 +118,15 @@ export default function CreateGroupChatScreen() {
         )}
       </View>
       {candidates.length > 0 && (
-        <AvatarListBar members={candidates} resetCandidates={resetCandidates} />
+        <>
+          <Text style={[styles.group_bar_title, { color: colors.border }]}>
+            群成员
+          </Text>
+          <AvatarListBar
+            members={candidates}
+            resetCandidates={resetCandidates}
+          />
+        </>
       )}
       {contacts.size > 0 ? (
         <FlatList
@@ -191,6 +199,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 10,
     margin: 20,
+  },
+  group_bar_title: {
+    alignSelf: "flex-start",
+    fontSize: 15,
+    marginLeft: 15,
   },
   notice_text: {
     alignSelf: "center",

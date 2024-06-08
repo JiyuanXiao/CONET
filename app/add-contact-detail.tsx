@@ -55,12 +55,11 @@ export default function AddContactDetailScreen() {
         contact_alias={contact_first_name}
         avatar_img_src={[avatar]}
       />
-      <TouchableOpacity
-        onPress={handleAddFriend}
-        disabled={Number(contact_id) === Number(user?.id)}
-      >
-        <OptionBar content="添加到通讯录" align_self="center" />
-      </TouchableOpacity>
+      {Number(contact_id) !== Number(user?.id) && (
+        <TouchableOpacity onPress={handleAddFriend}>
+          <OptionBar content="添加到通讯录" align_self="center" />
+        </TouchableOpacity>
+      )}
     </>
   );
 }

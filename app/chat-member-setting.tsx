@@ -9,15 +9,22 @@ import { AuthenticationContext } from "@/api/authentication/authentication.conte
 import * as ChatServer from "@/api/chats/chats.api";
 import { ContactsContext } from "@/api/contacts/contacts.context";
 
-export default function ContactDetailScreen() {
+export default function ChatMemberSettingScreen() {
   const { colors } = useTheme();
   const route = useRoute();
   const { user } = useContext(AuthenticationContext);
-  const { contacts, removeContact } = useContext(ContactsContext);
   const [is_creating, setIsCreating] = useState(false);
-  const { contact_username, contact_first_name, avatar } = route.params as {
-    contact_username: string;
-    contact_first_name: string;
+  const {
+    chat_id,
+    admin_username,
+    member_username,
+    member_first_name,
+    avatar,
+  } = route.params as {
+    chat_id: number;
+    admin_username: string;
+    member_username: string;
+    member_first_name: string;
     avatar: string;
   };
 
@@ -38,11 +45,11 @@ export default function ContactDetailScreen() {
           user?.username || "",
           user?.secret || "",
           new_chat_id,
-          contact_username
+          member_username
         );
         if (success) {
           console.log(
-            `Add ${contact_username} to new chat ${new_chat_id} successfully...`
+            `Add ${member_username} to new chat ${new_chat_id} successfully...`
           );
           setIsCreating(false);
           router.push({
@@ -53,7 +60,7 @@ export default function ContactDetailScreen() {
           });
         } else {
           console.warn(
-            `[contact-detail.tsx] add member ${contact_username} to chat ${new_chat_id} failed`
+            `[contact-detail.tsx] add member ${member_username} to chat ${new_chat_id} failed`
           );
           setIsCreating(false);
         }
@@ -67,34 +74,26 @@ export default function ContactDetailScreen() {
     }
   };
 
-  const deleteContact = async () => {
-    let target_id = -1;
-    for (let [id, contact] of contacts.entries()) {
-      if (contact.username === contact_username) {
-        target_id = id;
-      }
-    }
-    if (target_id !== -1) {
+  const deleteChatMmeber = async () => {
+    if (user) {
       try {
-        await removeContact(target_id);
-        console.log(`Delete contact ${contact_username}`);
+        await ChatServer.RemoveChatMember(
+          user.username,
+          user.secret,
+          chat_id,
+          member_username
+        );
+        console.log(`Delete contact ${member_username}`);
         navigation.goBack();
       } catch (err) {
         console.error(`[contact-detail.tsx] deleteContact(): Error: ${err}`);
       }
-    } else {
-      console.warn(
-        `[contact-detail.tsx] deleteContact(): contact ${contact_username} not found`
-      );
     }
   };
 
   return (
     <>
-      <ProfileBar
-        contact_alias={contact_first_name}
-        avatar_img_src={[avatar]}
-      />
+      <ProfileBar contact_alias={member_first_name} avatar_img_src={[avatar]} />
 
       {is_creating ? (
         <ActivityIndicator
@@ -107,10 +106,12 @@ export default function ContactDetailScreen() {
           <OptionBar content="发起新聊天" align_self="center" />
         </TouchableOpacity>
       )}
-
-      <TouchableOpacity onPress={deleteContact}>
-        <OptionBar content="删除联系人" align_self="center" />
-      </TouchableOpacity>
+      {admin_username === user?.username &&
+        member_username !== user.username && (
+          <TouchableOpacity onPress={deleteChatMmeber}>
+            <OptionBar content="移除该群员" align_self="center" />
+          </TouchableOpacity>
+        )}
     </>
   );
 }

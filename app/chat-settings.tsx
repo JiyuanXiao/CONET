@@ -74,6 +74,25 @@ export default function ChatSettingsScreen() {
     }
   };
 
+  const OpenChatMemberSetting = (
+    chat_id: number,
+    admin_username: string,
+    member_username: string,
+    member_first_name: string,
+    avatar: string
+  ) => {
+    router.push({
+      pathname: "/chat-member-setting",
+      params: {
+        chat_id: chat_id,
+        admin_username: admin_username,
+        member_username: member_username,
+        member_first_name: member_first_name,
+        avatar: avatar,
+      },
+    });
+  };
+
   useEffect(() => {
     if (isConfirm) {
       actionFunction();
@@ -85,11 +104,11 @@ export default function ChatSettingsScreen() {
   useEffect(() => {
     const current_chat = chats.get(Number(chat_id));
     if (current_chat) {
+      const current_members = [];
       for (const person of current_chat.people) {
-        const current_members = chat_members;
         current_members.push(person.person);
-        setChatMembers(current_members);
       }
+      setChatMembers(current_members);
       setIsDirectChat(current_chat.people.length <= 2);
       if (current_chat.people.length <= 2) {
         const member_1 = current_chat.people[0];
@@ -109,6 +128,18 @@ export default function ChatSettingsScreen() {
     }
   }, []);
 
+  useEffect(() => {
+    const current_chat = chats.get(Number(chat_id));
+    if (current_chat) {
+      const current_members = [];
+      for (const person of current_chat.people) {
+        current_members.push(person.person);
+      }
+      setChatMembers(current_members);
+      setIsDirectChat(current_chat.people.length <= 2);
+    }
+  }, [chats]);
+
   return (
     <>
       {is_direct_chat ? (
@@ -117,7 +148,12 @@ export default function ChatSettingsScreen() {
           avatar_img_src={friend ? [friend.person.avatar] : [""]}
         />
       ) : (
-        <AvatarListBar members={chat_members} />
+        <AvatarListBar
+          members={chat_members}
+          chat_id={chat_id}
+          admin_username={chats.get(Number(chat_id))?.admin.username}
+          OpenChatMemberSetting={OpenChatMemberSetting}
+        />
         // <AvatarListBar />
       )}
       <TouchableOpacity onPress={addChatMember}>
