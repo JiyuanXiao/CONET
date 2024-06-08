@@ -9,6 +9,7 @@ import {
 import { useTheme } from "@react-navigation/native";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.component";
 import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
+import { FontAwesome } from "@expo/vector-icons";
 
 // const MOCK_CONTACTS: ContactProps[] = [
 //   { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
@@ -112,6 +113,7 @@ const AvatarListBar = ({
   useEffect(() => {
     flatListRef.current?.scrollToEnd({ animated: true });
   }, [members]);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.card }]}>
       <FlatList
@@ -127,9 +129,18 @@ const AvatarListBar = ({
                   size={50}
                   theme_colors={colors}
                 />
-                <Text style={[styles.name, { color: colors.border }]}>
-                  {item.first_name}
-                </Text>
+                {resetCandidates ? (
+                  <FontAwesome
+                    name="remove"
+                    size={18}
+                    color={colors.notification}
+                    style={{ alignSelf: "center", paddingTop: 1 }}
+                  />
+                ) : (
+                  <Text style={[styles.name, { color: colors.border }]}>
+                    {item.first_name}
+                  </Text>
+                )}
               </View>
             </TouchableOpacity>
           );
