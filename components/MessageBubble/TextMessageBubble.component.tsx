@@ -7,7 +7,7 @@ import {
   Bubble,
   BubbleTime,
   BubbleAlias,
-} from "./MessageBubble.styles";
+} from "./TextMessageBubble.styles";
 import BubbleAvatar from "./BubbleAvatar.component";
 import { useTheme } from "@react-navigation/native";
 import { MessagesProps } from "@/constants/ContextTypes";
@@ -38,7 +38,7 @@ const formatTimestamp = (utc_timestamp: string) => {
   }
 };
 
-const MessageBubble = ({
+const TextMessageBubble = ({
   chat_id,
   chat_member,
   message_object,
@@ -103,4 +103,4 @@ const MessageBubble = ({
   );
 };
 
-export default MessageBubble;
+export default TextMessageBubble;

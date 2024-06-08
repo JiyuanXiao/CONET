@@ -157,7 +157,7 @@ export default function ChatSettingsScreen() {
         // <AvatarListBar />
       )}
       <TouchableOpacity onPress={addChatMember}>
-        <OptionBar content="添加新成员到聊天" />
+        <OptionBar content="添加新成员到聊天群" />
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
@@ -172,11 +172,11 @@ export default function ChatSettingsScreen() {
         <TouchableOpacity
           onPress={() => {
             setDialogVisible(true);
-            setConfrimMessage("确认删除聊天?");
+            setConfrimMessage("确认删除聊天群?");
             setActionFunction(() => DeleteChat);
           }}
         >
-          <OptionBar content="删除聊天" />
+          <OptionBar content="删除聊天群" />
         </TouchableOpacity>
       )}
       <ConfirmDialog

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -16,6 +16,7 @@ import { ContactsContext } from "@/api/contacts/contacts.context";
 import AvatarListBar from "@/components/AvatarListBar/AvatarListBar.component";
 import * as ChatServer from "@/api/chats/chats.api";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 export default function CreateGroupChatScreen() {
   const { colors } = useTheme();
@@ -24,7 +25,9 @@ export default function CreateGroupChatScreen() {
   const [chat_title, setChatTitle] = useState("");
   const { contacts } = useContext(ContactsContext);
   const { user } = useContext(AuthenticationContext);
+  const { messages, sendMessage } = useContext(MessagesContext);
   const navigation = useNavigation();
+  const sendMessageRef = useRef(sendMessage);
 
   const handleCreate = async () => {
     try {
@@ -46,6 +49,13 @@ export default function CreateGroupChatScreen() {
           if (success) {
             console.log(
               `Add ${candidate.username} to new chat ${new_chat_id} successfully...`
+            );
+            // send a system message
+            await sendMessageRef.current(
+              new_chat_id,
+              `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息] ${user?.first_name} 创建了聊天群`,
+              null,
+              Date.now().toString()
             );
             setIsCreating(false);
             navigation.dispatch(StackActions.popToTop());
@@ -81,6 +91,10 @@ export default function CreateGroupChatScreen() {
   const resetCandidates = (newCandidates: CE_PersonProps[]) => {
     setCandidates(newCandidates);
   };
+
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  }, [messages]);
 
   return (
     <View style={styles.container}>

@@ -34,7 +34,7 @@ export default function ContactDetailScreen() {
       const new_chat_id = await ChatServer.CreateChat(
         user?.username || "",
         user?.secret || "",
-        `${user?.first_name}的聊天`
+        `${user?.first_name}的聊天群`
       );
       if (new_chat_id) {
         console.log(`Create new chat ${new_chat_id} successfully...`);

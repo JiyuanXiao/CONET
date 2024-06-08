@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -17,6 +17,7 @@ import AvatarListBar from "@/components/AvatarListBar/AvatarListBar.component";
 import * as ChatServer from "@/api/chats/chats.api";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { ChatsContext } from "@/api/chats/chats.context";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 export default function AddChatMemberScreen() {
   const { colors } = useTheme();
@@ -26,7 +27,9 @@ export default function AddChatMemberScreen() {
   const { contacts } = useContext(ContactsContext);
   const { user } = useContext(AuthenticationContext);
   const { chats } = useContext(ChatsContext);
+  const { messages, sendMessage } = useContext(MessagesContext);
   const navigation = useNavigation();
+  const sendMessageRef = useRef(sendMessage);
   const route = useRoute();
   const { chat_id } = route.params as {
     chat_id: number;
@@ -47,8 +50,15 @@ export default function AddChatMemberScreen() {
           console.log(
             `Add ${candidate.username} to new chat ${chat_id} successfully...`
           );
+          // send a system message
+          await sendMessageRef.current(
+            chat_id,
+            `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息] ${user?.first_name} 邀请 ${candidate.first_name} 加入聊天群`,
+            null,
+            Date.now().toString()
+          );
           setIsAdding(false);
-          navigation.goBack();
+          navigation.dispatch(StackActions.pop(2));
         } else {
           console.warn(
             `[add-chat-member.tsx] add member ${candidate.username} to chat ${chat_id} failed`
@@ -81,6 +91,10 @@ export default function AddChatMemberScreen() {
     }
   }, [chats]);
 
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  }, [messages]);
+
   return (
     <View style={styles.container}>
       <View style={styles.title_bar}>
@@ -106,26 +120,48 @@ export default function AddChatMemberScreen() {
         )}
       </View>
       {candidates.length > 0 && (
-        <AvatarListBar members={candidates} resetCandidates={resetCandidates} />
+        <>
+          <Text style={[styles.group_bar_title, { color: colors.border }]}>
+            新添群成员
+          </Text>
+          <AvatarListBar
+            members={candidates}
+            resetCandidates={resetCandidates}
+          />
+        </>
       )}
       {contacts.size > 0 ? (
-        <FlatList
-          data={Array.from(contacts.values())}
-          renderItem={({ item }: { item: CE_PersonProps }) => {
-            return !candidates.includes(item) &&
-              !chat_member_names.includes(item.username) ? (
-              <TouchableOpacity onPress={() => handleContactOnPress(item)}>
-                <ContactBar
-                  contact_alias={item.first_name}
-                  avatar_img_src={[item.avatar]}
-                />
-              </TouchableOpacity>
-            ) : (
-              <></>
-            );
-          }}
-          keyExtractor={(item) => item.username}
-        ></FlatList>
+        <>
+          <Text style={[styles.subtitle_text, { color: colors.border }]}>
+            联系人列表
+          </Text>
+          <FlatList
+            data={Array.from(contacts.values())}
+            renderItem={({ item }: { item: CE_PersonProps }) => {
+              return !candidates.includes(item) &&
+                !chat_member_names.includes(item.username) ? (
+                <TouchableOpacity onPress={() => handleContactOnPress(item)}>
+                  <ContactBar
+                    contact_alias={item.first_name}
+                    avatar_img_src={[item.avatar]}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => handleContactOnPress(item)}
+                  disabled={true}
+                >
+                  <ContactBar
+                    contact_alias={item.first_name}
+                    avatar_img_src={[item.avatar]}
+                    disable={true}
+                  />
+                </TouchableOpacity>
+              );
+            }}
+            keyExtractor={(item) => item.username}
+          ></FlatList>
+        </>
       ) : (
         <View>
           <Text style={[styles.notice_text, { color: colors.border }]}>
@@ -168,6 +204,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     margin: 10,
   },
+  subtitle_text: {
+    alignSelf: "center",
+    fontSize: 15,
+    margin: 5,
+  },
   add_member_button: {
     height: "70%",
     alignSelf: "center",
@@ -180,6 +221,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 10,
     margin: 20,
+  },
+  group_bar_title: {
+    alignSelf: "flex-start",
+    fontSize: 15,
+    marginLeft: 15,
   },
   notice_text: {
     alignSelf: "center",

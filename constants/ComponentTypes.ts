@@ -71,4 +71,5 @@ export interface ProfileBarProps {
   contact_username?: string;
   avatar_img_src: string[];
   theme_colors?: ThemeColorsProps;
+  disable?: boolean;
 }

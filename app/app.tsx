@@ -47,7 +47,7 @@ const App = () => {
       <Stack.Screen
         name="create-group-chat"
         options={{
-          title: "创建群聊",
+          title: "创建聊天群",
           headerTitleAlign: "center",
           headerBackTitleVisible: false,
         }}
@@ -55,7 +55,7 @@ const App = () => {
       <Stack.Screen
         name="chat-settings"
         options={{
-          title: "聊天设置",
+          title: "聊天群设置",
           headerTitleAlign: "center",
           headerBackTitleVisible: false,
         }}

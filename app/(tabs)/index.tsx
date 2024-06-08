@@ -99,9 +99,9 @@ export default function ChatListScreen() {
 
     const result = {
       last_message:
-        target_messages.loaded_messages[0].content_type === "text"
-          ? target_messages.loaded_messages[0].text_content
-          : "[媒体文件]",
+        target_messages.loaded_messages[0].content_type === "file"
+          ? "[媒体文件]"
+          : target_messages.loaded_messages[0].text_content,
       last_message_time: target_messages.loaded_messages[0].timestamp,
     };
     return result;

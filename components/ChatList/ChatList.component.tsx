@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { FlatList } from "react-native";
 import { useNavigation } from "expo-router";
 import { StackActions } from "@react-navigation/native";
-import MessageBubble from "@/components/MessageBubble/MessageBubble.component";
+import TextMessageBubble from "@/components/MessageBubble/TextMessageBubble.component";
+import SystemMessageBubble from "../MessageBubble/SystemMessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesProps } from "@/constants/ContextTypes";
@@ -97,16 +98,42 @@ export const ChatList = (props: {
       inverted
       ref={flatListRef}
       data={loaded_messages}
-      renderItem={({ item }: { item: MessagesProps }) => (
-        <MessageBubble
-          chat_id={Number(props.chat_id)}
-          chat_member={chat_members.get(item.sender_username)}
-          message_object={item}
-          is_direct_chat={
-            current_chat ? Number(current_chat.people.length) <= 2 : false
-          }
-        />
-      )}
+      renderItem={({ item }: { item: MessagesProps }) => {
+        switch (item.content_type) {
+          case "text":
+            return (
+              <TextMessageBubble
+                chat_id={Number(props.chat_id)}
+                chat_member={chat_members.get(item.sender_username)}
+                message_object={item}
+                is_direct_chat={
+                  current_chat ? Number(current_chat.people.length) <= 2 : false
+                }
+              />
+            );
+          case "file":
+            return (
+              <TextMessageBubble
+                chat_id={Number(props.chat_id)}
+                chat_member={chat_members.get(item.sender_username)}
+                message_object={item}
+                is_direct_chat={
+                  current_chat ? Number(current_chat.people.length) <= 2 : false
+                }
+              />
+            );
+          case "system":
+            return (
+              <SystemMessageBubble
+                chat_id={Number(props.chat_id)}
+                chat_member={chat_members.get(item.sender_username)}
+                message_object={item}
+              />
+            );
+          default:
+            return <></>;
+        }
+      }}
       keyExtractor={(item) => item.timestamp}
       onEndReached={() => {
         console.log(

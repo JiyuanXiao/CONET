@@ -46,12 +46,16 @@ const ChatBox = (props: ChatBoxProps) => {
   }, [chats, current_talking_chat_id]);
 
   const lastMessageTime = formatTimestamp(props.last_message_time);
+  const projectID = process.env.EXPO_PUBLIC_PROJECT_ID;
 
   return (
     <ChatBoxCard
       chat_id={props.chat_id}
       chat_title={props.chat_title}
-      last_message={props.last_message}
+      last_message={props.last_message.replace(
+        new RegExp(`^\\[${projectID}\\]`),
+        ""
+      )}
       last_message_time={lastMessageTime}
       avatar_img_src={props.avatar_img_src}
       has_new_message={props.has_new_message}

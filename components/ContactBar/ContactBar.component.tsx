@@ -11,6 +11,7 @@ const ContactBar = (props: ProfileBarProps) => {
       contact_alias={props.contact_alias}
       avatar_img_src={props.avatar_img_src}
       theme_colors={colors}
+      disable={props.disable}
     />
   );
 };

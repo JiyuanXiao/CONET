@@ -12,6 +12,7 @@ import { AuthenticationContext } from "../authentication/authentication.context"
 import { ChatsContext } from "../chats/chats.context";
 import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
 import { getLoadedMessages } from "./messages.context.util";
+import { Systrace } from "react-native";
 
 export const MessagesContext = createContext<MessageContextProps>({
   messages: new Map<number, MessageContextObjectProps>(),
@@ -99,12 +100,28 @@ export const MessagesContextProvider = (props: {
     file_url: string | null,
     temp_timestamp: string
   ) => {
+    // determine the content type
+    let current_context_type;
+    if (text_content) {
+      if (
+        text_content.startsWith(
+          `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息]`
+        )
+      ) {
+        current_context_type = "system";
+      } else {
+        current_context_type = "text";
+      }
+    } else {
+      current_context_type = "file";
+    }
+
     const new_message = {
       message_id: -1,
       sender_username: user?.username || "",
       text_content: text_content || "",
       file_url: file_url || "",
-      content_type: text_content ? "text" : "file",
+      content_type: current_context_type,
       timestamp: temp_timestamp,
     };
 
@@ -142,6 +159,7 @@ export const MessagesContextProvider = (props: {
         console.error(
           `[Message Context] chat ${chat_id}: sent message to server failed: ${err}`
         );
+        return false;
       }
     } else {
       console.warn(
@@ -164,6 +182,22 @@ export const MessagesContextProvider = (props: {
       return false;
     }
 
+    // determine the content type
+    let current_context_type;
+    if (ce_message.text) {
+      if (
+        ce_message.text.startsWith(
+          `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息]`
+        )
+      ) {
+        current_context_type = "system";
+      } else {
+        current_context_type = "text";
+      }
+    } else {
+      current_context_type = "file";
+    }
+
     const received_message = {
       message_id: ce_message.id,
       sender_username: ce_message.sender_username,
@@ -172,7 +206,7 @@ export const MessagesContextProvider = (props: {
         !ce_message.text && ce_message.attachments.length > 0
           ? ce_message.attachments[0]
           : "",
-      content_type: ce_message.text ? "text" : "file",
+      content_type: current_context_type,
       timestamp: ce_message.created,
     } as MessagesProps;
 

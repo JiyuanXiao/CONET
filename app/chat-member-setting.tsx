@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import { router, useNavigation } from "expo-router";
 import { useRoute, useTheme } from "@react-navigation/native";
@@ -8,12 +8,15 @@ import OptionBar from "@/components/OptionBar/OptionBar.component";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import * as ChatServer from "@/api/chats/chats.api";
 import { ContactsContext } from "@/api/contacts/contacts.context";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 export default function ChatMemberSettingScreen() {
   const { colors } = useTheme();
   const route = useRoute();
   const { user } = useContext(AuthenticationContext);
+  const { messages, sendMessage } = useContext(MessagesContext);
   const [is_creating, setIsCreating] = useState(false);
+  const sendMessageRef = useRef(sendMessage);
   const {
     chat_id,
     admin_username,
@@ -84,12 +87,23 @@ export default function ChatMemberSettingScreen() {
           member_username
         );
         console.log(`Delete contact ${member_username}`);
+        // send a system message
+        await sendMessageRef.current(
+          chat_id,
+          `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息] ${member_first_name} 被移除出群`,
+          null,
+          Date.now().toString()
+        );
         navigation.goBack();
       } catch (err) {
         console.error(`[contact-detail.tsx] deleteContact(): Error: ${err}`);
       }
     }
   };
+
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  }, [messages]);
 
   return (
     <>
