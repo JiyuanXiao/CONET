@@ -139,7 +139,15 @@ export default function ChatListScreen() {
             />
           )}
           <FlatList
-            data={Array.from(chats.values())}
+            data={Array.from(chats.values()).sort((a, b) => {
+              const aLastMessageTime = new Date(
+                getLastMessageInfo(a.id).last_message_time
+              );
+              const bLastMessageTime = new Date(
+                getLastMessageInfo(b.id).last_message_time
+              );
+              return bLastMessageTime.getTime() - aLastMessageTime.getTime();
+            })}
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity

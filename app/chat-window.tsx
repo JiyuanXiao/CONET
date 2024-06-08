@@ -105,7 +105,7 @@ export default function ChatWindowScreen() {
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, chats]);
 
   return (
     <View

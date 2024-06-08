@@ -157,7 +157,7 @@ export default function ChatSettingsScreen() {
         // <AvatarListBar />
       )}
       <TouchableOpacity onPress={addChatMember}>
-        <OptionBar content="添加新成员" />
+        <OptionBar content="添加新成员到聊天" />
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {

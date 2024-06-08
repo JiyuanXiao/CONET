@@ -28,7 +28,7 @@ export default function AddContactDetailScreen() {
 
   const navigation = useNavigation();
 
-  const handleAddFriend = async () => {
+  const handleAddContact = async () => {
     const contact: CE_PersonProps = {
       username: contact_username,
       first_name: contact_first_name,
@@ -56,7 +56,7 @@ export default function AddContactDetailScreen() {
         avatar_img_src={[avatar]}
       />
       {Number(contact_id) !== Number(user?.id) && (
-        <TouchableOpacity onPress={handleAddFriend}>
+        <TouchableOpacity onPress={handleAddContact}>
           <OptionBar content="添加到通讯录" align_self="center" />
         </TouchableOpacity>
       )}

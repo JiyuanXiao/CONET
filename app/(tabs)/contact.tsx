@@ -107,6 +107,7 @@ export default function SettngScreen() {
                       contact_username: item.username,
                       contact_first_name: item.first_name,
                       avatar: item.avatar,
+                      source: "contact",
                     },
                   })
                 }

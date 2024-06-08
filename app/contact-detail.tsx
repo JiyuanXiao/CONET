@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { router, useNavigation } from "expo-router";
 import { useRoute, useTheme } from "@react-navigation/native";
@@ -13,13 +13,18 @@ export default function ContactDetailScreen() {
   const { colors } = useTheme();
   const route = useRoute();
   const { user } = useContext(AuthenticationContext);
-  const { contacts, removeContact } = useContext(ContactsContext);
+  const { contacts, removeContact, searchContact } =
+    useContext(ContactsContext);
   const [is_creating, setIsCreating] = useState(false);
-  const { contact_username, contact_first_name, avatar } = route.params as {
-    contact_username: string;
-    contact_first_name: string;
-    avatar: string;
-  };
+  const [contact_exits, setContactExist] = useState(false);
+  const [contact_id, setContactId] = useState(-1);
+  const { contact_username, contact_first_name, avatar, source } =
+    route.params as {
+      contact_username: string;
+      contact_first_name: string;
+      avatar: string;
+      source: string;
+    };
 
   const navigation = useNavigation();
 
@@ -68,15 +73,9 @@ export default function ContactDetailScreen() {
   };
 
   const deleteContact = async () => {
-    let target_id = -1;
-    for (let [id, contact] of contacts.entries()) {
-      if (contact.username === contact_username) {
-        target_id = id;
-      }
-    }
-    if (target_id !== -1) {
+    if (contact_id !== -1) {
       try {
-        await removeContact(target_id);
+        await removeContact(contact_id);
         console.log(`Delete contact ${contact_username}`);
         navigation.goBack();
       } catch (err) {
@@ -88,6 +87,15 @@ export default function ContactDetailScreen() {
       );
     }
   };
+
+  useEffect(() => {
+    for (let [id, contact] of contacts.entries()) {
+      if (contact.username === contact_username) {
+        setContactExist(true);
+        setContactId(id);
+      }
+    }
+  }, [contacts]);
 
   return (
     <>
@@ -107,10 +115,11 @@ export default function ContactDetailScreen() {
           <OptionBar content="发起新聊天" align_self="center" />
         </TouchableOpacity>
       )}
-
-      <TouchableOpacity onPress={deleteContact}>
-        <OptionBar content="删除联系人" align_self="center" />
-      </TouchableOpacity>
+      {source === "contact" && contact_exits && (
+        <TouchableOpacity onPress={deleteContact}>
+          <OptionBar content="删除联系人" align_self="center" />
+        </TouchableOpacity>
+      )}
     </>
   );
 }
