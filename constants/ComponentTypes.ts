@@ -41,6 +41,12 @@ export interface MessageBubbleProps {
   avatar_img_src?: string[];
   theme_colors?: ThemeColorsProps;
   timestamp?: string;
+  onImageResize?: React.Dispatch<
+    React.SetStateAction<{
+      width: number;
+      height: number;
+    }>
+  >;
   children?: React.ReactNode;
 }
 
