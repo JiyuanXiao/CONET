@@ -26,7 +26,7 @@ const SystemMessageBubble = ({
   const { user } = useContext(AuthenticationContext);
 
   const is_received = user?.username !== message_object.sender_username;
-  const projectID = process.env.EXPO_PUBLIC_PROJECT_ID;
+  const text_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
 
   return chat_member ? (
     <BubbleConatiner isReceived={is_received} theme_colors={colors}>
@@ -34,7 +34,7 @@ const SystemMessageBubble = ({
         <Bubble isReceived={is_received} theme_colors={colors}>
           <BubbleContent isReceived={is_received} theme_colors={colors}>
             {message_object.text_content.replace(
-              new RegExp(`^\\[${projectID}\\]\\[系统消息\\]`),
+              new RegExp(`^\\[${text_header}\\]\\[系统消息\\]`),
               ""
             )}
           </BubbleContent>

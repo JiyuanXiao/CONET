@@ -103,6 +103,18 @@ export const storeMessage = (
     console.error("[Message Storage] storeMessage(): username is empty");
     return;
   }
+  const message_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
+  let current_context_type;
+
+  if (!message_object.text) {
+    current_context_type = "file";
+  } else if (message_object.text.startsWith(`[${message_header}][系统消息]`)) {
+    current_context_type = "system";
+  } else if (message_object.text.startsWith(`[${message_header}][图片]`)) {
+    current_context_type = "image";
+  } else {
+    current_context_type = "text";
+  }
 
   try {
     db.runSync(
@@ -111,10 +123,8 @@ export const storeMessage = (
       message_object.id,
       message_object.sender.username,
       message_object.text ? message_object.text : "",
-      message_object.attachments.length > 0
-        ? message_object.attachments[0].file
-        : "",
-      message_object.text ? "text" : "file",
+      "",
+      current_context_type,
       message_object.created
     );
     console.log(

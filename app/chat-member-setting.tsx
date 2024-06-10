@@ -90,8 +90,7 @@ export default function ChatMemberSettingScreen() {
         // send a system message
         await sendMessageRef.current(
           chat_id,
-          `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息] ${member_first_name} 被移除出群`,
-          null,
+          `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][系统消息] ${member_first_name} 被移除出群`,
           Date.now().toString()
         );
         navigation.goBack();

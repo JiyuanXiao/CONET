@@ -112,7 +112,7 @@ export const ChatList = (props: {
                 }
               />
             );
-          case "file":
+          case "image":
             return (
               <ImageMessageBubble
                 chat_id={Number(props.chat_id)}

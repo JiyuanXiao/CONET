@@ -12,13 +12,13 @@ import { AuthenticationContext } from "../authentication/authentication.context"
 import { ChatsContext } from "../chats/chats.context";
 import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
 import { getLoadedMessages } from "./messages.context.util";
-import { Systrace } from "react-native";
+import * as FileSystem from "expo-file-system";
 
 export const MessagesContext = createContext<MessageContextProps>({
   messages: new Map<number, MessageContextObjectProps>(),
   createMeesageObjectForNewChat: async () => {},
   loadMessagesById: async () => {},
-  sendMessage: () => {},
+  sendMessage: async () => false,
   receiveMessage: () => false,
   resetLoadedMessagesById: async () => {},
   ClearAllMessagesById: async () => {},
@@ -96,31 +96,26 @@ export const MessagesContextProvider = (props: {
 
   const sendMessage = async (
     chat_id: number,
-    text_content: string | null,
-    file_url: string | null,
+    message_content: string,
     temp_timestamp: string
   ) => {
+    const content_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
     // determine the content type
     let current_context_type;
-    if (text_content) {
-      if (
-        text_content.startsWith(
-          `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息]`
-        )
-      ) {
-        current_context_type = "system";
-      } else {
-        current_context_type = "text";
-      }
+
+    if (message_content.startsWith(`[${content_header}][系统消息]`)) {
+      current_context_type = "system";
+    } else if (message_content.startsWith(`[${content_header}][图片]`)) {
+      current_context_type = "image";
     } else {
-      current_context_type = "file";
+      current_context_type = "text";
     }
 
     const new_message = {
       message_id: -1,
       sender_username: user?.username || "",
-      text_content: text_content || "",
-      file_url: file_url || "",
+      text_content: current_context_type === "url" ? "" : message_content,
+      file_url: current_context_type === "url" ? message_content : "",
       content_type: current_context_type,
       timestamp: temp_timestamp,
     };
@@ -142,13 +137,32 @@ export const MessagesContextProvider = (props: {
       // Replace the target message object by the loaded one
       setMessageMap(chat_id, updated_messages_object);
 
+      if (current_context_type === "image") {
+        try {
+          const image_uri = message_content.replace(
+            new RegExp(`^\\[${content_header}\\]\\[图片\\]`),
+            ""
+          );
+          const response = await fetch(image_uri);
+          const blob = await response.blob();
+          const base64 = await FileSystem.readAsStringAsync(image_uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          message_content = `[${content_header}][图片]data:${blob.type};base64,${base64}`;
+        } catch (err) {
+          console.error(
+            `[Message API] SendChatMessage(): Failed to convert image file to base64 format`
+          );
+          return false;
+        }
+      }
+
       try {
         const success = await MessageServer.SendChatMessage(
           user?.username || "",
           user?.secret || "",
           chat_id,
-          text_content,
-          file_url,
+          message_content,
           temp_timestamp
         );
         console.log(
@@ -174,6 +188,7 @@ export const MessagesContextProvider = (props: {
     ce_message: CE_MessageProps
   ): boolean => {
     const target_messages_object = messages.get(Number(chat_id));
+    const message_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
 
     if (!target_messages_object) {
       console.log(
@@ -185,27 +200,20 @@ export const MessagesContextProvider = (props: {
     // determine the content type
     let current_context_type;
     if (ce_message.text) {
-      if (
-        ce_message.text.startsWith(
-          `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息]`
-        )
-      ) {
+      if (ce_message.text.startsWith(`[${message_header}][系统消息]`)) {
         current_context_type = "system";
+      } else if (ce_message.text.startsWith(`[${message_header}][图片]`)) {
+        current_context_type = "image";
       } else {
         current_context_type = "text";
       }
-    } else {
-      current_context_type = "file";
     }
 
     const received_message = {
       message_id: ce_message.id,
       sender_username: ce_message.sender_username,
-      text_content: ce_message.text || "",
-      file_url:
-        !ce_message.text && ce_message.attachments.length > 0
-          ? ce_message.attachments[0]
-          : "",
+      text_content: current_context_type !== "url" ? ce_message.text : "",
+      file_url: current_context_type === "url" ? ce_message.text : "",
       content_type: current_context_type,
       timestamp: ce_message.created,
     } as MessagesProps;

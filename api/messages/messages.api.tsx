@@ -1,23 +1,17 @@
 import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
 import axios from "axios";
+import * as FileSystem from "expo-file-system";
 
 export const SendChatMessage = async (
   username: string,
   secret: string,
   chat_id: number,
-  text: string | null,
-  file: string | null,
+  content: string,
   temp_timestamp: string
 ) => {
   if (username.length === 0 || secret.length === 0) {
     console.warn(
       `[Message API] SendChatMessage(): username or secret is undefined: ${chat_id}`
-    );
-    return false;
-  }
-  if (!text && !file) {
-    console.warn(
-      `[Message API] SendChatMessage(): text and file cannot be both empty: ${chat_id}`
     );
     return false;
   }
@@ -28,14 +22,19 @@ export const SendChatMessage = async (
     "Project-ID": process.env.EXPO_PUBLIC_PROJECT_ID || "",
     "User-Name": username,
     "User-Secret": secret,
-    "Content-Type": "application/json",
   };
 
   const data = {
-    text: text,
-    attachment_urls: file ? [file] : [],
+    text: content,
     custom_json: temp_timestamp,
   };
+  // const data = new FormData();
+  // if (text) {
+  //   data.append("text", text);
+  // } else if (file) {
+  //   data.append("text", file);
+  // }
+  // data.append("custom_json", temp_timestamp);
 
   try {
     const response = await axios.post(url, data, { headers });

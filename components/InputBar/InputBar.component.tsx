@@ -1,12 +1,14 @@
 import React, { useState, useContext, useEffect } from "react";
+import { TouchableOpacity, Alert } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { InputBarContainer, InputBox, OffsetFooter } from "./InputBar.styles";
 import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
 import { ThemeColorsProps, InputBarProps } from "@/constants/ComponentTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
-import { useSQLiteContext } from "expo-sqlite";
 import { MessagesContext } from "@/api/messages/messages.context";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   <FontAwesome
@@ -31,6 +33,36 @@ const InputBar = (props: InputBarProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const { sendMessage } = useContext(MessagesContext);
+  const [imageUri, setImageUri] = useState(null);
+
+  const pickImage = async () => {
+    // Ask for permission to access the media library
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    // Pick an image
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      try {
+        const file_uri = result.assets[0].uri;
+        const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][图片]${file_uri}`;
+        await sendMessage(props.chat_id, new_message, Date.now().toString());
+      } catch (error) {
+        console.error("Error converting the image:", error);
+        Alert.alert("Error converting the image");
+      }
+    }
+  };
 
   const handleChangeText = (text: string) => {
     if (text.endsWith("\n")) {
@@ -44,7 +76,7 @@ const InputBar = (props: InputBarProps) => {
             "InputBar(): calling sendMessage() for " + user?.username
           );
 
-          sendMessage(props.chat_id, new_message, null, Date.now().toString());
+          sendMessage(props.chat_id, new_message, Date.now().toString());
         } else {
           console.error("InputBar(): User is undefined");
         }
@@ -71,7 +103,9 @@ const InputBar = (props: InputBarProps) => {
             onChangeText={handleChangeText}
             onContentSizeChange={handleContentSizeChange}
           />
-          <SelectPictureIcon {...colors} />
+          <TouchableOpacity onPress={pickImage}>
+            <SelectPictureIcon {...colors} />
+          </TouchableOpacity>
         </InputBox>
       </InputBarContainer>
       <OffsetFooter theme_colors={colors} />

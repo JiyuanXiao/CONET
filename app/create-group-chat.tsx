@@ -53,8 +53,7 @@ export default function CreateGroupChatScreen() {
             // send a system message
             await sendMessageRef.current(
               new_chat_id,
-              `[${process.env.EXPO_PUBLIC_PROJECT_ID}][系统消息] ${user?.first_name} 创建了聊天群`,
-              null,
+              `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][系统消息] ${user?.first_name} 创建了聊天群`,
               Date.now().toString()
             );
             setIsCreating(false);

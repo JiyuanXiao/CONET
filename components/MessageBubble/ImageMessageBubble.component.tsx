@@ -55,12 +55,18 @@ const ImageMessageBubble = ({
 
   const is_received = user?.username !== message_object.sender_username;
   const lastMessageTime = formatTimestamp(message_object.timestamp);
+  const text_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
 
   return chat_member ? (
     <BubbleConatiner isReceived={is_received} theme_colors={colors}>
       <View>
         <Bubble isReceived={is_received} theme_colors={colors}>
-          <BubbleImageContent source="https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D" />
+          <BubbleImageContent
+            source={message_object.text_content.replace(
+              new RegExp(`^\\[${text_header}\\]\\[图片\\]`),
+              ""
+            )}
+          />
         </Bubble>
         {Number(message_object.message_id) < 0 ? (
           <ActivityIndicator color={colors.primary} size={14} />
