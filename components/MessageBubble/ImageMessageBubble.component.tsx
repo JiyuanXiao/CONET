@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { router } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
-import { Image } from "expo-image";
 import {
   BubbleImageContent,
   BubbleConatiner,
@@ -15,6 +14,7 @@ import { MessagesProps } from "@/constants/ContextTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
+import ImageView from "react-native-image-viewing";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -56,49 +56,71 @@ const ImageMessageBubble = ({
   const is_received = user?.username !== message_object.sender_username;
   const lastMessageTime = formatTimestamp(message_object.timestamp);
   const text_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
+  const [image_uri, setImageUri] = useState("");
+  const [image_viewer_visiable, setImageViewerVisiable] = useState(false);
+
+  const HandleViewImage = () => {
+    const uri = message_object.text_content.replace(
+      new RegExp(`^\\[${text_header}\\]\\[图片\\]`),
+      ""
+    );
+    setImageUri(uri);
+    setImageViewerVisiable(true);
+  };
 
   return chat_member ? (
-    <BubbleConatiner isReceived={is_received} theme_colors={colors}>
-      <View>
-        <Bubble isReceived={is_received} theme_colors={colors}>
-          <BubbleImageContent
-            source={message_object.text_content.replace(
-              new RegExp(`^\\[${text_header}\\]\\[图片\\]`),
-              ""
-            )}
-          />
-        </Bubble>
-        {Number(message_object.message_id) < 0 ? (
-          <ActivityIndicator color={colors.primary} size={14} />
-        ) : (
-          <BubbleTime isReceived={is_received} theme_colors={colors}>
-            {lastMessageTime}
-          </BubbleTime>
-        )}
-      </View>
-      <View style={{ flexDirection: "column", justifyContent: "flex-end" }}>
-        {!is_direct_chat && (
-          <BubbleAlias isReceived={is_received} theme_colors={colors}>
-            {chat_member.person.first_name}
-          </BubbleAlias>
-        )}
-        <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/contact-detail",
-              params: {
-                contact_username: chat_member.person.username,
-                contact_first_name: chat_member.person.first_name,
-                avatar: chat_member.person.avatar,
-                source: "chat-window",
-              },
-            })
-          }
-        >
-          <BubbleAvatar img_src={[chat_member.person.avatar]} size={40} />
+    <>
+      <ImageView
+        images={[{ uri: image_uri }]}
+        imageIndex={0}
+        visible={image_viewer_visiable && image_uri.length > 0}
+        onRequestClose={() => {
+          setImageViewerVisiable(false);
+          setImageUri("");
+        }}
+      />
+      <BubbleConatiner isReceived={is_received} theme_colors={colors}>
+        <TouchableOpacity onPress={HandleViewImage}>
+          <Bubble isReceived={is_received} theme_colors={colors}>
+            <BubbleImageContent
+              source={message_object.text_content.replace(
+                new RegExp(`^\\[${text_header}\\]\\[图片\\]`),
+                ""
+              )}
+            />
+          </Bubble>
+          {Number(message_object.message_id) < 0 ? (
+            <ActivityIndicator color={colors.primary} size={14} />
+          ) : (
+            <BubbleTime isReceived={is_received} theme_colors={colors}>
+              {lastMessageTime}
+            </BubbleTime>
+          )}
         </TouchableOpacity>
-      </View>
-    </BubbleConatiner>
+        <View style={{ flexDirection: "column", justifyContent: "flex-end" }}>
+          {!is_direct_chat && (
+            <BubbleAlias isReceived={is_received} theme_colors={colors}>
+              {chat_member.person.first_name}
+            </BubbleAlias>
+          )}
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: "/contact-detail",
+                params: {
+                  contact_username: chat_member.person.username,
+                  contact_first_name: chat_member.person.first_name,
+                  avatar: chat_member.person.avatar,
+                  source: "chat-window",
+                },
+              })
+            }
+          >
+            <BubbleAvatar img_src={[chat_member.person.avatar]} size={40} />
+          </TouchableOpacity>
+        </View>
+      </BubbleConatiner>
+    </>
   ) : (
     <></>
   );

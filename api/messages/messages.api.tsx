@@ -28,13 +28,6 @@ export const SendChatMessage = async (
     text: content,
     custom_json: temp_timestamp,
   };
-  // const data = new FormData();
-  // if (text) {
-  //   data.append("text", text);
-  // } else if (file) {
-  //   data.append("text", file);
-  // }
-  // data.append("custom_json", temp_timestamp);
 
   try {
     const response = await axios.post(url, data, { headers });

@@ -137,25 +137,25 @@ export const MessagesContextProvider = (props: {
       // Replace the target message object by the loaded one
       setMessageMap(chat_id, updated_messages_object);
 
-      if (current_context_type === "image") {
-        try {
-          const image_uri = message_content.replace(
-            new RegExp(`^\\[${content_header}\\]\\[图片\\]`),
-            ""
-          );
-          const response = await fetch(image_uri);
-          const blob = await response.blob();
-          const base64 = await FileSystem.readAsStringAsync(image_uri, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-          message_content = `[${content_header}][图片]data:${blob.type};base64,${base64}`;
-        } catch (err) {
-          console.error(
-            `[Message API] SendChatMessage(): Failed to convert image file to base64 format`
-          );
-          return false;
-        }
-      }
+      // if (current_context_type === "image") {
+      //   try {
+      //     const image_uri = message_content.replace(
+      //       new RegExp(`^\\[${content_header}\\]\\[图片\\]`),
+      //       ""
+      //     );
+      //     const response = await fetch(image_uri);
+      //     const blob = await response.blob();
+      //     const base64 = await FileSystem.readAsStringAsync(image_uri, {
+      //       encoding: FileSystem.EncodingType.Base64,
+      //     });
+      //     message_content = `[${content_header}][图片]data:${blob.type};base64,${base64}`;
+      //   } catch (err) {
+      //     console.error(
+      //       `[Message API] SendChatMessage(): Failed to convert image file to base64 format`
+      //     );
+      //     return false;
+      //   }
+      // }
 
       try {
         const success = await MessageServer.SendChatMessage(

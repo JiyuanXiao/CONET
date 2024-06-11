@@ -79,3 +79,7 @@ export interface ProfileBarProps {
   theme_colors?: ThemeColorsProps;
   disable?: boolean;
 }
+
+export interface ImageViewerSource {
+  uri: string;
+}

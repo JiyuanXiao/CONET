@@ -1,12 +1,18 @@
 import React, { useState, useContext, useEffect } from "react";
+import { router } from "expo-router";
 import { TouchableOpacity, Alert } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { InputBarContainer, InputBox, OffsetFooter } from "./InputBar.styles";
 import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
-import { ThemeColorsProps, InputBarProps } from "@/constants/ComponentTypes";
+import {
+  ThemeColorsProps,
+  InputBarProps,
+  ImageViewerSource,
+} from "@/constants/ComponentTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesContext } from "@/api/messages/messages.context";
+import ImageView from "react-native-image-viewing";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 
@@ -33,7 +39,6 @@ const InputBar = (props: InputBarProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const { sendMessage } = useContext(MessagesContext);
-  const [imageUri, setImageUri] = useState(null);
 
   const pickImage = async () => {
     // Ask for permission to access the media library
@@ -49,14 +54,19 @@ const InputBar = (props: InputBarProps) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
+      allowsMultipleSelection: true,
+      selectionLimit: 9,
+      base64: true,
       quality: 1,
     });
 
     if (!result.canceled) {
       try {
-        const file_uri = result.assets[0].uri;
-        const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][图片]${file_uri}`;
-        await sendMessage(props.chat_id, new_message, Date.now().toString());
+        for (const image of result.assets) {
+          console.log(image.type);
+          const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][图片]data:${image.type};base64,${image.base64}`;
+          await sendMessage(props.chat_id, new_message, Date.now().toString());
+        }
       } catch (error) {
         console.error("Error converting the image:", error);
         Alert.alert("Error converting the image");
