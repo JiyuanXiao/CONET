@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
-import { StyleSheet, Button } from "react-native";
+import { StyleSheet, Button, View } from "react-native";
 import { useTheme } from "@react-navigation/native";
+import { router } from "expo-router";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
@@ -25,8 +26,26 @@ export default function SettngScreen() {
     logOut();
   };
 
+  const handleChangeName = () => {
+    router.push({
+      pathname: "/account-setting",
+      params: {
+        setting_type: "change-name",
+      },
+    });
+  };
+
+  const handleChangePassword = () => {
+    router.push({
+      pathname: "/account-setting",
+      params: {
+        setting_type: "change-password",
+      },
+    });
+  };
+
   return (
-    <ScrollView>
+    <ScrollView style={styles.container}>
       <ProfileBar
         contact_id={user?.id || 0}
         contact_alias={user?.first_name || ""}
@@ -35,6 +54,12 @@ export default function SettngScreen() {
           user ? [user.avatar] : ["@/assets/avatars/avatar_1.png"]
         }
       />
+      <TouchableOpacity onPress={handleChangeName}>
+        <OptionBar content="名字设置" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleChangePassword}>
+        <OptionBar content="更改密码" />
+      </TouchableOpacity>
       <TouchableOpacity onPress={handleLogout}>
         <OptionBar content="退出登录" align_self="center" />
       </TouchableOpacity>
@@ -45,8 +70,7 @@ export default function SettngScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: "column",
   },
   title: {
     fontSize: 20,

@@ -51,4 +51,51 @@ export const GetMyAccount = async (
   }
 };
 
-export const UpdateMyAccount = async () => {};
+export const UpdateMyAccount = async (
+  username: string,
+  pw: string,
+  new_name: string | null,
+  new_password: string | null
+) => {
+  const url = `${process.env.EXPO_PUBLIC_BASE_URL}/users/me/`;
+
+  const headers = {
+    "Project-ID": process.env.EXPO_PUBLIC_PROJECT_ID,
+    "User-Name": username,
+    "User-Secret": pw,
+  };
+
+  let data;
+
+  if (!new_name && !new_password) {
+    return false;
+  } else if (new_name) {
+    data = {
+      first_name: new_name,
+    };
+  } else if (new_password) {
+    data = {
+      secret: new_password,
+    };
+  }
+
+  try {
+    const response = await axios.patch(url, data, { headers });
+    if (response.status === 200) {
+      console.log(`[Auth API] Account inforamtion changed successfully...`);
+      return true;
+    } else {
+      console.warn(
+        `[Auth API] Account inforamtion changed failed: ${
+          response.status
+        } ${JSON.stringify(response.data, null, 2)}`
+      );
+      return false;
+    }
+  } catch (err: any) {
+    console.error(
+      `[Auth API]  UpdateMyAccount() : error ${err.response.status}:  ${err.response.data.detail}`
+    );
+    return false;
+  }
+};

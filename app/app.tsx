@@ -45,6 +45,13 @@ const App = () => {
         }}
       />
       <Stack.Screen
+        name="account-setting"
+        options={{
+          headerTitleAlign: "center",
+          headerBackTitleVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="create-group-chat"
         options={{
           title: "创建聊天群",
@@ -77,11 +84,11 @@ const App = () => {
         }}
       />
       <Stack.Screen
+        name="chat-window"
         options={{
           headerBackTitleVisible: false,
           headerTitleAlign: "center",
         }}
-        name="chat-window"
       />
     </Stack>
   ) : (
