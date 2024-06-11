@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
-import { TouchableOpacity } from "react-native";
+import React, { useContext, useState } from "react";
+import { TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "expo-router";
-import { useRoute, StackActions } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native-paper";
+import { useRoute, StackActions, useTheme } from "@react-navigation/native";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import { ContactsContext } from "@/api/contacts/contacts.context";
@@ -25,7 +26,8 @@ export default function AddContactDetailScreen() {
     custom_json: string;
     avatar: string;
   };
-
+  const [is_loading, setIsLoading] = useState(false);
+  const { colors } = useTheme();
   const navigation = useNavigation();
 
   const handleAddContact = async () => {
@@ -38,13 +40,19 @@ export default function AddContactDetailScreen() {
       is_online: false,
     };
     try {
+      setIsLoading(true);
       await addContact(contact_id, contact);
+      setIsLoading(false);
       console.log(
         `AddContactDetailScreen(): Added new contact ${contact_first_name} successfully: `
       );
       navigation.dispatch(StackActions.pop(2));
     } catch (err) {
       console.error(`AddContactDetailScreen(): ERROR: ${err}`);
+      Alert.alert("添加联系人失败", "请稍后再试", [
+        { text: "OK", onPress: () => {} },
+      ]);
+      setIsLoading(false);
     }
   };
 
@@ -55,11 +63,18 @@ export default function AddContactDetailScreen() {
         contact_alias={contact_first_name}
         avatar_img_src={[avatar]}
       />
-      {Number(contact_id) !== Number(user?.id) && (
-        <TouchableOpacity onPress={handleAddContact}>
-          <OptionBar content="添加到通讯录" align_self="center" />
-        </TouchableOpacity>
-      )}
+      {Number(contact_id) !== Number(user?.id) &&
+        (is_loading ? (
+          <ActivityIndicator
+            animating={true}
+            color={colors.primary}
+            style={{ paddingVertical: 15 }}
+          />
+        ) : (
+          <TouchableOpacity onPress={handleAddContact} disabled={is_loading}>
+            <OptionBar content="添加到通讯录" align_self="center" />
+          </TouchableOpacity>
+        ))}
     </>
   );
 }

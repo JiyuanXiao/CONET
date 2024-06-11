@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
 import { ContactStorageProps } from "@/constants/ContextTypes";
+import * as FileSystem from "expo-file-system";
 
 export const setContact = async (
   username: string | undefined,
@@ -19,6 +20,7 @@ export const setContact = async (
     const key = `${username}_contact_${contact_id.toString()}`;
     const value = JSON.stringify(contact);
     await AsyncStorage.setItem(key, value);
+
     console.log(
       `[Contact Storage] add or update contact data for contact ${contact_id}`
     );
@@ -75,5 +77,65 @@ export const fetchAllContacts = async (
     console.error("[Contact Storage] fetchAllContacts(): " + err);
 
     return [];
+  }
+};
+
+export const saveAvatarToFilesystem = async (
+  username: string | undefined,
+  contact_username: string,
+  avatar_url: string
+) => {
+  if (!username) {
+    console.error(
+      "[Contact Storage] saveAvatarToFilesystem(): user is undefined"
+    );
+    return null;
+  }
+  const avatar_directory = `${FileSystem.documentDirectory}${username}/contacts/avatars/`;
+
+  const file_extension_match = avatar_url.match(/\/avatars\/[^?]+\.(\w+)\?/);
+  let file_extension = "";
+  if (!file_extension_match) {
+    file_extension = "png";
+    console.warn(
+      `[Contact Storage] saveAvatarToFilesystem(): can not find avatar's file extension from url, set to default: "png"`
+    );
+  } else {
+    file_extension = file_extension_match[1];
+  }
+  const avatar_path = `${avatar_directory}${contact_username}.${file_extension}`;
+  try {
+    const dir_info = await FileSystem.getInfoAsync(avatar_directory);
+    if (!dir_info.exists) {
+      await FileSystem.makeDirectoryAsync(avatar_directory, {
+        intermediates: true,
+      });
+    }
+    const download_result = await FileSystem.downloadAsync(
+      avatar_url,
+      avatar_path
+    );
+    if (!download_result) {
+      console.warn(
+        `[Contact Storage] saveAvatarToFilesystem(): failed to download avatar for ${username}`
+      );
+      return null;
+    }
+    console.log(download_result.uri);
+    return download_result.uri;
+  } catch (err) {
+    console.warn(
+      `[Contact Storage] saveAvatarToFilesystem(): failed to download avatar for ${username}`
+    );
+    return null;
+  }
+};
+
+export const deleteAvatarFromFilesystem = async (avatar_uri: string) => {
+  try {
+    await FileSystem.deleteAsync(avatar_uri);
+    console.log`[Contact Storage] deleteAvatarFronFilesystem(): deleted:\n ${avatar_uri}`;
+  } catch (err) {
+    console.warn`[Contact Storage] deleteAvatarFronFilesystem(): error : ${err}`;
   }
 };

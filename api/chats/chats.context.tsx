@@ -53,23 +53,6 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     );
   };
 
-  // const addChat = async (new_chat: CE_ChatProps) => {
-  //   try {
-  //     // add chat to local storage
-  //     await ChatStorage.setChat(user?.username, new_chat.id, new_chat);
-
-  //     // add chat to conext
-  //     setChatMap(new_chat.id, new_chat);
-  //     console.log(
-  //       "[Chat Context] New chat " +
-  //         new_chat.id +
-  //         " has been added to chat context"
-  //     );
-  //   } catch (err) {
-  //     console.error(`[Chat Context] addChat(): ${err}`);
-  //   }
-  // };
-
   const updateChat = async (chat_object: CE_ChatProps) => {
     try {
       // update chat to local storage
@@ -94,6 +77,10 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         `[Chat Context] Start to delete chat ${chat_id}'s context and storage data...`
       );
       // delete chat from local storage
+      await ChatStorage.deleteAllChatAvatarsFromFilesystem(
+        user?.username,
+        chat_id
+      );
       await ChatStorage.removeChat(user?.username, chat_id);
       console.log(`[Chat Context] delete storage data for chat: ${chat_id}`);
 
@@ -176,12 +163,22 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     const init_chats = new Map<number, CE_ChatProps>();
     const init_has_new_message = new Map<number, boolean>();
     for (const chat of new_chats) {
-      //setChatMap(chat.id, chat);
+      for (const person of chat.people) {
+        const new_avatar_uri = await ChatStorage.saveAvatarToFilesystem(
+          user.username,
+          chat.id,
+          person.person.username,
+          person.person.avatar
+        );
+        if (new_avatar_uri) {
+          person.person.avatar = new_avatar_uri;
+        }
+      }
+
       init_chats.set(chat.id, chat);
 
       const last_read = await ChatStorage.getLastRead(user.username, chat.id);
       init_has_new_message.set(chat.id, chat.last_message.id > last_read);
-      //setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
 
       console.log(
         `[Chat Context] chat ${chat.id}: New message: ${chat.last_message.id} -> Last read: ${last_read}`
@@ -217,7 +214,6 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
       console.log("[Chat Context] Initialize chat context successfully...");
 
       setIsChatsInitialized(true);
-      // TODO: Get data from Chat Engine to update context and storage
     }
   };
 
@@ -234,13 +230,6 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
       initializeChatsContext();
     }
   }, [is_authentication_initialized]);
-
-  // useEffect(() => {
-  //   if (last_read_need_update) {
-  //     updateNewMessageStatus();
-  //     setLastReadNeedUpdate(false);
-  //   }
-  // }, [chats, last_read_need_update]);
 
   useEffect(() => {
     console.log(

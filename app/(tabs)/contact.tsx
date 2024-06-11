@@ -16,18 +16,12 @@ import { router } from "expo-router";
 import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
 import { ContactsContext } from "@/api/contacts/contacts.context";
 
-const MOCK_CONTACTS = [
-  { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
-  { id: 383302, username: "jichang", alias: "鸡肠", avatar: "" },
-  { id: 383301, username: "shaoji", alias: "烧鸡", avatar: "" },
-  { id: 384817, username: "yejiang", alias: "叶酱", avatar: "" },
-];
-
-// const MOCK_CONTACTS: ContactProps[] = [];
-
 export default function SettngScreen() {
   const { colors } = useTheme();
   const { contacts } = useContext(ContactsContext);
+  for (const contact of contacts.values()) {
+    console.log(contact.avatar);
+  }
   return (
     <>
       <View style={{ marginBottom: 15 }}>

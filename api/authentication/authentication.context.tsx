@@ -3,11 +3,7 @@ import {
   AuthenticationContentProps,
   MyAccountResponseProps,
 } from "@/constants/ContextTypes";
-import {
-  storeAuthenticatedUser,
-  fetchAuthenticatedUser,
-  removeAuthenticatedUser,
-} from "./authentication.storage";
+import * as AuthenStorage from "./authentication.storage";
 import { GetMyAccount } from "./authentication.api";
 import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 
@@ -73,7 +69,14 @@ export const AuthenticationContextProvider = (props: {
         "[Auth Context] User " + curr_user.username + " loging in..."
       );
       curr_user.secret = pw;
-      await storeAuthenticatedUser(curr_user);
+      const new_user_avatar_uri = await AuthenStorage.saveAvatarToFilesystem(
+        curr_user.username,
+        curr_user.avatar
+      );
+      if (new_user_avatar_uri) {
+        curr_user.avatar = new_user_avatar_uri;
+      }
+      await AuthenStorage.storeAuthenticatedUser(curr_user);
       setUser(curr_user);
       setError("");
       setIsAuthenticationInitialized(true);
@@ -90,18 +93,25 @@ export const AuthenticationContextProvider = (props: {
   const logOut = async () => {
     console.log("[Auth Context] User loging out...");
     setIsAuthenticationInitialized(false);
-    await removeAuthenticatedUser();
+    await AuthenStorage.removeAuthenticatedUser();
     setUser(null);
   };
 
   const initializeUserData = async () => {
     console.log("[Auth Context] Start to initialize authentication context");
-    const curr_user = await fetchAuthenticatedUser();
+    const curr_user = await AuthenStorage.fetchAuthenticatedUser();
     if (curr_user) {
       const response = await GetMyAccount(curr_user.username, curr_user.secret);
       const updated_user = response.data;
       if (updated_user) {
         updated_user.secret = curr_user.secret;
+        const new_user_avatar_uri = await AuthenStorage.saveAvatarToFilesystem(
+          updated_user.username,
+          updated_user.avatar
+        );
+        if (new_user_avatar_uri) {
+          updated_user.avatar = new_user_avatar_uri;
+        }
         setUser(updated_user);
       }
       setIsAuthenticationInitialized(true);

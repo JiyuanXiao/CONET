@@ -1,6 +1,5 @@
-import React, { useState, useContext } from "react";
-import { StyleSheet, Button, View } from "react-native";
-import { useTheme } from "@react-navigation/native";
+import React, { useContext } from "react";
+import { StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
@@ -10,6 +9,7 @@ import { ChatsContext } from "@/api/chats/chats.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { WebSocketContext } from "@/api/websocket/websocket.context";
 import { ContactsContext } from "@/api/contacts/contacts.context";
+import * as FileSystem from "expo-file-system";
 
 export default function SettngScreen() {
   const { user, logOut } = useContext(AuthenticationContext);
@@ -51,7 +51,7 @@ export default function SettngScreen() {
         contact_alias={user?.first_name || ""}
         contact_username={user?.username || ""}
         avatar_img_src={
-          user ? [user.avatar] : ["@/assets/avatars/avatar_1.png"]
+          user ? [user.avatar] : ["@/assets/avatars/avatar_default.png"]
         }
       />
       <TouchableOpacity onPress={handleChangeName}>
