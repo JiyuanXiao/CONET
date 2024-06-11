@@ -106,7 +106,7 @@ export const MessagesContextProvider = (props: {
     if (message_content.startsWith(`[${content_header}][系统消息]`)) {
       current_context_type = "system";
     } else if (message_content.startsWith(`[${content_header}][图片]`)) {
-      current_context_type = "image";
+      current_context_type = "image_base64";
     } else {
       current_context_type = "text";
     }
@@ -185,7 +185,8 @@ export const MessagesContextProvider = (props: {
 
   const receiveMessage = (
     chat_id: number,
-    ce_message: CE_MessageProps
+    message: MessagesProps,
+    temp_timestamp: string
   ): boolean => {
     const target_messages_object = messages.get(Number(chat_id));
     const message_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
@@ -198,35 +199,35 @@ export const MessagesContextProvider = (props: {
     }
 
     // determine the content type
-    let current_context_type;
-    if (ce_message.text) {
-      if (ce_message.text.startsWith(`[${message_header}][系统消息]`)) {
-        current_context_type = "system";
-      } else if (ce_message.text.startsWith(`[${message_header}][图片]`)) {
-        current_context_type = "image";
-      } else {
-        current_context_type = "text";
-      }
-    }
+    //const current_context_type = message.content_type;
+    // if (ce_message.text) {
+    //   if (ce_message.text.startsWith(`[${message_header}][系统消息]`)) {
+    //     current_context_type = "system";
+    //   } else if (ce_message.text.startsWith(`[${message_header}][图片]`)) {
+    //     current_context_type = "image";
+    //   } else {
+    //     current_context_type = "text";
+    //   }
+    // }
 
     const received_message = {
-      message_id: ce_message.id,
-      sender_username: ce_message.sender_username,
-      text_content: current_context_type !== "url" ? ce_message.text : "",
-      file_url: current_context_type === "url" ? ce_message.text : "",
-      content_type: current_context_type,
-      timestamp: ce_message.created,
+      message_id: message.message_id,
+      sender_username: message.sender_username,
+      text_content: message.content_type !== "url" ? message.text_content : "",
+      file_url: message.content_type === "url" ? message.file_url : "",
+      content_type: message.content_type,
+      timestamp: message.timestamp,
     } as MessagesProps;
 
     const target_message_index =
       target_messages_object.loaded_messages.findIndex((msg) => {
-        return msg.timestamp === ce_message.custom_json;
+        return msg.timestamp === temp_timestamp;
       });
 
     // This new message is sent by myself
     if (target_message_index !== -1) {
       console.log(
-        `[Message Context] Confirmed a message ${ce_message.id} is sent by myself`
+        `[Message Context] Confirmed a message ${message.message_id} is sent by myself`
       );
 
       const updated_loaded_messages = target_messages_object.loaded_messages;
@@ -245,7 +246,7 @@ export const MessagesContextProvider = (props: {
     // This message is sent by other
     else {
       console.log(
-        `[Message Context] A new message ${ce_message.id} is sent from ${ce_message.sender_username}`
+        `[Message Context] A new message ${message.message_id} is sent from ${message.sender_username}`
       );
       const updated_messages_object = {
         chat_id: target_messages_object.chat_id,
@@ -259,7 +260,9 @@ export const MessagesContextProvider = (props: {
       setMessageMap(chat_id, updated_messages_object);
     }
     //await MessagesStorage.storeMessage(username, chat_id, ce_message, db);
-    console.log(`[Message Context] New message ${ce_message.id} is received`);
+    console.log(
+      `[Message Context] New message ${message.message_id} is received`
+    );
     return true;
   };
 

@@ -1,6 +1,7 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { MessagesProps } from "@/constants/ContextTypes";
 import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
+import * as FileSystem from "expo-file-system";
 
 export const messageTableExist = (
   username: string | undefined,
@@ -93,7 +94,7 @@ export const fetchLatestMessage = (
   }
 };
 
-export const storeMessage = (
+export const storeMessage = async (
   username: string | undefined,
   chat_id: number,
   message_object: CE_MessageProps,
@@ -111,7 +112,45 @@ export const storeMessage = (
   } else if (message_object.text.startsWith(`[${message_header}][系统消息]`)) {
     current_context_type = "system";
   } else if (message_object.text.startsWith(`[${message_header}][图片]`)) {
-    current_context_type = "image";
+    const base_64_data_match = message_object.text.match(
+      /data:image\/\w+;base64,([\s\S]*)/
+    );
+    const file_extension = message_object.text.match(
+      /data:image\/(\w+);base64,/
+    );
+    if (
+      base_64_data_match &&
+      base_64_data_match.length > 1 &&
+      file_extension &&
+      file_extension.length > 1
+    ) {
+      const base_64_data = base_64_data_match[1];
+      const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
+      const file_path = `${directory_path}${message_object.id}.${file_extension[1]}`;
+      try {
+        const dir_info = await FileSystem.getInfoAsync(directory_path);
+        if (!dir_info.exists) {
+          await FileSystem.makeDirectoryAsync(directory_path, {
+            intermediates: true,
+          });
+        }
+        await FileSystem.writeAsStringAsync(file_path, base_64_data, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        message_object.text = file_path;
+        console.log(`[Message Storage] saved image to ${message_object.text}`);
+      } catch (err) {
+        console.error(`[Message Storage] saving image to file system failed`);
+        return;
+      }
+    } else {
+      console.error(message_object.text.substring(0, 100));
+      console.error(
+        "[Message Storage] storeMessage(): Invalid input string format"
+      );
+      return;
+    }
+    current_context_type = "image_uri";
   } else {
     current_context_type = "text";
   }

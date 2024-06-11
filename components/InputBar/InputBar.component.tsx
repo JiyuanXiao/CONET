@@ -63,8 +63,7 @@ const InputBar = (props: InputBarProps) => {
     if (!result.canceled) {
       try {
         for (const image of result.assets) {
-          console.log(image.type);
-          const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][图片]data:${image.type};base64,${image.base64}`;
+          const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][图片]data:${image.mimeType};base64,${image.base64}`;
           await sendMessage(props.chat_id, new_message, Date.now().toString());
         }
       } catch (error) {

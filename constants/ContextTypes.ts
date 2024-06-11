@@ -94,7 +94,11 @@ export interface MessageContextProps {
     message_content: string,
     temp_timestamp: string
   ) => Promise<boolean>;
-  receiveMessage: (chat_id: number, ce_message: CE_MessageProps) => boolean;
+  receiveMessage: (
+    chat_id: number,
+    ce_message: MessagesProps,
+    temp_timestamp: string
+  ) => boolean;
   resetLoadedMessagesById: (chat_id: number) => Promise<void>;
   ClearAllMessagesById: (chat_id: number) => void;
   is_messages_initialized: boolean;

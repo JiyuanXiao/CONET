@@ -63,19 +63,21 @@ export const WebSocketProvider = ({
   const handleNewMessage = async (message_data: MessageDataProps) => {
     console.log(`[WebSocket] action: new_message for chat ${message_data.id}`);
     // update message context
-    const recevie_success = receiveMessageRef.current(
+
+    // update message storage
+
+    const stored_message = await MessagesStorage.storeMessage(
+      user?.username,
       message_data.id,
-      message_data.message
+      message_data.message,
+      db
     );
 
-    if (recevie_success) {
-      // update message storage
-
-      MessagesStorage.storeMessage(
-        user?.username,
+    if (stored_message) {
+      const recevie_success = receiveMessageRef.current(
         message_data.id,
-        message_data.message,
-        db
+        stored_message,
+        message_data.message.custom_json
       );
 
       // update last read
@@ -84,6 +86,8 @@ export const WebSocketProvider = ({
       } else {
         setHasNewMessageStatusRef.current(Number(message_data.id), true);
       }
+    } else {
+      console.warn(`[WebSocket] Unable to store new message to local storage`);
     }
     console.log(
       `[WebSocket] finished new_message action: send by ${message_data.message.sender}`

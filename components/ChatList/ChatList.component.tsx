@@ -112,7 +112,18 @@ export const ChatList = (props: {
                 }
               />
             );
-          case "image":
+          case "image_base64":
+            return (
+              <ImageMessageBubble
+                chat_id={Number(props.chat_id)}
+                chat_member={chat_members.get(item.sender_username)}
+                message_object={item}
+                is_direct_chat={
+                  current_chat ? Number(current_chat.people.length) <= 2 : false
+                }
+              />
+            );
+          case "image_uri":
             return (
               <ImageMessageBubble
                 chat_id={Number(props.chat_id)}
