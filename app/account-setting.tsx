@@ -37,10 +37,22 @@ export default function AccountSettingScreen() {
         name,
         null
       );
-      if (success) {
+      if (success === 200) {
         Alert.alert("成功重置名字", "", [{ text: "OK", onPress: () => {} }]);
+      } else if (success === 429) {
+        Alert.alert("重置名字失败", "用户请求达到上限，请稍后再试", [
+          { text: "OK", onPress: () => {} },
+        ]);
+      } else if (success === 403 || success === 404) {
+        Alert.alert("重置名字失败", "用户信息认证失败，请联系开发人员", [
+          { text: "OK", onPress: () => {} },
+        ]);
+      } else if (success === 400) {
+        Alert.alert("重置名字失败", "无效请求，请联系开发人员", [
+          { text: "OK", onPress: () => {} },
+        ]);
       } else {
-        Alert.alert("重置名字失败", "请稍候再试", [
+        Alert.alert("重置名字失败", "服务器错误，请联系开发人员", [
           { text: "OK", onPress: () => {} },
         ]);
       }
@@ -70,14 +82,26 @@ export default function AccountSettingScreen() {
       setIsUpLoading(true);
       const success = await AuthenServer.UpdateMyAccount(
         user?.username || "",
-        user?.secret || "",
+        old_password,
         null,
         new_password
       );
-      if (success) {
+      if (success === 200) {
         Alert.alert("成功更改密码", "", [{ text: "OK", onPress: () => {} }]);
+      } else if (success === 429) {
+        Alert.alert("更改密码失败", "用户请求达到上限，请稍后再试", [
+          { text: "OK", onPress: () => {} },
+        ]);
+      } else if (success === 403 || success === 404) {
+        Alert.alert("更改密码失败", "密码不正确", [
+          { text: "OK", onPress: () => {} },
+        ]);
+      } else if (success === 400) {
+        Alert.alert("更改密码失败", "无效请求，请联系开发人员", [
+          { text: "OK", onPress: () => {} },
+        ]);
       } else {
-        Alert.alert("更改密码失败", "请稍候再试", [
+        Alert.alert("更改密码失败", "服务器错误，请联系开发人员", [
           { text: "OK", onPress: () => {} },
         ]);
       }
@@ -173,6 +197,7 @@ export default function AccountSettingScreen() {
           />
           <Searchbar
             mode="bar"
+            secureTextEntry={!password_visiable}
             placeholder="再次输入旧密码"
             onChangeText={(text) => {
               setOldPasswordAgain(text);
@@ -204,6 +229,7 @@ export default function AccountSettingScreen() {
           />
           <Searchbar
             mode="bar"
+            secureTextEntry={!password_visiable}
             placeholder="新密码"
             onChangeText={(text) => {
               setNewPassowrd(text);

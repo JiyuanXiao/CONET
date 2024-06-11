@@ -68,7 +68,7 @@ export const UpdateMyAccount = async (
   let data;
 
   if (!new_name && !new_password) {
-    return false;
+    return 0;
   } else if (new_name) {
     data = {
       first_name: new_name,
@@ -83,19 +83,19 @@ export const UpdateMyAccount = async (
     const response = await axios.patch(url, data, { headers });
     if (response.status === 200) {
       console.log(`[Auth API] Account inforamtion changed successfully...`);
-      return true;
+      return Number(response.status);
     } else {
       console.warn(
         `[Auth API] Account inforamtion changed failed: ${
           response.status
         } ${JSON.stringify(response.data, null, 2)}`
       );
-      return false;
+      return Number(response.status);
     }
   } catch (err: any) {
     console.error(
       `[Auth API]  UpdateMyAccount() : error ${err.response.status}:  ${err.response.data.detail}`
     );
-    return false;
+    return Number(err.response.status);
   }
 };

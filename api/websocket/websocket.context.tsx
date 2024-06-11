@@ -191,7 +191,7 @@ export const WebSocketProvider = ({
 
   useEffect(() => {
     if (!websocket_connected && user && is_messages_initialized) {
-      //connectWebSocket();
+      connectWebSocket();
     }
     return () => {
       web_socket.current?.close();
@@ -230,7 +230,7 @@ export const WebSocketProvider = ({
         `[WebSocket] clean up connection and data for ${user?.username}`
       );
     } else {
-      //connectWebSocket();
+      connectWebSocket();
     }
   };
 
