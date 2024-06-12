@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { TouchableOpacity, Alert } from "react-native";
 import { router, useNavigation } from "expo-router";
 import { useRoute, useTheme } from "@react-navigation/native";
@@ -8,6 +8,7 @@ import OptionBar from "@/components/OptionBar/OptionBar.component";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import * as ChatServer from "@/api/chats/chats.api";
 import { ContactsContext } from "@/api/contacts/contacts.context";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 export default function ContactDetailScreen() {
   const { colors } = useTheme();
@@ -15,6 +16,7 @@ export default function ContactDetailScreen() {
   const { user } = useContext(AuthenticationContext);
   const { contacts, removeContact, searchContact } =
     useContext(ContactsContext);
+  const { messages, sendMessage } = useContext(MessagesContext);
   const [is_creating, setIsCreating] = useState(false);
   const [is_deleting, setIsDeleteing] = useState(false);
   const [contact_exits, setContactExist] = useState(false);
@@ -26,7 +28,7 @@ export default function ContactDetailScreen() {
       avatar: string;
       source: string;
     };
-
+  const sendMessageRef = useRef(sendMessage);
   const navigation = useNavigation();
 
   const startChat = async () => {
@@ -49,6 +51,12 @@ export default function ContactDetailScreen() {
         if (success) {
           console.log(
             `Add ${contact_username} to new chat ${new_chat_id} successfully...`
+          );
+          // send a system message
+          await sendMessageRef.current(
+            new_chat_id,
+            `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][系统消息] ${user?.first_name} 创建了聊天群`,
+            Date.now().toString()
           );
           setIsCreating(false);
           router.push({
@@ -110,6 +118,10 @@ export default function ContactDetailScreen() {
       }
     }
   }, [contacts]);
+
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  }, [messages]);
 
   return (
     <>
