@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigation } from "expo-router";
-import { TouchableOpacity } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { TouchableOpacity, Alert } from "react-native";
+import { useRoute, useTheme } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native-paper";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog.component";
@@ -21,7 +22,7 @@ export default function ChatSettingsScreen() {
   const { chat_id } = route.params as {
     chat_id: number;
   };
-
+  const { colors } = useTheme();
   const { ClearAllMessagesById } = useContext(MessagesContext);
   const { chats } = useContext(ChatsContext);
   const [chat_members, setChatMembers] = useState<CE_PersonProps[]>([]);
@@ -32,6 +33,8 @@ export default function ChatSettingsScreen() {
   const [confirm_message, setConfrimMessage] = useState<string>("");
   const [isConfirm, setIsConfirm] = useState<boolean>(false);
   const [actionFunction, setActionFunction] = useState<() => void>(() => {});
+  const [is_deleting, setIsDeleteing] = useState(false);
+  const [is_clearing, setIsClearing] = useState(false);
   const navigation = useNavigation();
 
   const addChatMember = () => {
@@ -43,12 +46,14 @@ export default function ChatSettingsScreen() {
     });
   };
 
-  const ClearChatHistory = () => {
+  const ClearChatHistory = async () => {
     console.log(
       "FriendSettingsScreen(): Start to clear chat history for chat: " +
         chat_id.toString()
     );
-    ClearAllMessagesById(Number(chat_id));
+    setIsClearing(true);
+    await ClearAllMessagesById(Number(chat_id));
+    setIsClearing(false);
     console.log(
       "FriendSettingsScreen(): Successfully cleared chat history for chat: " +
         chat_id.toString()
@@ -59,18 +64,23 @@ export default function ChatSettingsScreen() {
 
   const DeleteChat = async () => {
     try {
+      setIsDeleteing(true);
       await ChatServer.DeleteChat(
         user?.username || "",
         user?.secret || "",
         chat_id
       );
       console.log("Deleted chat " + chat_id + " successfully...");
-
+      setIsDeleteing(false);
       //navigation.dispatch(StackActions.popToTop());
     } catch (err) {
       console.warn(
         `ChatSettingsScreen(): delete chat ${chat_id} failed: ${err}`
       );
+      setIsDeleteing(false);
+      Alert.alert("删除聊天失败", `服务器出错`, [
+        { text: "OK", onPress: () => {} },
+      ]);
     }
   };
 
@@ -159,26 +169,41 @@ export default function ChatSettingsScreen() {
       <TouchableOpacity onPress={addChatMember}>
         <OptionBar content="添加新成员到群" />
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          setDialogVisible(true);
-          setConfrimMessage("确认清空聊天记录?");
-          setActionFunction(() => ClearChatHistory);
-        }}
-      >
-        <OptionBar content="清空聊天记录" />
-      </TouchableOpacity>
-      {chats.get(Number(chat_id))?.admin.username === user?.username && (
+      {is_clearing ? (
+        <ActivityIndicator
+          animating={true}
+          color={colors.primary}
+          style={{ paddingVertical: 23 }}
+        />
+      ) : (
         <TouchableOpacity
           onPress={() => {
             setDialogVisible(true);
-            setConfrimMessage("确认删除聊天群?");
-            setActionFunction(() => DeleteChat);
+            setConfrimMessage("确认清空聊天记录?");
+            setActionFunction(() => ClearChatHistory);
           }}
         >
-          <OptionBar content="删除聊天群" />
+          <OptionBar content="清空聊天记录" />
         </TouchableOpacity>
       )}
+      {chats.get(Number(chat_id))?.admin.username === user?.username &&
+        (is_deleting ? (
+          <ActivityIndicator
+            animating={true}
+            color={colors.primary}
+            style={{ paddingVertical: 23 }}
+          />
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              setDialogVisible(true);
+              setConfrimMessage("确认删除聊天群?");
+              setActionFunction(() => DeleteChat);
+            }}
+          >
+            <OptionBar content="删除聊天群" />
+          </TouchableOpacity>
+        ))}
       <ConfirmDialog
         visible={dialog_visible}
         setDialogVisible={setDialogVisible}

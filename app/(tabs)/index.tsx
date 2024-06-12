@@ -39,7 +39,6 @@ export default function ChatListScreen() {
   const { user } = useContext(AuthenticationContext);
   const { resetWebSocket } = useContext(WebSocketContext);
   const [refreshing, setRefreshing] = useState(false);
-  //const fetchChatDataFromServerRef = useRef(fetchChatDataFromServer);
   const initializeMessageContextRef = useRef(initializeMessageContext);
 
   const getChatTitle = (chat: CE_ChatProps) => {

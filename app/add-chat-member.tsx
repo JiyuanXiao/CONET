@@ -5,12 +5,12 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 import { useTheme, StackActions, useRoute } from "@react-navigation/native";
 import { Searchbar, Button, ActivityIndicator } from "react-native-paper";
 import { router, useNavigation } from "expo-router";
 import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
-import { FontAwesome5 } from "@expo/vector-icons";
 import ContactBar from "@/components/ContactBar/ContactBar.component";
 import { ContactsContext } from "@/api/contacts/contacts.context";
 import AvatarListBar from "@/components/AvatarListBar/AvatarListBar.component";
@@ -62,11 +62,17 @@ export default function AddChatMemberScreen() {
           console.warn(
             `[add-chat-member.tsx] add member ${candidate.username} to chat ${chat_id} failed`
           );
+          Alert.alert("添加群成员失败", "服务器出错", [
+            { text: "OK", onPress: () => {} },
+          ]);
           setIsAdding(false);
         }
       }
     } catch (err) {
       console.error(`[add-chat-member.tsx] add chat member failed: ${err}`);
+      Alert.alert("添加群成员失败", `服务器出错`, [
+        { text: "OK", onPress: () => {} },
+      ]);
       setIsAdding(false);
     }
   };

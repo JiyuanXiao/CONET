@@ -1,5 +1,5 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, Alert } from "react-native";
 import { router, useNavigation } from "expo-router";
 import { useRoute, useTheme } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
@@ -16,6 +16,7 @@ export default function ChatMemberSettingScreen() {
   const { user } = useContext(AuthenticationContext);
   const { messages, sendMessage } = useContext(MessagesContext);
   const [is_creating, setIsCreating] = useState(false);
+  const [is_deleting, setIsDeleteing] = useState(false);
   const sendMessageRef = useRef(sendMessage);
   const {
     chat_id,
@@ -66,20 +67,30 @@ export default function ChatMemberSettingScreen() {
             `[contact-detail.tsx] add member ${member_username} to chat ${new_chat_id} failed`
           );
           setIsCreating(false);
+          Alert.alert("出现错误", `添加用户${member_username}到聊天出错`, [
+            { text: "OK", onPress: () => {} },
+          ]);
         }
       } else {
         console.warn(`[contact-detail.tsx] create chat failed`);
         setIsCreating(false);
+        Alert.alert("发起聊天失败", `创建新聊天出错`, [
+          { text: "OK", onPress: () => {} },
+        ]);
       }
     } catch (err) {
       console.error(`[contact-detail.tsx] create chat failed: ${err}`);
       setIsCreating(false);
+      Alert.alert("发起聊天失败", `服务器出错`, [
+        { text: "OK", onPress: () => {} },
+      ]);
     }
   };
 
   const deleteChatMmeber = async () => {
     if (user) {
       try {
+        setIsDeleteing(true);
         await ChatServer.RemoveChatMember(
           user.username,
           user.secret,
@@ -87,6 +98,7 @@ export default function ChatMemberSettingScreen() {
           member_username
         );
         console.log(`Delete contact ${member_username}`);
+        setIsDeleteing(false);
         // send a system message
         await sendMessageRef.current(
           chat_id,
@@ -96,6 +108,7 @@ export default function ChatMemberSettingScreen() {
         navigation.goBack();
       } catch (err) {
         console.error(`[contact-detail.tsx] deleteContact(): Error: ${err}`);
+        setIsDeleteing(false);
       }
     }
   };
@@ -120,11 +133,18 @@ export default function ChatMemberSettingScreen() {
         </TouchableOpacity>
       )}
       {admin_username === user?.username &&
-        member_username !== user.username && (
+        member_username !== user.username &&
+        (is_deleting ? (
+          <ActivityIndicator
+            animating={true}
+            color={colors.primary}
+            style={{ paddingVertical: 23 }}
+          />
+        ) : (
           <TouchableOpacity onPress={deleteChatMmeber}>
             <OptionBar content="移除该群员" align_self="center" />
           </TouchableOpacity>
-        )}
+        ))}
     </>
   );
 }

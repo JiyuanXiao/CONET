@@ -55,6 +55,18 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
 
   const updateChat = async (chat_object: CE_ChatProps) => {
     try {
+      // update each person's avatar
+      for (const person of chat_object.people) {
+        const new_avatar_uri = await ChatStorage.saveAvatarToFilesystem(
+          user?.username,
+          chat_object.id,
+          person.person.username,
+          person.person.avatar
+        );
+        if (new_avatar_uri) {
+          person.person.avatar = new_avatar_uri;
+        }
+      }
       // update chat to local storage
       await ChatStorage.setChat(user?.username, chat_object.id, chat_object);
 
@@ -77,7 +89,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         `[Chat Context] Start to delete chat ${chat_id}'s context and storage data...`
       );
       // delete chat from local storage
-      await ChatStorage.deleteAllChatAvatarsFromFilesystem(
+      await ChatStorage.deleteAllChatImagesFromFilesystem(
         user?.username,
         chat_id
       );

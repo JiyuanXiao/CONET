@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 import { useTheme, StackActions } from "@react-navigation/native";
 import { Searchbar, Button, ActivityIndicator } from "react-native-paper";
@@ -37,6 +38,7 @@ export default function CreateGroupChatScreen() {
         user?.secret || "",
         chat_title
       );
+
       if (new_chat_id) {
         console.log(`Create new chat ${new_chat_id} successfully...`);
         for (const candidate of candidates) {
@@ -69,15 +71,24 @@ export default function CreateGroupChatScreen() {
               `[create-group-chat.tsx] add member ${candidate.username} to chat ${new_chat_id} failed`
             );
             setIsCreating(false);
+            Alert.alert("出现错误", `添加用户${candidate.username}到聊天出错`, [
+              { text: "OK", onPress: () => {} },
+            ]);
           }
         }
       } else {
         console.warn(`[create-group-chat.tsx] create chat failed`);
         setIsCreating(false);
+        Alert.alert("发起聊天失败", `创建新聊天出错`, [
+          { text: "OK", onPress: () => {} },
+        ]);
       }
     } catch (err) {
       console.error(`[create-group-chat.tsx] create chat failed: ${err}`);
       setIsCreating(false);
+      Alert.alert("发起聊天失败", `服务器出错`, [
+        { text: "OK", onPress: () => {} },
+      ]);
     }
   };
 

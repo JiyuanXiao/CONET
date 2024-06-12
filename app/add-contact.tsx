@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import { Searchbar, Card, Button } from "react-native-paper";
+import { Searchbar, Card, Button, ActivityIndicator } from "react-native-paper";
 import { router } from "expo-router";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import { ContactsContext } from "@/api/contacts/contacts.context";
@@ -23,13 +24,23 @@ export default function AddContactScreen() {
     null
   );
   const { searchContact } = useContext(ContactsContext);
+  const [is_loading, setIsLoading] = useState(false);
 
   const handleSearch = async () => {
     if (searchQuery.length > 0) {
-      const contact_id = Number(searchQuery);
-      const result = await searchContact(contact_id);
-      setDoesSearch(true);
-      setSearchResult(result);
+      try {
+        setIsLoading(true);
+        const contact_id = Number(searchQuery);
+        const result = await searchContact(contact_id);
+        setDoesSearch(true);
+        setSearchResult(result);
+        setIsLoading(false);
+      } catch (err) {
+        console.error(`[add-contact.tsx] handleSearch(): error ${err}`);
+        Alert.alert("搜索用户失败", "服务器出错", [
+          { text: "OK", onPress: () => {} },
+        ]);
+      }
     }
   };
 
@@ -53,16 +64,24 @@ export default function AddContactScreen() {
             keyboardType="decimal-pad"
             style={[styles.search_input, { backgroundColor: colors.card }]}
           />
-          <Button
-            mode="contained"
-            buttonColor={colors.primary}
-            textColor="black"
-            disabled={searchQuery.length === 0}
-            style={[styles.button]}
-            onPress={handleSearch}
-          >
-            搜索
-          </Button>
+          {is_loading ? (
+            <ActivityIndicator
+              animating={true}
+              color={colors.primary}
+              style={{ paddingVertical: 15 }}
+            />
+          ) : (
+            <Button
+              mode="contained"
+              buttonColor={colors.primary}
+              textColor="black"
+              disabled={searchQuery.length === 0 || is_loading}
+              style={[styles.button]}
+              onPress={handleSearch}
+            >
+              搜索
+            </Button>
+          )}
         </View>
         {searchResult ? (
           <TouchableOpacity

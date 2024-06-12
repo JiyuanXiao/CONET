@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, Alert } from "react-native";
 import { router, useNavigation } from "expo-router";
 import { useRoute, useTheme } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
@@ -16,6 +16,7 @@ export default function ContactDetailScreen() {
   const { contacts, removeContact, searchContact } =
     useContext(ContactsContext);
   const [is_creating, setIsCreating] = useState(false);
+  const [is_deleting, setIsDeleteing] = useState(false);
   const [contact_exits, setContactExist] = useState(false);
   const [contact_id, setContactId] = useState(-1);
   const { contact_username, contact_first_name, avatar, source } =
@@ -61,30 +62,43 @@ export default function ContactDetailScreen() {
             `[contact-detail.tsx] add member ${contact_username} to chat ${new_chat_id} failed`
           );
           setIsCreating(false);
+          Alert.alert("出现错误", `添加用户${contact_username}到聊天出错`, [
+            { text: "OK", onPress: () => {} },
+          ]);
         }
       } else {
         console.warn(`[contact-detail.tsx] create chat failed`);
         setIsCreating(false);
+        Alert.alert("发起聊天失败", `创建新聊天出错`, [
+          { text: "OK", onPress: () => {} },
+        ]);
       }
     } catch (err) {
       console.error(`[contact-detail.tsx] create chat failed: ${err}`);
       setIsCreating(false);
+      Alert.alert("发起聊天失败", `服务器出错`, [
+        { text: "OK", onPress: () => {} },
+      ]);
     }
   };
 
   const deleteContact = async () => {
     if (contact_id !== -1) {
       try {
+        setIsDeleteing(true);
         await removeContact(contact_id);
         console.log(`Delete contact ${contact_username}`);
+        setIsDeleteing(false);
         navigation.goBack();
       } catch (err) {
         console.error(`[contact-detail.tsx] deleteContact(): Error: ${err}`);
+        setIsDeleteing(false);
       }
     } else {
       console.warn(
         `[contact-detail.tsx] deleteContact(): contact ${contact_username} not found`
       );
+      setIsDeleteing(false);
     }
   };
 
@@ -115,11 +129,19 @@ export default function ContactDetailScreen() {
           <OptionBar content="发起新聊天" align_self="center" />
         </TouchableOpacity>
       )}
-      {source === "contact" && contact_exits && (
-        <TouchableOpacity onPress={deleteContact}>
-          <OptionBar content="删除联系人" align_self="center" />
-        </TouchableOpacity>
-      )}
+      {source === "contact" &&
+        contact_exits &&
+        (is_deleting ? (
+          <ActivityIndicator
+            animating={true}
+            color={colors.primary}
+            style={{ paddingVertical: 23 }}
+          />
+        ) : (
+          <TouchableOpacity onPress={deleteContact}>
+            <OptionBar content="删除联系人" align_self="center" />
+          </TouchableOpacity>
+        ))}
     </>
   );
 }

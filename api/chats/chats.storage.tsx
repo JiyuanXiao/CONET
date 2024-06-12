@@ -204,7 +204,7 @@ export const saveAvatarToFilesystem = async (
   }
 };
 
-export const deleteAllChatAvatarsFromFilesystem = async (
+export const deleteAllChatImagesFromFilesystem = async (
   username: string | undefined,
   chat_id: number
 ) => {

@@ -93,7 +93,7 @@ export default function AccountSettingScreen() {
           { text: "OK", onPress: () => {} },
         ]);
       } else if (success === 403 || success === 404) {
-        Alert.alert("更改密码失败", "密码不正确", [
+        Alert.alert("等阵...更改密码失败", "密码不正确", [
           { text: "OK", onPress: () => {} },
         ]);
       } else if (success === 400) {
