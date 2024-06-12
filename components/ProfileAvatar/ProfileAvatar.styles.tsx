@@ -1,15 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "react-native-paper";
 import { UserAvatarProps } from "@/constants/ComponentTypes";
 import { Image } from "expo-image";
 
-export const ProfileAvatarIcon: React.FC<UserAvatarProps> = (props) => {
+export const ProfileAvatarImage: React.FC<UserAvatarProps> = (props) => {
   const [source, setSource] = useState(props.img_src);
 
   const handleError = () => {
     setSource(require("@/assets/avatars/avatar_default.png"));
   };
+
+  useEffect(() => {
+    setSource(props.img_src);
+  }, [props.img_src]);
 
   return (
     <Image
