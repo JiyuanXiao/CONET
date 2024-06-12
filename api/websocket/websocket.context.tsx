@@ -67,7 +67,7 @@ export const WebSocketProvider = ({
     // update message storage
 
     if (
-      MessagesStorage.messageTableExist(user?.username, message_data.id, db)
+      !MessagesStorage.messageTableExist(user?.username, message_data.id, db)
     ) {
       MessagesStorage.createMessageTableIfNotExists(
         user?.username,

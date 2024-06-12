@@ -57,7 +57,7 @@ const InputBar = (props: InputBarProps) => {
       allowsMultipleSelection: true,
       selectionLimit: 9,
       base64: true,
-      quality: 1,
+      quality: 0.5,
     });
 
     if (!result.canceled) {
