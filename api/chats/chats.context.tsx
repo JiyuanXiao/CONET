@@ -13,6 +13,7 @@ export const ChatsContext = createContext<ChatsContextProps>({
   has_new_message: new Map<number, boolean>(),
   setHasNewMessageStatus: () => {},
   is_chats_initialized: false,
+  is_chats_loaded_from_local: false,
   // addChat: async () => {},
   updateChat: async () => {},
   deleteChat: async () => {},
@@ -34,6 +35,8 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
   );
   const [current_talking_chat_id, setCurrentTalkingChatId] =
     useState<number>(-1);
+  const [is_chats_loaded_from_local, setIsChatsLoadedFromLocal] =
+    useState<boolean>(false);
   const [is_chats_initialized, setIsChatsInitialized] =
     useState<boolean>(false);
   const [has_new_message, setHasNewMessage] = useState<Map<number, boolean>>(
@@ -149,6 +152,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
   };
 
   const fetchChatDataFromStorage = async (user: CE_UserProps) => {
+    setIsChatsLoadedFromLocal(false);
     console.log(
       "[Chat Context] Start to fetch chats' data from local storage..."
     );
@@ -161,6 +165,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
       const last_read = await ChatStorage.getLastRead(user.username, chat.id);
       setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
     }
+    setIsChatsLoadedFromLocal(true);
     console.log("[Chat Context] Chat data has been loaded from local storage");
   };
 
@@ -212,6 +217,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
 
   const initializeChatsContext = async () => {
     if (user) {
+      setIsChatsInitialized(false);
       console.log("[Chat Context] Start to initialize chat context...");
 
       await fetchChatDataFromStorage(user);
@@ -259,7 +265,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         has_new_message,
         setHasNewMessageStatus,
         is_chats_initialized,
-        // addChat,
+        is_chats_loaded_from_local,
         updateChat,
         deleteChat,
         getLastRead,

@@ -23,6 +23,7 @@ export const MessagesContext = createContext<MessageContextProps>({
   resetLoadedMessagesById: async () => {},
   ClearAllMessagesById: async () => {},
   is_messages_initialized: false,
+  is_message_loaded_from_local: false,
   initializeMessageContext: async () => {},
   resetMessageContext: () => {},
 });
@@ -36,8 +37,15 @@ export const MessagesContextProvider = (props: {
   >(new Map<number, MessageContextObjectProps>());
   const [is_messages_initialized, setIsMessagesInitialized] =
     useState<boolean>(false);
+  const [is_message_loaded_from_local, setIsMessagesLoadedFromLocal] =
+    useState<boolean>(false);
   const { user } = useContext(AuthenticationContext);
-  const { chats, is_chats_initialized, getLastRead } = useContext(ChatsContext);
+  const {
+    chats,
+    is_chats_initialized,
+    is_chats_loaded_from_local,
+    getLastRead,
+  } = useContext(ChatsContext);
   const db = useSQLiteContext();
 
   const setMessageMap = (
@@ -137,26 +145,6 @@ export const MessagesContextProvider = (props: {
       // Replace the target message object by the loaded one
       setMessageMap(chat_id, updated_messages_object);
 
-      // if (current_context_type === "image") {
-      //   try {
-      //     const image_uri = message_content.replace(
-      //       new RegExp(`^\\[${content_header}\\]\\[图片\\]`),
-      //       ""
-      //     );
-      //     const response = await fetch(image_uri);
-      //     const blob = await response.blob();
-      //     const base64 = await FileSystem.readAsStringAsync(image_uri, {
-      //       encoding: FileSystem.EncodingType.Base64,
-      //     });
-      //     message_content = `[${content_header}][图片]data:${blob.type};base64,${base64}`;
-      //   } catch (err) {
-      //     console.error(
-      //       `[Message API] SendChatMessage(): Failed to convert image file to base64 format`
-      //     );
-      //     return false;
-      //   }
-      // }
-
       try {
         const success = await MessageServer.SendChatMessage(
           user?.username || "",
@@ -197,18 +185,6 @@ export const MessagesContextProvider = (props: {
       );
       return false;
     }
-
-    // determine the content type
-    //const current_context_type = message.content_type;
-    // if (ce_message.text) {
-    //   if (ce_message.text.startsWith(`[${message_header}][系统消息]`)) {
-    //     current_context_type = "system";
-    //   } else if (ce_message.text.startsWith(`[${message_header}][图片]`)) {
-    //     current_context_type = "image";
-    //   } else {
-    //     current_context_type = "text";
-    //   }
-    // }
 
     const received_message = {
       message_id: message.message_id,
@@ -371,8 +347,65 @@ export const MessagesContextProvider = (props: {
     }
   };
 
+  const fetchMessageDataFromStorage = async () => {
+    if (user) {
+      setIsMessagesLoadedFromLocal(false);
+      const init_messages = new Map<number, MessageContextObjectProps>();
+      // Fetach all messages from loacl storage for each friend
+      for (const chat of chats.values()) {
+        let initial_messages_object = {
+          chat_id: chat.id,
+          loaded_messages: [],
+          current_index: 0,
+          total_messages_amount: 0,
+        } as MessageContextObjectProps;
+
+        // If message data existed already, load the data
+        if (MessagesStorage.messageTableExist(user.username, chat.id, db)) {
+          try {
+            const is_initial_load = true;
+
+            initial_messages_object = await getLoadedMessages(
+              user.username,
+              chat.id,
+              initial_messages_object,
+              NUM_OF_MESSAGES_LOAD_AT_ONCE,
+              db,
+              is_initial_load
+            );
+            console.log(
+              `[Message Context] initially loaded message for chat ${chat.id} successfully`
+            );
+          } catch (err) {
+            console.error(
+              `[Message Context] initially loaded message for chat ${chat.id} failed: ${err}`
+            );
+          }
+        }
+        // If message data doesn't exist, create one in local storage
+        else {
+          console.log(
+            `[Message Context] message table for chat ${chat.id} do not exist, start creating...`
+          );
+          MessagesStorage.createMessageTableIfNotExists(
+            user.username,
+            chat.id,
+            db
+          );
+        }
+
+        // Append new messages object to object list
+        init_messages.set(chat.id, initial_messages_object);
+        //setMessageMap(chat.id, initial_messages_object);
+      }
+      setMessages(init_messages);
+      setIsMessagesLoadedFromLocal(true);
+    }
+  };
+
   const initializeMessageContext = async () => {
     if (user) {
+      setIsMessagesInitialized(false);
       console.log("[Message Context] Start to initialize message context...");
 
       const chat_server_connected = true;
@@ -504,10 +537,16 @@ export const MessagesContextProvider = (props: {
   };
 
   useEffect(() => {
-    if (is_chats_initialized) {
+    if (is_chats_loaded_from_local) {
+      fetchMessageDataFromStorage();
+    }
+  }, [is_chats_loaded_from_local]);
+
+  useEffect(() => {
+    if (is_chats_initialized && is_message_loaded_from_local) {
       initializeMessageContext();
     }
-  }, [is_chats_initialized]);
+  }, [is_chats_initialized, is_message_loaded_from_local]);
 
   return (
     <MessagesContext.Provider
@@ -520,6 +559,7 @@ export const MessagesContextProvider = (props: {
         resetLoadedMessagesById,
         ClearAllMessagesById,
         is_messages_initialized,
+        is_message_loaded_from_local,
         initializeMessageContext,
         resetMessageContext,
       }}

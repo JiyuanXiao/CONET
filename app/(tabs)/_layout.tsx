@@ -8,10 +8,12 @@ import {
 } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
 import { Pressable } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useTheme } from "@react-navigation/native";
 import { ThemeColorsProps } from "@/constants/ComponentTypes";
 import { WebSocketContext } from "@/api/websocket/websocket.context";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 // explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 
@@ -77,6 +79,7 @@ const CreateChatIcon = (props: {
 export default function TabLayout() {
   const { colors } = useTheme();
   const { websocket_connected } = useContext(WebSocketContext);
+  const { is_messages_initialized } = useContext(MessagesContext);
 
   return (
     <Tabs
@@ -96,7 +99,11 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: websocket_connected ? "CONET" : "连接中...",
+          title: is_messages_initialized
+            ? websocket_connected
+              ? "CONET"
+              : "连接中..."
+            : "读取中...",
           headerTitleAlign: "center",
           tabBarIcon: ({ focused }) => (
             <ChatsTabIcon focused={focused} theme_colors={colors} />
@@ -110,6 +117,14 @@ export default function TabLayout() {
               </Pressable>
             </Link>
           ),
+          headerLeft: () =>
+            (!websocket_connected || !is_messages_initialized) && (
+              <ActivityIndicator
+                size="small"
+                color={colors.primary}
+                style={{ marginLeft: 140 }}
+              />
+            ),
         }}
       />
       <Tabs.Screen

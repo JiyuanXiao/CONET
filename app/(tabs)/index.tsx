@@ -27,15 +27,11 @@ export default function ChatListScreen() {
   const {
     chats,
     has_new_message,
-    is_chats_initialized,
+    is_chats_loaded_from_local,
     fetchChatDataFromServer,
   } = useContext(ChatsContext);
-  const {
-    is_messages_initialized,
-    messages,
-    initializeMessageContext,
-    resetMessageContext,
-  } = useContext(MessagesContext);
+  const { is_message_loaded_from_local, messages, initializeMessageContext } =
+    useContext(MessagesContext);
   const { user } = useContext(AuthenticationContext);
   const { resetWebSocket } = useContext(WebSocketContext);
   const [refreshing, setRefreshing] = useState(false);
@@ -113,7 +109,6 @@ export default function ChatListScreen() {
     if (user) {
       console.log("refreshing...");
       await fetchChatDataFromServer(user);
-      //resetMessageContext();
       await initializeMessageContextRef.current();
       resetWebSocket();
     }
@@ -129,57 +124,48 @@ export default function ChatListScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {is_chats_initialized ? (
-        <>
-          {is_messages_initialized ? null : (
-            <ActivityIndicator
-              animating={true}
-              color={colors.primary}
-              style={{ paddingVertical: 20 }}
-            />
-          )}
-          <FlatList
-            data={Array.from(chats.values()).sort((a, b) => {
-              const aLastMessageTime = new Date(
-                getLastMessageInfo(a.id).last_message_time
-              );
-              const bLastMessageTime = new Date(
-                getLastMessageInfo(b.id).last_message_time
-              );
-              return bLastMessageTime.getTime() - aLastMessageTime.getTime();
-            })}
-            renderItem={({ item }) => {
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push({
-                      pathname: "/chat-window",
-                      params: {
-                        chat_id: item.id,
-                      },
-                    });
-                  }}
-                  style={styles.chatBoxContainer}
-                >
-                  <ChatBox
-                    chat_id={item.id}
-                    chat_title={getChatTitle(item)}
-                    last_message={getLastMessageInfo(item.id).last_message}
-                    last_message_time={
-                      getLastMessageInfo(item.id).last_message_time
-                    }
-                    has_new_message={has_new_message.get(item.id) || false}
-                    avatar_img_src={getChatAvatar(item)}
-                  />
-                </TouchableOpacity>
-              );
-            }}
-            keyExtractor={(item) => item.id.toString()}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          />
-        </>
+      {is_message_loaded_from_local ? (
+        <FlatList
+          data={Array.from(chats.values()).sort((a, b) => {
+            const aLastMessageTime = new Date(
+              getLastMessageInfo(a.id).last_message_time
+            );
+            const bLastMessageTime = new Date(
+              getLastMessageInfo(b.id).last_message_time
+            );
+            return bLastMessageTime.getTime() - aLastMessageTime.getTime();
+          })}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({
+                    pathname: "/chat-window",
+                    params: {
+                      chat_id: item.id,
+                    },
+                  });
+                }}
+                style={styles.chatBoxContainer}
+              >
+                <ChatBox
+                  chat_id={item.id}
+                  chat_title={getChatTitle(item)}
+                  last_message={getLastMessageInfo(item.id).last_message}
+                  last_message_time={
+                    getLastMessageInfo(item.id).last_message_time
+                  }
+                  has_new_message={has_new_message.get(item.id) || false}
+                  avatar_img_src={getChatAvatar(item)}
+                />
+              </TouchableOpacity>
+            );
+          }}
+          keyExtractor={(item) => item.id.toString()}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
       ) : (
         <ActivityIndicator
           animating={true}
