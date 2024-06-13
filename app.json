@@ -37,7 +37,15 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "photosPermission": "允许访问你的相册"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "允许访问你的相册",
+          "savePhotosPermission": "允许保存图片到你的相册",
+          "isAccessMediaLocationEnabled": true
         }
       ]
     ],

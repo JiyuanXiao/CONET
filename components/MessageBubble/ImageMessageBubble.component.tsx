@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { router } from "expo-router";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, Alert } from "react-native";
 import {
   BubbleImageContent,
   BubbleConatiner,
@@ -15,6 +15,8 @@ import { AuthenticationContext } from "@/api/authentication/authentication.conte
 import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
 import ImageView from "react-native-image-viewing";
+import * as MediaLibrary from "expo-media-library";
+import OptionBar from "../OptionBar/OptionBar.component";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -58,6 +60,7 @@ const ImageMessageBubble = ({
   const text_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
   const [image_uri, setImageUri] = useState("");
   const [image_viewer_visiable, setImageViewerVisiable] = useState(false);
+  const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
 
   const HandleViewImage = () => {
     const uri = message_object.text_content.replace(
@@ -68,6 +71,43 @@ const ImageMessageBubble = ({
     setImageViewerVisiable(true);
   };
 
+  const savePhoto = useCallback(async (uri: string) => {
+    let current_permission = permissionResponse;
+    if (!current_permission || current_permission.status !== "granted") {
+      current_permission = await requestPermission();
+      console.log(current_permission);
+    }
+
+    if (current_permission?.status !== "granted") {
+      Alert.alert("未成功授权访问相册");
+      return;
+    }
+
+    Alert.alert("确认保存图片?", "", [
+      {
+        isPreferred: true,
+        text: "确认",
+        onPress: async () => {
+          try {
+            await MediaLibrary.saveToLibraryAsync(uri);
+            Alert.alert("保存成功", "", [{ text: "OK", onPress: () => {} }]);
+          } catch (err) {
+            console.error(
+              `[ImageMessageBubble.component] savePhoto: failed to save phto to library: ${err}`
+            );
+          }
+        },
+        style: "default",
+      },
+      {
+        isPreferred: false,
+        text: "取消",
+        onPress: () => {},
+        style: "destructive",
+      },
+    ]);
+  }, []);
+
   return chat_member ? (
     <>
       <ImageView
@@ -77,6 +117,9 @@ const ImageMessageBubble = ({
         onRequestClose={() => {
           setImageViewerVisiable(false);
           setImageUri("");
+        }}
+        onLongPress={() => {
+          savePhoto(image_uri);
         }}
       />
       <BubbleConatiner isReceived={is_received} theme_colors={colors}>
