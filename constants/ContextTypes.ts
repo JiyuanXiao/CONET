@@ -21,6 +21,11 @@ export interface AuthenticationContentProps {
   is_authentication_initialized: boolean;
   logIn: (id: string, pw: string) => Promise<boolean>;
   logOut: () => Promise<void>;
+  changePassword: (
+    old_password: string,
+    new_password: string
+  ) => Promise<number>;
+  chanegName: (new_name: string) => Promise<number>;
 }
 
 export interface MyAccountResponseProps {

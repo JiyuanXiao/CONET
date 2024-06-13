@@ -9,10 +9,11 @@ import {
 } from "react-native-paper";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { FontAwesome5 } from "@expo/vector-icons";
-import * as AuthenServer from "@/api/authentication/authentication.api";
 
 export default function AccountSettingScreen() {
-  const { user } = useContext(AuthenticationContext);
+  const { user, chanegName, changePassword } = useContext(
+    AuthenticationContext
+  );
   const [name, setName] = useState("");
   const [old_password, setOldPassword] = useState("");
   const [old_password_again, setOldPasswordAgain] = useState("");
@@ -31,23 +32,25 @@ export default function AccountSettingScreen() {
   const handleChangeName = async () => {
     try {
       setIsUpLoading(true);
-      const success = await AuthenServer.UpdateMyAccount(
-        user?.username || "",
-        user?.secret || "",
-        name,
-        null
-      );
-      if (success === 200) {
-        Alert.alert("成功重置名字", "", [{ text: "OK", onPress: () => {} }]);
-      } else if (success === 429) {
+      const status_code = await chanegName(name);
+      if (status_code === 200) {
+        Alert.alert("成功重置名字", "", [
+          {
+            text: "OK",
+            onPress: () => {
+              navigation.goBack();
+            },
+          },
+        ]);
+      } else if (status_code === 429) {
         Alert.alert("重置名字失败", "用户请求达到上限，请稍后再试", [
           { text: "OK", onPress: () => {} },
         ]);
-      } else if (success === 403 || success === 404) {
+      } else if (status_code === 403 || status_code === 404) {
         Alert.alert("重置名字失败", "用户信息认证失败，请联系开发人员", [
           { text: "OK", onPress: () => {} },
         ]);
-      } else if (success === 400) {
+      } else if (status_code === 400) {
         Alert.alert("重置名字失败", "无效请求，请联系开发人员", [
           { text: "OK", onPress: () => {} },
         ]);
@@ -80,23 +83,25 @@ export default function AccountSettingScreen() {
     }
     try {
       setIsUpLoading(true);
-      const success = await AuthenServer.UpdateMyAccount(
-        user?.username || "",
-        old_password,
-        null,
-        new_password
-      );
-      if (success === 200) {
-        Alert.alert("成功更改密码", "", [{ text: "OK", onPress: () => {} }]);
-      } else if (success === 429) {
+      const status_code = await changePassword(old_password, new_password);
+      if (status_code === 200) {
+        Alert.alert("成功更改密码", "", [
+          {
+            text: "OK",
+            onPress: () => {
+              navigation.goBack();
+            },
+          },
+        ]);
+      } else if (status_code === 429) {
         Alert.alert("更改密码失败", "用户请求达到上限，请稍后再试", [
           { text: "OK", onPress: () => {} },
         ]);
-      } else if (success === 403 || success === 404) {
-        Alert.alert("等阵...更改密码失败", "密码不正确", [
+      } else if (status_code === 403 || status_code === 404) {
+        Alert.alert("更改密码失败", "密码不正确", [
           { text: "OK", onPress: () => {} },
         ]);
-      } else if (success === 400) {
+      } else if (status_code === 400) {
         Alert.alert("更改密码失败", "无效请求，请联系开发人员", [
           { text: "OK", onPress: () => {} },
         ]);

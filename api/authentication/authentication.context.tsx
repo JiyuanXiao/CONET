@@ -4,7 +4,7 @@ import {
   MyAccountResponseProps,
 } from "@/constants/ContextTypes";
 import * as AuthenStorage from "./authentication.storage";
-import { GetMyAccount } from "./authentication.api";
+import * as AuthenServer from "./authentication.api";
 import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 
 export const AuthenticationContext = createContext<AuthenticationContentProps>({
@@ -14,6 +14,8 @@ export const AuthenticationContext = createContext<AuthenticationContentProps>({
   is_authentication_initialized: false,
   logIn: async (id: string, pw: string) => false,
   logOut: async () => {},
+  chanegName: async () => -1,
+  changePassword: async () => -1,
 });
 
 export const AuthenticationContextProvider = (props: {
@@ -26,7 +28,7 @@ export const AuthenticationContextProvider = (props: {
     useState<boolean>(false);
 
   const logIn = async (username: string, pw: string) => {
-    const response = await GetMyAccount(username, pw);
+    const response = await AuthenServer.GetMyAccount(username, pw);
     if (!response.success) {
       if (Number(response.status) === 429) {
         console.warn(
@@ -97,11 +99,46 @@ export const AuthenticationContextProvider = (props: {
     setUser(null);
   };
 
+  const changePassword = async (old_password: string, new_password: string) => {
+    const status_code = await AuthenServer.UpdateMyAccount(
+      user?.username || "",
+      old_password,
+      null,
+      new_password
+    );
+    if (user && status_code === 200) {
+      const updated_user = user;
+      updated_user.secret = new_password;
+      setUser(updated_user);
+      await AuthenStorage.storeAuthenticatedUser(updated_user);
+    }
+    return status_code;
+  };
+
+  const chanegName = async (new_name: string) => {
+    const status_code = await AuthenServer.UpdateMyAccount(
+      user?.username || "",
+      user?.secret || "",
+      new_name,
+      null
+    );
+    if (user && status_code === 200) {
+      const updated_user = user;
+      updated_user.first_name = new_name;
+      setUser(updated_user);
+      await AuthenStorage.storeAuthenticatedUser(updated_user);
+    }
+    return status_code;
+  };
+
   const initializeUserData = async () => {
     console.log("[Auth Context] Start to initialize authentication context");
     const curr_user = await AuthenStorage.fetchAuthenticatedUser();
     if (curr_user) {
-      const response = await GetMyAccount(curr_user.username, curr_user.secret);
+      const response = await AuthenServer.GetMyAccount(
+        curr_user.username,
+        curr_user.secret
+      );
       const updated_user = response.data;
       if (updated_user) {
         updated_user.secret = curr_user.secret;
@@ -140,6 +177,8 @@ export const AuthenticationContextProvider = (props: {
         is_authentication_initialized,
         logIn,
         logOut,
+        chanegName,
+        changePassword,
       }}
     >
       {props.children}
