@@ -1,7 +1,13 @@
-import React, { useContext } from "react";
+import React, {
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import { StyleSheet } from "react-native";
 import { router } from "expo-router";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity, RefreshControl } from "react-native";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
@@ -12,11 +18,13 @@ import { ContactsContext } from "@/api/contacts/contacts.context";
 import * as FileSystem from "expo-file-system";
 
 export default function SettngScreen() {
-  const { user, logOut } = useContext(AuthenticationContext);
+  const { user, logOut, reloadAccountInfo } = useContext(AuthenticationContext);
   const { resetChatContext } = useContext(ChatsContext);
   const { resetMessageContext } = useContext(MessagesContext);
   const { closeWebSocket } = useContext(WebSocketContext);
   const { resetContacts } = useContext(ContactsContext);
+  const [refreshing, setRefreshing] = useState(false);
+  const reloadAccountInfoRef = useRef(reloadAccountInfo);
   const handleLogout = () => {
     console.log("SettingScreen() in setting.tsx is calling logOut()");
     resetMessageContext();
@@ -44,8 +52,28 @@ export default function SettngScreen() {
     });
   };
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+
+    if (user) {
+      console.log("refreshing account info...");
+      await reloadAccountInfo();
+    }
+
+    setRefreshing(false);
+  }, []);
+
+  useEffect(() => {
+    reloadAccountInfoRef.current = reloadAccountInfo;
+  }, [user]);
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <ProfileBar
         contact_id={user?.id || 0}
         contact_alias={user?.first_name || ""}

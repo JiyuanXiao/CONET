@@ -19,6 +19,7 @@ export interface AuthenticationContentProps {
   isLoading: boolean;
   error: string;
   is_authentication_initialized: boolean;
+  can_hide_splash: boolean;
   logIn: (id: string, pw: string) => Promise<boolean>;
   logOut: () => Promise<void>;
   changePassword: (
@@ -26,6 +27,7 @@ export interface AuthenticationContentProps {
     new_password: string
   ) => Promise<number>;
   chanegName: (new_name: string) => Promise<number>;
+  reloadAccountInfo: () => Promise<void>;
 }
 
 export interface MyAccountResponseProps {

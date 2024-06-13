@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { DarkTheme, LightTheme } from "@/constants/Theme";
@@ -39,7 +39,7 @@ export default function RootLayout() {
   // }, [error]);
 
   useEffect(() => {
-    SplashScreen.hideAsync();
+    //SplashScreen.hideAsync();
   }, []);
 
   // if (!loaded) {

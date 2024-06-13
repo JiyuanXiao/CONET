@@ -12,10 +12,12 @@ export const AuthenticationContext = createContext<AuthenticationContentProps>({
   user: null as CE_UserProps | null,
   error: "",
   is_authentication_initialized: false,
+  can_hide_splash: false,
   logIn: async (id: string, pw: string) => false,
   logOut: async () => {},
   chanegName: async () => -1,
   changePassword: async () => -1,
+  reloadAccountInfo: async () => {},
 });
 
 export const AuthenticationContextProvider = (props: {
@@ -26,6 +28,7 @@ export const AuthenticationContextProvider = (props: {
   const [error, setError] = useState<string>("");
   const [is_authentication_initialized, setIsAuthenticationInitialized] =
     useState<boolean>(false);
+  const [can_hide_splash, setCanHideSplash] = useState(false);
 
   const logIn = async (username: string, pw: string) => {
     const response = await AuthenServer.GetMyAccount(username, pw);
@@ -131,17 +134,15 @@ export const AuthenticationContextProvider = (props: {
     return status_code;
   };
 
-  const initializeUserData = async () => {
-    console.log("[Auth Context] Start to initialize authentication context");
-    const curr_user = await AuthenStorage.fetchAuthenticatedUser();
-    if (curr_user) {
+  const reloadAccountInfo = async () => {
+    if (user) {
       const response = await AuthenServer.GetMyAccount(
-        curr_user.username,
-        curr_user.secret
+        user.username,
+        user.secret
       );
       const updated_user = response.data;
       if (updated_user) {
-        updated_user.secret = curr_user.secret;
+        updated_user.secret = user.secret;
         const new_user_avatar_uri = await AuthenStorage.saveAvatarToFilesystem(
           updated_user.username,
           updated_user.avatar
@@ -149,8 +150,18 @@ export const AuthenticationContextProvider = (props: {
         if (new_user_avatar_uri) {
           updated_user.avatar = new_user_avatar_uri;
         }
+        await AuthenStorage.storeAuthenticatedUser(updated_user);
         setUser(updated_user);
       }
+    }
+  };
+
+  const initializeUserData = async () => {
+    console.log("[Auth Context] Start to initialize authentication context");
+    const curr_user = await AuthenStorage.fetchAuthenticatedUser();
+
+    if (curr_user) {
+      setUser(curr_user);
       setIsAuthenticationInitialized(true);
       console.log(
         "[Auth Context] Initialize authentication context successfully: " +
@@ -162,6 +173,7 @@ export const AuthenticationContextProvider = (props: {
       );
       setIsAuthenticationInitialized(false);
     }
+    setCanHideSplash(true);
   };
 
   useEffect(() => {
@@ -175,10 +187,12 @@ export const AuthenticationContextProvider = (props: {
         user,
         error,
         is_authentication_initialized,
+        can_hide_splash,
         logIn,
         logOut,
         chanegName,
         changePassword,
+        reloadAccountInfo,
       }}
     >
       {props.children}
