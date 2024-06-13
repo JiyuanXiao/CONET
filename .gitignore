@@ -46,3 +46,7 @@ mock_data/
 
 # EAS
 eas.json
+
+# sensitive
+conet*.json
+google-services.json

@@ -150,7 +150,8 @@ export const WebSocketProvider = ({
       switch (response.action) {
         case "new_message":
           console.log(`[WebSocket] ACTION: new_message`);
-          handleNewMessage(response.data);
+          const response_data: MessageDataProps = response.data;
+          handleNewMessage(response_data);
           break;
         case "edit_chat":
           console.log(`[WebSocket] ACTION: edit_chat`);

@@ -11,6 +11,7 @@ import { ChatsContextProvider } from "@/api/chats/chats.context";
 import { MessagesContextProvider } from "@/api/messages/messages.context";
 import { WebSocketProvider } from "@/api/websocket/websocket.context";
 import { ContactsContextProvider } from "@/api/contacts/contacts.context";
+import { NotificationContextProvider } from "@/api/notification/notification.context";
 import "react-native-reanimated";
 
 // export {
@@ -59,13 +60,15 @@ function RootLayoutNav() {
         <SQLiteProvider databaseName="messages.db">
           <AuthenticationContextProvider>
             <ContactsContextProvider>
-              <ChatsContextProvider>
-                <MessagesContextProvider>
-                  <WebSocketProvider>
-                    <App />
-                  </WebSocketProvider>
-                </MessagesContextProvider>
-              </ChatsContextProvider>
+              <NotificationContextProvider>
+                <ChatsContextProvider>
+                  <MessagesContextProvider>
+                    <WebSocketProvider>
+                      <App />
+                    </WebSocketProvider>
+                  </MessagesContextProvider>
+                </ChatsContextProvider>
+              </NotificationContextProvider>
             </ContactsContextProvider>
           </AuthenticationContextProvider>
         </SQLiteProvider>
