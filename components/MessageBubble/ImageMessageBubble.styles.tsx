@@ -15,12 +15,18 @@ interface BubbleImageContentProps {
 export const BubbleImageContent: React.FC<BubbleImageContentProps> = (
   props
 ) => {
-  const [dimensions, setDimensions] = useState({ width: 200, height: 200 });
+  const [dimensions, setDimensions] = useState({ width: 140, height: 140 });
 
   const onLoad = (event: any) => {
     const { width, height } = event.source;
-    const aspectRatio = width / height;
-    setDimensions({ width: 200, height: 200 / aspectRatio });
+
+    if (width > height) {
+      const aspectRatio = width / height;
+      setDimensions({ width: 140, height: 140 / aspectRatio });
+    } else {
+      const aspectRatio = height / width;
+      setDimensions({ width: 140 / aspectRatio, height: 140 });
+    }
   };
 
   return (
