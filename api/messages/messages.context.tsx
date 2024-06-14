@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+} from "react";
 import * as MessagesStorage from "./messages.storage";
 import * as ChatServer from "@/api/chats/chats.api";
 import * as MessageServer from "@/api/messages/messages.api";
@@ -13,6 +19,7 @@ import { ChatsContext } from "../chats/chats.context";
 import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
 import { getLoadedMessages } from "./messages.context.util";
 import * as FileSystem from "expo-file-system";
+import { NotificationContext } from "../notification/notification.context";
 
 export const MessagesContext = createContext<MessageContextProps>({
   messages: new Map<number, MessageContextObjectProps>(),
@@ -47,6 +54,8 @@ export const MessagesContextProvider = (props: {
     getLastRead,
   } = useContext(ChatsContext);
   const db = useSQLiteContext();
+  const { sendNotificationByChatId } = useContext(NotificationContext);
+  const sendNotificationByChatIdRef = useRef(sendNotificationByChatId);
 
   const setMessageMap = (
     chat_id: number,
@@ -146,6 +155,10 @@ export const MessagesContextProvider = (props: {
       setMessageMap(chat_id, updated_messages_object);
 
       try {
+        await sendNotificationByChatIdRef.current(chat_id);
+        console.log(
+          `[Message Context] chat ${chat_id}: sent notifications to server successfully...`
+        );
         const success = await MessageServer.SendChatMessage(
           user?.username || "",
           user?.secret || "",
@@ -547,6 +560,10 @@ export const MessagesContextProvider = (props: {
       initializeMessageContext();
     }
   }, [is_chats_initialized, is_message_loaded_from_local]);
+
+  useEffect(() => {
+    sendNotificationByChatIdRef.current = sendNotificationByChatId;
+  }, [chats]);
 
   return (
     <MessagesContext.Provider

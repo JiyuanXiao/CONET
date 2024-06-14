@@ -60,15 +60,15 @@ function RootLayoutNav() {
         <SQLiteProvider databaseName="messages.db">
           <AuthenticationContextProvider>
             <ContactsContextProvider>
-              <NotificationContextProvider>
-                <ChatsContextProvider>
+              <ChatsContextProvider>
+                <NotificationContextProvider>
                   <MessagesContextProvider>
                     <WebSocketProvider>
                       <App />
                     </WebSocketProvider>
                   </MessagesContextProvider>
-                </ChatsContextProvider>
-              </NotificationContextProvider>
+                </NotificationContextProvider>
+              </ChatsContextProvider>
             </ContactsContextProvider>
           </AuthenticationContextProvider>
         </SQLiteProvider>
