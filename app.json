@@ -4,7 +4,7 @@
     "slug": "CONET",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon_v2.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -20,8 +20,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/adaptive-icon_v2.png",
+        "backgroundColor": "#fcc404"
       },
       "package": "com.ianxiao.CONET",
       "googleServicesFile": "./google-services.json"
@@ -46,6 +46,18 @@
           "photosPermission": "允许访问你的相册",
           "savePhotosPermission": "允许保存图片到你的相册",
           "isAccessMediaLocationEnabled": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#fcc404",
+          "defaultChannel": "default",
+          "sounds": [
+            "./assets/sounds/correct-answer.wav",
+            "./assets/sounds/long-pop.wave"
+          ]
         }
       ]
     ],
