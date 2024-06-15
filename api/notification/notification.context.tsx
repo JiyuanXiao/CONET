@@ -146,23 +146,24 @@ export const NotificationContextProvider = ({
 
   const sendNotificationByChatId = async (chat_id: number) => {
     const current_chat = chats.get(Number(chat_id));
-    console.log(`[Notification Context] ${JSON.stringify(current_chat)}`);
     if (current_chat) {
       const chat_title = getChatTitle(current_chat);
       for (const member of current_chat.people) {
-        try {
-          await NotificationServer.sendNotification(
-            user?.username || "",
-            member.person.username,
-            chat_title
-          );
-          console.log(
-            `[Notification Context] send notification to ${member.person.first_name}`
-          );
-        } catch (err) {
-          console.error(
-            `[Notification Context] send notification to ${member.person.first_name} failed: ${err}`
-          );
+        if (member.person.username !== user?.username) {
+          try {
+            await NotificationServer.sendNotification(
+              user?.username || "",
+              member.person.username,
+              chat_title
+            );
+            console.log(
+              `[Notification Context] send notification to ${member.person.first_name}`
+            );
+          } catch (err) {
+            console.error(
+              `[Notification Context] send notification to ${member.person.first_name} failed: ${err}`
+            );
+          }
         }
       }
     }

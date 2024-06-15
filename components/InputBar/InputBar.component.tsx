@@ -1,20 +1,13 @@
 import React, { useState, useContext, useEffect } from "react";
-import { router } from "expo-router";
 import { TouchableOpacity, Alert } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { InputBarContainer, InputBox, OffsetFooter } from "./InputBar.styles";
 import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
-import {
-  ThemeColorsProps,
-  InputBarProps,
-  ImageViewerSource,
-} from "@/constants/ComponentTypes";
+import { ThemeColorsProps, InputBarProps } from "@/constants/ComponentTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesContext } from "@/api/messages/messages.context";
-import ImageView from "react-native-image-viewing";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   <FontAwesome
@@ -25,8 +18,27 @@ const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   />
 );
 
-const StickerIcon = (theme_colors: ThemeColorsProps) => (
-  <FontAwesome6 name="face-smile" size={26} color={theme_colors.border} />
+const SubmitIcon = ({
+  disable,
+  theme_colors,
+}: {
+  disable: boolean;
+  theme_colors: ThemeColorsProps;
+}) => (
+  <FontAwesome
+    name="send"
+    size={20}
+    color={disable ? theme_colors.border : theme_colors.primary}
+    style={{
+      backgroundColor: theme_colors.background,
+      borderWidth: 2,
+      borderRadius: 12,
+      borderColor: disable ? theme_colors.border : theme_colors.primary,
+      paddingRight: 15,
+      paddingLeft: 13,
+      paddingVertical: 7,
+    }}
+  />
 );
 
 const SelectPictureIcon = (theme_colors: ThemeColorsProps) => (
@@ -77,7 +89,7 @@ const InputBar = (props: InputBarProps) => {
     if (text.endsWith("\n")) {
       // let chat-window know a new message is sent
       props.setMessageSent(true);
-
+      setNewMessage("");
       if (new_message.length > 0) {
         if (user) {
           // Update Message Context, Context will store message to local storage for us
@@ -90,9 +102,23 @@ const InputBar = (props: InputBarProps) => {
           console.error("InputBar(): User is undefined");
         }
       }
-      setNewMessage("");
     } else {
       setNewMessage(text);
+    }
+  };
+
+  const handleSubmit = () => {
+    props.setMessageSent(true);
+    setNewMessage("");
+    if (new_message.length > 0) {
+      if (user) {
+        // Update Message Context, Context will store message to local storage for us
+        console.log("InputBar(): calling sendMessage() for " + user?.username);
+
+        sendMessage(props.chat_id, new_message, Date.now().toString());
+      } else {
+        console.error("InputBar(): User is undefined");
+      }
     }
   };
 
@@ -104,7 +130,9 @@ const InputBar = (props: InputBarProps) => {
     <>
       <InputBarContainer inputHeight={inputHeight} theme_colors={colors}>
         <InputBox inputHeight={inputHeight} theme_colors={colors}>
-          <VoiceMessageIcon {...colors} />
+          <TouchableOpacity onPress={pickImage}>
+            <SelectPictureIcon {...colors} />
+          </TouchableOpacity>
           <TextInput
             value={new_message}
             inputHeight={inputHeight}
@@ -112,8 +140,14 @@ const InputBar = (props: InputBarProps) => {
             onChangeText={handleChangeText}
             onContentSizeChange={handleContentSizeChange}
           />
-          <TouchableOpacity onPress={pickImage}>
-            <SelectPictureIcon {...colors} />
+          <TouchableOpacity
+            onPress={handleSubmit}
+            disabled={new_message.length === 0}
+          >
+            <SubmitIcon
+              disable={new_message.length === 0}
+              theme_colors={colors}
+            />
           </TouchableOpacity>
         </InputBox>
       </InputBarContainer>

@@ -26,6 +26,7 @@ export interface TextInputBarProps {
   value?: string | undefined;
   onChangeText?: (text: string) => void;
   onContentSizeChange?: (event: any) => void;
+  onKeyPress?: (e: React.KeyboardEvent) => void;
   children?: React.ReactNode;
 }
 
