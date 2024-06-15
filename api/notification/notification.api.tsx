@@ -5,7 +5,9 @@ export const setNotificationToken = async (
   username: string | undefined
 ) => {
   if (!token || !username) {
-    console.warn(`[Notification API] token and username cannot be undefined`);
+    console.warn(
+      `[Notification API] setNotificationToken(): token and username cannot be undefined`
+    );
     return;
   }
   try {
@@ -41,5 +43,31 @@ export const sendNotification = async (
     console.log(`[Notification API] Sent Notificaiton: ${response.data}`);
   } catch (err) {
     console.log(`[Notification API] Sent Notificaiton Failed: ${err}`);
+  }
+};
+
+export const disconnectFromNotificaiton = async (
+  username: string | undefined
+) => {
+  if (!username) {
+    console.warn(
+      `[Notification API] disconnectFromNotificaiton(): username cannot be undefined`
+    );
+    return;
+  }
+  try {
+    const url = `${process.env.EXPO_PUBLIC_NOTIFICATION_SERVER_URL}/${username}/`;
+    console.log(url);
+    const headers = {
+      "SECRET-KEY": process.env.EXPO_PUBLIC_NOTIFICATION_SERVER_KEY,
+    };
+    const response = await axios.delete(url, { headers });
+    console.log(
+      `[Notification API] Disconnect from notification server: ${response.data}`
+    );
+  } catch (err) {
+    console.log(
+      `[Notification API] Disconnect from notification server Failed: ${err}`
+    );
   }
 };

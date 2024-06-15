@@ -11,11 +11,15 @@ import * as NotificationServer from "@/api/notification/notification.api";
 interface NotificationContextProps {
   notification: Notifications.Notification | undefined;
   sendNotificationByChatId: (chat_id: number) => Promise<void>;
+  registerForPushNotificationsAsync(): Promise<string | undefined>;
+  disconnectFromNotificaiton: () => Promise<void>;
 }
 
 export const NotificationContext = createContext<NotificationContextProps>({
   notification: undefined,
   sendNotificationByChatId: async () => {},
+  registerForPushNotificationsAsync: async () => undefined,
+  disconnectFromNotificaiton: async () => {},
 });
 
 export const NotificationContextProvider = ({
@@ -84,6 +88,10 @@ export const NotificationContextProvider = ({
             projectId,
           })
         ).data;
+        await NotificationServer.setNotificationToken(
+          pushTokenString,
+          user?.username
+        );
         return pushTokenString;
       } catch (e: unknown) {
         handleRegistrationError(`${e}`);
@@ -160,12 +168,25 @@ export const NotificationContextProvider = ({
     }
   };
 
+  const disconnectFromNotificaiton = async () => {
+    try {
+      await NotificationServer.disconnectFromNotificaiton(user?.username);
+      console.log(
+        `[Notification Context] ${user?.username} stop receving notification`
+      );
+    } catch (err) {
+      console.error(
+        `[Notification Context] disconnect from notificaiton server failed: ${err}`
+      );
+    }
+  };
+
   useEffect(() => {
-    if (is_authentication_initialized) {
+    if (is_authentication_initialized && user) {
       registerForPushNotificationsAsync()
-        .then(async (token) => {
+        .then((token) => {
           setExpoPushToken(token ?? "");
-          await NotificationServer.setNotificationToken(token, user?.username);
+          // await NotificationServer.setNotificationToken(token, user?.username);
           console.log(`[Notification Context] token: ${token}`);
         })
         .catch((error: any) => {
@@ -196,12 +217,18 @@ export const NotificationContextProvider = ({
         );
       responseListener.current &&
         Notifications.removeNotificationSubscription(responseListener.current);
+      disconnectFromNotificaiton();
     };
-  }, [is_authentication_initialized]);
+  }, [is_authentication_initialized, user]);
 
   return (
     <NotificationContext.Provider
-      value={{ notification, sendNotificationByChatId }}
+      value={{
+        notification,
+        sendNotificationByChatId,
+        registerForPushNotificationsAsync,
+        disconnectFromNotificaiton,
+      }}
     >
       {children}
     </NotificationContext.Provider>

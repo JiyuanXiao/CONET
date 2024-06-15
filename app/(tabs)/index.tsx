@@ -21,6 +21,7 @@ import { AuthenticationContext } from "@/api/authentication/authentication.conte
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
 import { WebSocketContext } from "@/api/websocket/websocket.context";
+import { NotificationContext } from "@/api/notification/notification.context";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
@@ -36,6 +37,7 @@ export default function ChatListScreen() {
   const { resetWebSocket } = useContext(WebSocketContext);
   const [refreshing, setRefreshing] = useState(false);
   const initializeMessageContextRef = useRef(initializeMessageContext);
+  const { registerForPushNotificationsAsync } = useContext(NotificationContext);
 
   const getChatTitle = (chat: CE_ChatProps) => {
     switch (chat.people.length) {
@@ -108,6 +110,7 @@ export default function ChatListScreen() {
 
     if (user) {
       console.log("refreshing...");
+      await registerForPushNotificationsAsync();
       await fetchChatDataFromServer(user);
       await initializeMessageContextRef.current();
       resetWebSocket();
