@@ -42,7 +42,12 @@ const SubmitIcon = ({
 );
 
 const SelectPictureIcon = (theme_colors: ThemeColorsProps) => (
-  <FontAwesome name="picture-o" size={26} color={theme_colors.text} />
+  <FontAwesome
+    name="picture-o"
+    size={26}
+    color={theme_colors.text}
+    style={{ marginLeft: 8 }}
+  />
 );
 
 const InputBar = (props: InputBarProps) => {
