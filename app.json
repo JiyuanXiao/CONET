@@ -12,7 +12,9 @@
       "resizeMode": "cover",
       "backgroundColor": "#fcc404"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ianxiao.CONET",
@@ -59,7 +61,8 @@
             "./assets/sounds/long-pop.wave"
           ]
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true

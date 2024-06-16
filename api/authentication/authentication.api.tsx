@@ -1,6 +1,8 @@
 import axios from "axios";
 import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 import { MyAccountResponseProps } from "@/constants/ContextTypes";
+import * as FileSystem from "expo-file-system";
+import { Asset } from "expo-asset";
 
 //const MOCK_USERS_AUTH = require("../../mock_data/users.mock.json");
 
@@ -55,7 +57,8 @@ export const UpdateMyAccount = async (
   username: string,
   pw: string,
   new_name: string | null,
-  new_password: string | null
+  new_password: string | null,
+  avatar_index: number | null
 ) => {
   const url = `${process.env.EXPO_PUBLIC_BASE_URL}/users/me/`;
 
@@ -67,7 +70,7 @@ export const UpdateMyAccount = async (
 
   let data;
 
-  if (!new_name && !new_password) {
+  if (!new_name && !new_password && !avatar_index) {
     return 0;
   } else if (new_name) {
     data = {
@@ -77,6 +80,12 @@ export const UpdateMyAccount = async (
     data = {
       secret: new_password,
     };
+  } else if (avatar_index) {
+    data = {
+      custom_json: avatar_index.toString(),
+    };
+  } else {
+    return 0;
   }
 
   try {
@@ -93,9 +102,8 @@ export const UpdateMyAccount = async (
       return Number(response.status);
     }
   } catch (err: any) {
-    console.error(
-      `[Auth API]  UpdateMyAccount() : error ${err.response.status}:  ${err.response.data.detail}`
-    );
-    return Number(err.response.status);
+    console.error(`[Auth API]  UpdateMyAccount() error: ${err}`);
+
+    return 0;
   }
 };

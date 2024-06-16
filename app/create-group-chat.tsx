@@ -18,6 +18,7 @@ import AvatarListBar from "@/components/AvatarListBar/AvatarListBar.component";
 import * as ChatServer from "@/api/chats/chats.api";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesContext } from "@/api/messages/messages.context";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 export default function CreateGroupChatScreen() {
   const { colors } = useTheme();
@@ -29,6 +30,7 @@ export default function CreateGroupChatScreen() {
   const { messages, sendMessage } = useContext(MessagesContext);
   const navigation = useNavigation();
   const sendMessageRef = useRef(sendMessage);
+  const avatars = getAvatarAssets();
 
   const handleCreate = async () => {
     try {
@@ -160,7 +162,9 @@ export default function CreateGroupChatScreen() {
               <TouchableOpacity onPress={() => handleContactOnPress(item)}>
                 <ContactBar
                   contact_alias={item.first_name}
-                  avatar_img_src={[item.avatar]}
+                  avatar_img_src={
+                    avatars ? [avatars[Number(item.custom_json)]] : []
+                  }
                 />
               </TouchableOpacity>
             ) : (

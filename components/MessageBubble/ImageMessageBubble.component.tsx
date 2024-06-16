@@ -16,7 +16,7 @@ import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
 import ImageView from "react-native-image-viewing";
 import * as MediaLibrary from "expo-media-library";
-import OptionBar from "../OptionBar/OptionBar.component";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -61,6 +61,7 @@ const ImageMessageBubble = ({
   const [image_uri, setImageUri] = useState("");
   const [image_viewer_visiable, setImageViewerVisiable] = useState(false);
   const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
+  const avatars = getAvatarAssets();
 
   const HandleViewImage = () => {
     const uri = message_object.text_content.replace(
@@ -153,13 +154,18 @@ const ImageMessageBubble = ({
                 params: {
                   contact_username: chat_member.person.username,
                   contact_first_name: chat_member.person.first_name,
-                  avatar: chat_member.person.avatar,
+                  avatar_index: chat_member.person.custom_json,
                   source: "chat-window",
                 },
               })
             }
           >
-            <BubbleAvatar img_src={[chat_member.person.avatar]} size={40} />
+            <BubbleAvatar
+              img_src={
+                avatars ? [avatars[Number(chat_member.person.custom_json)]] : []
+              }
+              size={40}
+            />
           </TouchableOpacity>
         </View>
       </BubbleConatiner>

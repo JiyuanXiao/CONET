@@ -55,6 +55,14 @@ const App = () => {
           }}
         />
         <Stack.Screen
+          name="avatar-setting"
+          options={{
+            headerTitleAlign: "center",
+            headerBackTitleVisible: false,
+            title: "头像设置",
+          }}
+        />
+        <Stack.Screen
           name="create-group-chat"
           options={{
             title: "创建聊天群",

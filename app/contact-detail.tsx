@@ -9,6 +9,7 @@ import { AuthenticationContext } from "@/api/authentication/authentication.conte
 import * as ChatServer from "@/api/chats/chats.api";
 import { ContactsContext } from "@/api/contacts/contacts.context";
 import { MessagesContext } from "@/api/messages/messages.context";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 export default function ContactDetailScreen() {
   const { colors } = useTheme();
@@ -21,15 +22,16 @@ export default function ContactDetailScreen() {
   const [is_deleting, setIsDeleteing] = useState(false);
   const [contact_exits, setContactExist] = useState(false);
   const [contact_id, setContactId] = useState(-1);
-  const { contact_username, contact_first_name, avatar, source } =
+  const { contact_username, contact_first_name, avatar_index, source } =
     route.params as {
       contact_username: string;
       contact_first_name: string;
-      avatar: string;
+      avatar_index: string;
       source: string;
     };
   const sendMessageRef = useRef(sendMessage);
   const navigation = useNavigation();
+  const avatars = getAvatarAssets();
 
   const startChat = async () => {
     try {
@@ -127,7 +129,7 @@ export default function ContactDetailScreen() {
     <>
       <ProfileBar
         contact_alias={contact_first_name}
-        avatar_img_src={[avatar]}
+        avatar_img_src={avatars ? [avatars[Number(avatar_index)]] : []}
       />
 
       {is_creating ? (

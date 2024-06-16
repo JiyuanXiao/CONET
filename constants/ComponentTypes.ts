@@ -1,3 +1,6 @@
+import { Asset } from "expo-asset";
+import { AST } from "react-native-svg/lib/typescript/xml";
+
 // Theme props
 export interface ThemeColorsProps {
   primary: string;
@@ -14,7 +17,7 @@ export interface ChatBoxProps {
   chat_title: string;
   last_message: string;
   last_message_time: string;
-  avatar_img_src: string[];
+  avatar_img_src: Asset[];
   has_new_message: boolean;
   theme_colors?: ThemeColorsProps;
 }
@@ -53,7 +56,7 @@ export interface MessageBubbleProps {
 
 // Avatar Components props
 export interface UserAvatarProps {
-  img_src: string[];
+  img_src: Asset[];
   size: number;
   theme_colors?: ThemeColorsProps;
 }
@@ -76,7 +79,7 @@ export interface ProfileBarProps {
   contact_id?: number;
   contact_alias: string;
   contact_username?: string;
-  avatar_img_src: string[];
+  avatar_img_src: Asset[];
   theme_colors?: ThemeColorsProps;
   disable?: boolean;
 }

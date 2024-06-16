@@ -6,6 +6,7 @@ import {
 import * as AuthenStorage from "./authentication.storage";
 import * as AuthenServer from "./authentication.api";
 import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
+import { Asset } from "expo-asset";
 
 export const AuthenticationContext = createContext<AuthenticationContentProps>({
   isLoading: false,
@@ -17,6 +18,7 @@ export const AuthenticationContext = createContext<AuthenticationContentProps>({
   logOut: async () => {},
   chanegName: async () => -1,
   changePassword: async () => -1,
+  chanegAvatar: async () => -1,
   reloadAccountInfo: async () => {},
 });
 
@@ -74,13 +76,13 @@ export const AuthenticationContextProvider = (props: {
         "[Auth Context] User " + curr_user.username + " loging in..."
       );
       curr_user.secret = pw;
-      const new_user_avatar_uri = await AuthenStorage.saveAvatarToFilesystem(
-        curr_user.username,
-        curr_user.avatar
-      );
-      if (new_user_avatar_uri) {
-        curr_user.avatar = new_user_avatar_uri;
-      }
+      // const new_user_avatar_uri = await AuthenStorage.saveAvatarToFilesystem(
+      //   curr_user.username,
+      //   curr_user.custom_json
+      // );
+      // if (new_user_avatar_uri) {
+      //   curr_user.avatar = new_user_avatar_uri;
+      // }
       await AuthenStorage.storeAuthenticatedUser(curr_user);
       setUser(curr_user);
       setError("");
@@ -107,11 +109,12 @@ export const AuthenticationContextProvider = (props: {
       user?.username || "",
       old_password,
       null,
-      new_password
+      new_password,
+      null
     );
     if (user && status_code === 200) {
-      const updated_user = user;
-      updated_user.secret = new_password;
+      const updated_user = { ...user, secret: new_password };
+      // updated_user.secret = new_password;
       setUser(updated_user);
       await AuthenStorage.storeAuthenticatedUser(updated_user);
     }
@@ -123,14 +126,35 @@ export const AuthenticationContextProvider = (props: {
       user?.username || "",
       user?.secret || "",
       new_name,
+      null,
       null
     );
     if (user && status_code === 200) {
-      const updated_user = user;
-      updated_user.first_name = new_name;
+      const updated_user = { ...user, first_name: new_name };
+      // updated_user.first_name = new_name;
       setUser(updated_user);
       await AuthenStorage.storeAuthenticatedUser(updated_user);
     }
+    return status_code;
+  };
+
+  const chanegAvatar = async (avatar_index: number) => {
+    const status_code = await AuthenServer.UpdateMyAccount(
+      user?.username || "",
+      user?.secret || "",
+      null,
+      null,
+      avatar_index
+    );
+
+    if (user && status_code === 200) {
+      const updated_user = { ...user, custom_json: avatar_index.toString() };
+      //updated_user.custom_json = avatar_index.toString();
+
+      setUser(updated_user);
+      await AuthenStorage.storeAuthenticatedUser(updated_user);
+    }
+
     return status_code;
   };
 
@@ -143,13 +167,13 @@ export const AuthenticationContextProvider = (props: {
       const updated_user = response.data;
       if (updated_user) {
         updated_user.secret = user.secret;
-        const new_user_avatar_uri = await AuthenStorage.saveAvatarToFilesystem(
-          updated_user.username,
-          updated_user.avatar
-        );
-        if (new_user_avatar_uri) {
-          updated_user.avatar = new_user_avatar_uri;
-        }
+        // const new_user_avatar_uri = await AuthenStorage.saveAvatarToFilesystem(
+        //   updated_user.username,
+        //   updated_user.custom_json
+        // );
+        // if (new_user_avatar_uri) {
+        //   updated_user.avatar = new_user_avatar_uri;
+        // }
         await AuthenStorage.storeAuthenticatedUser(updated_user);
         setUser(updated_user);
       }
@@ -192,6 +216,7 @@ export const AuthenticationContextProvider = (props: {
         logOut,
         chanegName,
         changePassword,
+        chanegAvatar,
         reloadAccountInfo,
       }}
     >

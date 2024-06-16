@@ -10,66 +10,7 @@ import { useTheme } from "@react-navigation/native";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.component";
 import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
 import { FontAwesome } from "@expo/vector-icons";
-
-// const MOCK_CONTACTS: ContactProps[] = [
-//   { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
-//   { id: 383302, username: "jichang", alias: "鸡肠", avatar: "" },
-//   { id: 383301, username: "shaoji", alias: "烧鸡", avatar: "" },
-//   { id: 384817, username: "yejiang", alias: "叶酱", avatar: "" },
-//   { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
-//   { id: 383302, username: "jichang", alias: "鸡肠", avatar: "" },
-//   { id: 383301, username: "shaoji", alias: "烧鸡", avatar: "" },
-//   { id: 384817, username: "yejiang", alias: "叶酱", avatar: "" },
-//   { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
-//   { id: 383302, username: "jichang", alias: "鸡肠", avatar: "" },
-//   { id: 383301, username: "shaoji", alias: "烧鸡", avatar: "" },
-//   { id: 384817, username: "yejiang", alias: "叶酱", avatar: "" },
-//   { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
-//   { id: 383302, username: "jichang", alias: "鸡肠", avatar: "" },
-//   { id: 383301, username: "shaoji", alias: "烧鸡", avatar: "" },
-//   { id: 384817, username: "yejiang", alias: "叶酱", avatar: "" },
-//   { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
-//   { id: 383302, username: "jichang", alias: "鸡肠", avatar: "" },
-//   { id: 383301, username: "shaoji", alias: "烧鸡", avatar: "" },
-//   { id: 384817, username: "yejiang", alias: "叶酱", avatar: "" },
-//   { id: 383299, username: "admin", alias: "龟龟", avatar: "" },
-//   { id: 383302, username: "jichang", alias: "鸡肠", avatar: "" },
-//   { id: 383301, username: "shaoji", alias: "烧鸡", avatar: "" },
-//   { id: 384817, username: "yejiang", alias: "叶酱", avatar: "" },
-// ];
-
-// export interface ContactProps {
-//   id: number;
-//   username: string;
-//   alias: string;
-//   avatar: string;
-// }
-
-// const AvatarListBar = () => {
-//   const { colors } = useTheme();
-//   return (
-//     <View style={[styles.container, { backgroundColor: colors.card }]}>
-//       <FlatList
-//         data={MOCK_CONTACTS}
-//         numColumns={5}
-//         renderItem={({ item }: { item: ContactProps }) => {
-//           return (
-//             <View style={styles.avatar}>
-//               <ProfileAvatar
-//                 img_src={[item.avatar]}
-//                 size={50}
-//                 theme_colors={colors}
-//               />
-//               <Text style={[styles.name, { color: colors.border }]}>
-//                 {item.alias}
-//               </Text>
-//             </View>
-//           );
-//         }}
-//       />
-//     </View>
-//   );
-// };
+import { getAvatarAssets } from "@/constants/Avatars";
 
 const AvatarListBar = ({
   members,
@@ -87,11 +28,12 @@ const AvatarListBar = ({
     admin_username: string,
     member_username: string,
     member_first_name: string,
-    avatar: string
+    avatar_index: string
   ) => void;
 }) => {
   const { colors } = useTheme();
   const flatListRef = useRef<FlatList>(null);
+  const avatars = getAvatarAssets();
 
   const handleOnPress = (item: CE_PersonProps) => {
     if (resetCandidates) {
@@ -105,7 +47,7 @@ const AvatarListBar = ({
         admin_username || "",
         item.username,
         item.first_name,
-        item.avatar
+        item.custom_json
       );
     }
   };
@@ -125,17 +67,27 @@ const AvatarListBar = ({
             <TouchableOpacity onPress={() => handleOnPress(item)}>
               <View style={styles.avatar}>
                 <ProfileAvatar
-                  img_src={[item.avatar]}
+                  img_src={avatars ? [avatars[Number(item.custom_json)]] : []}
                   size={50}
                   theme_colors={colors}
                 />
                 {resetCandidates ? (
-                  <FontAwesome
-                    name="remove"
-                    size={18}
-                    color={colors.notification}
-                    style={{ alignSelf: "center", paddingTop: 1 }}
-                  />
+                  <View
+                    style={{
+                      maxWidth: 50,
+                      maxHeight: 30,
+                    }}
+                  >
+                    <Text style={[styles.name, { color: colors.border }]}>
+                      {item.first_name.substring(0, 4)}
+                    </Text>
+                    <FontAwesome
+                      name="remove"
+                      size={18}
+                      color={colors.notification}
+                      style={{ alignSelf: "center", paddingTop: 0 }}
+                    />
+                  </View>
                 ) : (
                   <Text style={[styles.name, { color: colors.border }]}>
                     {item.first_name}
@@ -166,7 +118,7 @@ const styles = StyleSheet.create({
   },
   name: {
     alignSelf: "center",
-    paddingVertical: 5,
+    paddingTop: 5,
   },
 });
 

@@ -57,15 +57,15 @@ export default function ChatWindowScreen() {
         case 0:
           return "";
         case 1:
-          return chat.people[0].person.first_name;
+          return chat.people[0].person.first_name.substring(0, 10);
         case 2:
-          const name_1 = chat.people[0].person.first_name;
-          const name_2 = chat.people[1].person.first_name;
+          const name_1 = chat.people[0].person.first_name.substring(0, 10);
+          const name_2 = chat.people[1].person.first_name.substring(0, 10);
           return chat.people[0].person.username === user?.username
             ? name_2
             : name_1;
         default:
-          return chat.title;
+          return chat.title.substring(0, 10);
       }
     }
     return "";

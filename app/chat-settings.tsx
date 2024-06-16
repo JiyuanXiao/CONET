@@ -16,6 +16,7 @@ import {
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import AvatarListBar from "@/components/AvatarListBar/AvatarListBar.component";
 import * as ChatServer from "@/api/chats/chats.api";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 export default function ChatSettingsScreen() {
   const route = useRoute();
@@ -36,6 +37,7 @@ export default function ChatSettingsScreen() {
   const [is_deleting, setIsDeleteing] = useState(false);
   const [is_clearing, setIsClearing] = useState(false);
   const navigation = useNavigation();
+  const avatars = getAvatarAssets();
 
   const addChatMember = () => {
     router.push({
@@ -89,7 +91,7 @@ export default function ChatSettingsScreen() {
     admin_username: string,
     member_username: string,
     member_first_name: string,
-    avatar: string
+    avatar_index: string
   ) => {
     router.push({
       pathname: "/chat-member-setting",
@@ -98,7 +100,7 @@ export default function ChatSettingsScreen() {
         admin_username: admin_username,
         member_username: member_username,
         member_first_name: member_first_name,
-        avatar: avatar,
+        avatar_index: avatar_index,
       },
     });
   };
@@ -155,7 +157,11 @@ export default function ChatSettingsScreen() {
       {is_direct_chat ? (
         <ProfileBar
           contact_alias={friend?.person.first_name || ""}
-          avatar_img_src={friend ? [friend.person.avatar] : [""]}
+          avatar_img_src={
+            friend && avatars
+              ? [avatars[Number(friend.person.custom_json)]]
+              : []
+          }
         />
       ) : (
         <AvatarListBar

@@ -34,14 +34,7 @@ export default function AccountSettingScreen() {
       setIsUpLoading(true);
       const status_code = await chanegName(name);
       if (status_code === 200) {
-        Alert.alert("成功重置名字", "", [
-          {
-            text: "OK",
-            onPress: () => {
-              navigation.goBack();
-            },
-          },
-        ]);
+        navigation.goBack();
       } else if (status_code === 429) {
         Alert.alert("重置名字失败", "用户请求达到上限，请稍后再试", [
           { text: "OK", onPress: () => {} },

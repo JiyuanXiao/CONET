@@ -18,6 +18,7 @@ import * as ChatServer from "@/api/chats/chats.api";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { ChatsContext } from "@/api/chats/chats.context";
 import { MessagesContext } from "@/api/messages/messages.context";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 export default function AddChatMemberScreen() {
   const { colors } = useTheme();
@@ -34,6 +35,7 @@ export default function AddChatMemberScreen() {
   const { chat_id } = route.params as {
     chat_id: number;
   };
+  const avatars = getAvatarAssets();
 
   const handleAddMembers = async () => {
     try {
@@ -148,7 +150,9 @@ export default function AddChatMemberScreen() {
                 <TouchableOpacity onPress={() => handleContactOnPress(item)}>
                   <ContactBar
                     contact_alias={item.first_name}
-                    avatar_img_src={[item.avatar]}
+                    avatar_img_src={
+                      avatars ? [avatars[Number(item.custom_json)]] : []
+                    }
                   />
                 </TouchableOpacity>
               ) : (
@@ -158,7 +162,9 @@ export default function AddChatMemberScreen() {
                 >
                   <ContactBar
                     contact_alias={item.first_name}
-                    avatar_img_src={[item.avatar]}
+                    avatar_img_src={
+                      avatars ? [avatars[Number(item.custom_json)]] : []
+                    }
                     disable={true}
                   />
                 </TouchableOpacity>

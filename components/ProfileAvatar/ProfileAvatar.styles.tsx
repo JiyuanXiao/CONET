@@ -12,7 +12,11 @@ export const ProfileAvatarImage: React.FC<UserAvatarProps> = (props) => {
   };
 
   useEffect(() => {
-    setSource(props.img_src);
+    if (props.img_src.length === 0) {
+      setSource(require("@/assets/avatars/avatar_default.png"));
+    } else {
+      setSource(props.img_src);
+    }
   }, [props.img_src]);
 
   return (

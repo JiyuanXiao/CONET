@@ -22,6 +22,8 @@ import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
 import { WebSocketContext } from "@/api/websocket/websocket.context";
 import { NotificationContext } from "@/api/notification/notification.context";
+import { getAvatarAssets } from "@/constants/Avatars";
+import { Asset, useAssets } from "expo-asset";
 
 export default function ChatListScreen() {
   const { colors } = useTheme();
@@ -38,6 +40,7 @@ export default function ChatListScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const initializeMessageContextRef = useRef(initializeMessageContext);
   const { registerForPushNotificationsAsync } = useContext(NotificationContext);
+  const avatar_assets = getAvatarAssets();
 
   const getChatTitle = (chat: CE_ChatProps) => {
     switch (chat.people.length) {
@@ -57,29 +60,45 @@ export default function ChatListScreen() {
   };
 
   const getChatAvatar = (chat: CE_ChatProps) => {
-    switch (chat.people.length) {
-      case 0:
-        return ["@/assets/avatars/avatar_default.png"];
-      case 1:
-        return [chat.people[0].person.avatar];
-      case 2:
-        const name_1 = chat.people[0].person.username;
-        const avatar_1 = chat.people[0].person.avatar;
-        const avatar_2 = chat.people[1].person.avatar;
-        return name_1 === user?.username ? [avatar_2] : [avatar_1];
-      default:
-        let count = 0;
-        const avatar_list = [];
-        for (const member of chat.people) {
-          if (count < 9) {
-            avatar_list.push(member.person.avatar);
-            count += 1;
-          } else {
-            break;
-          }
-        }
+    if (avatar_assets) {
+      switch (chat.people.length) {
+        case 0:
+          const [assets, error] = useAssets([
+            require("@/assets/avatars/avatar_default.png"),
+          ]);
+          return assets ? assets : [];
+        case 1:
+          return [avatar_assets[Number(chat.people[0].person.custom_json)]];
+        case 2:
+          const name_1 = chat.people[0].person.username;
+          const avatar_1 =
+            avatar_assets[Number(chat.people[0].person.custom_json)];
+          const avatar_2 =
+            avatar_assets[Number(chat.people[1].person.custom_json)];
+          return name_1 === user?.username ? [avatar_2] : [avatar_1];
 
-        return avatar_list;
+        default:
+          let count = 0;
+          const avatar_list = [];
+          if (avatar_assets) {
+            for (const member of chat.people) {
+              if (count < 9) {
+                avatar_list.push(
+                  avatar_assets[Number(member.person.custom_json)]
+                );
+                count += 1;
+              } else {
+                break;
+              }
+            }
+          }
+          return avatar_list;
+      }
+    } else {
+      const [assets, error] = useAssets([
+        require("@/assets/avatars/avatar_default.png"),
+      ]);
+      return assets ? assets : [];
     }
   };
 

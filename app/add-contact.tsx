@@ -14,6 +14,7 @@ import { router } from "expo-router";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import { ContactsContext } from "@/api/contacts/contacts.context";
 import { ContactStorageProps } from "@/constants/ContextTypes";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 export default function AddContactScreen() {
   const { colors } = useTheme();
@@ -25,6 +26,7 @@ export default function AddContactScreen() {
   );
   const { searchContact } = useContext(ContactsContext);
   const [is_loading, setIsLoading] = useState(false);
+  const avatars = getAvatarAssets();
 
   const handleSearch = async () => {
     if (searchQuery.length > 0) {
@@ -102,7 +104,11 @@ export default function AddContactScreen() {
               contact_id={searchResult.id}
               contact_alias={searchResult.contact.first_name}
               contact_username={searchResult.contact.last_name}
-              avatar_img_src={[searchResult.contact.avatar]}
+              avatar_img_src={
+                avatars
+                  ? [avatars[Number(searchResult.contact.custom_json)]]
+                  : []
+              }
             />
           </TouchableOpacity>
         ) : (

@@ -155,54 +155,54 @@ export const deleteLastRead = async (
   }
 };
 
-export const saveAvatarToFilesystem = async (
-  username: string | undefined,
-  chat_id: number,
-  member_username: string,
-  avatar_url: string
-) => {
-  if (!username) {
-    console.error("[Chat Storage] saveAvatarToFilesystem(): user is undefined");
-    return null;
-  }
-  const avatar_directory = `${FileSystem.documentDirectory}${username}/${chat_id}/avatars/`;
+// export const saveAvatarToFilesystem = async (
+//   username: string | undefined,
+//   chat_id: number,
+//   member_username: string,
+//   avatar_url: string
+// ) => {
+//   if (!username) {
+//     console.error("[Chat Storage] saveAvatarToFilesystem(): user is undefined");
+//     return null;
+//   }
+//   const avatar_directory = `${FileSystem.documentDirectory}${username}/${chat_id}/avatars/`;
 
-  const file_extension_match = avatar_url.match(/\/avatars\/[^?]+\.(\w+)\?/);
-  let file_extension = "";
-  if (!file_extension_match) {
-    file_extension = "png";
-    console.warn(
-      `[Chat Storage] saveAvatarToFilesystem(): can not find avatar's file extension from url, set to default: "png"`
-    );
-  } else {
-    file_extension = file_extension_match[1];
-  }
-  const avatar_path = `${avatar_directory}${member_username}.${file_extension}`;
-  try {
-    const dir_info = await FileSystem.getInfoAsync(avatar_directory);
-    if (!dir_info.exists) {
-      await FileSystem.makeDirectoryAsync(avatar_directory, {
-        intermediates: true,
-      });
-    }
-    const download_result = await FileSystem.downloadAsync(
-      avatar_url,
-      avatar_path
-    );
-    if (!download_result) {
-      console.warn(
-        `[Chat Storage] saveAvatarToFilesystem(): failed to download avatar for ${member_username} in chat ${chat_id}`
-      );
-      return null;
-    }
-    return download_result.uri;
-  } catch (err) {
-    console.warn(
-      `[Chat Storage] saveAvatarToFilesystem(): failed to download avatar for ${member_username} in chat ${chat_id}: ${err}`
-    );
-    return null;
-  }
-};
+//   // const file_extension_match = avatar_url.match(/\/avatars\/[^?]+\.(\w+)\?/);
+//   // let file_extension = "";
+//   // if (!file_extension_match) {
+//   //   file_extension = "png";
+//   //   console.warn(
+//   //     `[Chat Storage] saveAvatarToFilesystem(): can not find avatar's file extension from url, set to default: "png"`
+//   //   );
+//   // } else {
+//   //   file_extension = file_extension_match[1];
+//   // }
+//   const avatar_path = `${avatar_directory}${member_username}.png`;
+//   try {
+//     const dir_info = await FileSystem.getInfoAsync(avatar_directory);
+//     if (!dir_info.exists) {
+//       await FileSystem.makeDirectoryAsync(avatar_directory, {
+//         intermediates: true,
+//       });
+//     }
+//     const download_result = await FileSystem.downloadAsync(
+//       avatar_url,
+//       avatar_path
+//     );
+//     if (!download_result) {
+//       console.warn(
+//         `[Chat Storage] saveAvatarToFilesystem(): failed to download avatar for ${member_username} in chat ${chat_id}`
+//       );
+//       return null;
+//     }
+//     return download_result.uri;
+//   } catch (err) {
+//     console.warn(
+//       `[Chat Storage] saveAvatarToFilesystem(): failed to download avatar for ${member_username} in chat ${chat_id}: ${err}`
+//     );
+//     return null;
+//   }
+// };
 
 export const deleteAllChatImagesFromFilesystem = async (
   username: string | undefined,

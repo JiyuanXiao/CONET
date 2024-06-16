@@ -59,17 +59,17 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
   const updateChat = async (chat_object: CE_ChatProps) => {
     try {
       // update each person's avatar
-      for (const person of chat_object.people) {
-        const new_avatar_uri = await ChatStorage.saveAvatarToFilesystem(
-          user?.username,
-          chat_object.id,
-          person.person.username,
-          person.person.avatar
-        );
-        if (new_avatar_uri) {
-          person.person.avatar = new_avatar_uri;
-        }
-      }
+      // for (const person of chat_object.people) {
+      //   const new_avatar_uri = await ChatStorage.saveAvatarToFilesystem(
+      //     user?.username,
+      //     chat_object.id,
+      //     person.person.username,
+      //     person.person.custom_json
+      //   );
+      //   if (new_avatar_uri) {
+      //     person.person.avatar = new_avatar_uri;
+      //   }
+      // }
       // update chat to local storage
       await ChatStorage.setChat(user?.username, chat_object.id, chat_object);
 
@@ -180,17 +180,17 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     const init_chats = new Map<number, CE_ChatProps>();
     const init_has_new_message = new Map<number, boolean>();
     for (const chat of new_chats) {
-      for (const person of chat.people) {
-        const new_avatar_uri = await ChatStorage.saveAvatarToFilesystem(
-          user.username,
-          chat.id,
-          person.person.username,
-          person.person.avatar
-        );
-        if (new_avatar_uri) {
-          person.person.avatar = new_avatar_uri;
-        }
-      }
+      // for (const person of chat.people) {
+      //   const new_avatar_uri = await ChatStorage.saveAvatarToFilesystem(
+      //     user.username,
+      //     chat.id,
+      //     person.person.username,
+      //     person.person.custom_json
+      //   );
+      //   if (new_avatar_uri) {
+      //     person.person.avatar = new_avatar_uri;
+      //   }
+      // }
 
       init_chats.set(chat.id, chat);
 

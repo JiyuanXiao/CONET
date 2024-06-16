@@ -5,6 +5,7 @@ import {
   CE_MessageProps,
   CE_PersonProps,
 } from "./ChatEngineObjectTypes";
+import { Asset } from "expo-asset";
 
 /////////////////////////////////////// AUTHENTICATION ACONTEXT ////////////////////////////////////////////////
 
@@ -27,6 +28,7 @@ export interface AuthenticationContentProps {
     new_password: string
   ) => Promise<number>;
   chanegName: (new_name: string) => Promise<number>;
+  chanegAvatar: (avatar_index: number) => Promise<number>;
   reloadAccountInfo: () => Promise<void>;
 }
 

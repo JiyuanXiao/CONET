@@ -94,4 +94,6 @@ export const BubbleAlias: React.FC<{
   align-self: ${(props) => (props.isReceived ? "flex-end" : "flex-right")};
   padding-right: ${(props) => (props.isReceived ? "10px" : "0px")};
   padding-left: ${(props) => (props.isReceived ? "0px" : "10px")};
+  max-width: 50px;
+  max-height: 20px;
 `;

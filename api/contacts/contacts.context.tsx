@@ -46,15 +46,15 @@ export const ContactsContextProvider = (props: {
 
   const addContact = async (contact_id: number, contact: CE_PersonProps) => {
     try {
-      const new_contact_avatar_uri =
-        await ContactStorage.saveAvatarToFilesystem(
-          user?.username,
-          contact.username,
-          contact.avatar
-        );
-      if (new_contact_avatar_uri) {
-        contact.avatar = new_contact_avatar_uri;
-      }
+      // const new_contact_avatar_uri =
+      //   await ContactStorage.saveAvatarToFilesystem(
+      //     user?.username,
+      //     contact.username,
+      //     contact.custom_json
+      //   );
+      // if (new_contact_avatar_uri) {
+      //   contact.avatar = new_contact_avatar_uri;
+      // }
       await ContactStorage.setContact(user?.username, contact_id, contact);
       setContactsMap(contact_id, contact);
 
@@ -71,9 +71,9 @@ export const ContactsContextProvider = (props: {
   const removeContact = async (contact_id: number) => {
     try {
       const target_contact = contacts.get(contact_id);
-      if (target_contact) {
-        await ContactStorage.deleteAvatarFromFilesystem(target_contact.avatar);
-      }
+      // if (target_contact) {
+      //   await ContactStorage.deleteAvatarFromFilesystem(target_contact.avatar);
+      // }
       await ContactStorage.removeContact(user?.username, contact_id);
       if (contacts.delete(contact_id)) {
         setContacts(new Map<number, CE_PersonProps>(contacts));
@@ -105,15 +105,15 @@ export const ContactsContextProvider = (props: {
         try {
           const updated_contact = await ContactServer.GetUser(contact.id);
           if (updated_contact) {
-            const new_contact_avatar_uri =
-              await ContactStorage.saveAvatarToFilesystem(
-                user?.username,
-                updated_contact.contact.username,
-                updated_contact.contact.avatar
-              );
-            if (new_contact_avatar_uri) {
-              updated_contact.contact.avatar = new_contact_avatar_uri;
-            }
+            // const new_contact_avatar_uri =
+            //   await ContactStorage.saveAvatarToFilesystem(
+            //     user?.username,
+            //     updated_contact.contact.username,
+            //     updated_contact.contact.custom_json
+            //   );
+            // if (new_contact_avatar_uri) {
+            //   updated_contact.contact.avatar = new_contact_avatar_uri;
+            // }
             setContactsMap(contact.id, updated_contact.contact);
             console.log(
               `[Contact Context] fetch contect ${contact.contact.first_name} data from server`

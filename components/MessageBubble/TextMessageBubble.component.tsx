@@ -14,6 +14,7 @@ import { MessagesProps } from "@/constants/ContextTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -51,10 +52,7 @@ const TextMessageBubble = ({
 }) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
-  //const {messages} = useContext(MessagesContext);
-  //const { current_talking_chat_id } = useContext(ChatsContext);
-  // const [current_chat_member, setCurrentChatMembers] =
-  //   useState<CE_ChatMemberProps>();
+  const avatars = getAvatarAssets();
 
   const is_received = user?.username !== message_object.sender_username;
   const lastMessageTime = formatTimestamp(message_object.timestamp);
@@ -88,13 +86,18 @@ const TextMessageBubble = ({
               params: {
                 contact_username: chat_member.person.username,
                 contact_first_name: chat_member.person.first_name,
-                avatar: chat_member.person.avatar,
+                avatar_index: chat_member.person.custom_json,
                 source: "chat-window",
               },
             })
           }
         >
-          <BubbleAvatar img_src={[chat_member.person.avatar]} size={40} />
+          <BubbleAvatar
+            img_src={
+              avatars ? [avatars[Number(chat_member.person.custom_json)]] : []
+            }
+            size={40}
+          />
         </TouchableOpacity>
       </View>
     </BubbleConatiner>

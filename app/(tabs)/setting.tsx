@@ -17,6 +17,8 @@ import { WebSocketContext } from "@/api/websocket/websocket.context";
 import { ContactsContext } from "@/api/contacts/contacts.context";
 import * as FileSystem from "expo-file-system";
 import { NotificationContext } from "@/api/notification/notification.context";
+import { getAvatarAssets } from "@/constants/Avatars";
+import { Asset, useAssets } from "expo-asset";
 
 export default function SettngScreen() {
   const { user, logOut, reloadAccountInfo } = useContext(AuthenticationContext);
@@ -27,6 +29,7 @@ export default function SettngScreen() {
   const { disconnectFromNotificaiton } = useContext(NotificationContext);
   const [refreshing, setRefreshing] = useState(false);
   const reloadAccountInfoRef = useRef(reloadAccountInfo);
+  const avatars = getAvatarAssets();
 
   const handleLogout = async () => {
     console.log("SettingScreen() in setting.tsx is calling logOut()");
@@ -44,6 +47,12 @@ export default function SettngScreen() {
       params: {
         setting_type: "change-name",
       },
+    });
+  };
+
+  const handleChangeAvatar = () => {
+    router.push({
+      pathname: "/avatar-setting",
     });
   };
 
@@ -69,6 +78,7 @@ export default function SettngScreen() {
 
   useEffect(() => {
     reloadAccountInfoRef.current = reloadAccountInfo;
+    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->" + user?.custom_json);
   }, [user]);
 
   return (
@@ -83,11 +93,14 @@ export default function SettngScreen() {
         contact_alias={user?.first_name || ""}
         contact_username={user?.username || ""}
         avatar_img_src={
-          user ? [user.avatar] : ["@/assets/avatars/avatar_default.png"]
+          user && avatars ? [avatars[Number(user.custom_json)]] : []
         }
       />
       <TouchableOpacity onPress={handleChangeName}>
         <OptionBar content="名字设置" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleChangeAvatar}>
+        <OptionBar content="头像设置" />
       </TouchableOpacity>
       <TouchableOpacity onPress={handleChangePassword}>
         <OptionBar content="更改密码" />

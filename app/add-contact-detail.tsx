@@ -8,6 +8,7 @@ import OptionBar from "@/components/OptionBar/OptionBar.component";
 import { ContactsContext } from "@/api/contacts/contacts.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 export default function AddContactDetailScreen() {
   const route = useRoute();
@@ -29,6 +30,7 @@ export default function AddContactDetailScreen() {
   const [is_loading, setIsLoading] = useState(false);
   const { colors } = useTheme();
   const navigation = useNavigation();
+  const avatars = getAvatarAssets();
 
   const handleAddContact = async () => {
     const contact: CE_PersonProps = {
@@ -61,7 +63,7 @@ export default function AddContactDetailScreen() {
       <ProfileBar
         contact_id={contact_id}
         contact_alias={contact_first_name}
-        avatar_img_src={[avatar]}
+        avatar_img_src={avatars ? [avatars[Number(custom_json)]] : []}
       />
       {Number(contact_id) !== Number(user?.id) &&
         (is_loading ? (

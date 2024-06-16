@@ -7,8 +7,8 @@ import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import OptionBar from "@/components/OptionBar/OptionBar.component";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import * as ChatServer from "@/api/chats/chats.api";
-import { ContactsContext } from "@/api/contacts/contacts.context";
 import { MessagesContext } from "@/api/messages/messages.context";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 export default function ChatMemberSettingScreen() {
   const { colors } = useTheme();
@@ -18,18 +18,19 @@ export default function ChatMemberSettingScreen() {
   const [is_creating, setIsCreating] = useState(false);
   const [is_deleting, setIsDeleteing] = useState(false);
   const sendMessageRef = useRef(sendMessage);
+  const avatars = getAvatarAssets();
   const {
     chat_id,
     admin_username,
     member_username,
     member_first_name,
-    avatar,
+    avatar_index,
   } = route.params as {
     chat_id: number;
     admin_username: string;
     member_username: string;
     member_first_name: string;
-    avatar: string;
+    avatar_index: string;
   };
 
   const navigation = useNavigation();
@@ -125,7 +126,10 @@ export default function ChatMemberSettingScreen() {
 
   return (
     <>
-      <ProfileBar contact_alias={member_first_name} avatar_img_src={[avatar]} />
+      <ProfileBar
+        contact_alias={member_first_name}
+        avatar_img_src={avatars ? [avatars[Number(avatar_index)]] : []}
+      />
 
       {is_creating ? (
         <ActivityIndicator

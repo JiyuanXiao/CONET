@@ -15,13 +15,13 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
 import { ContactsContext } from "@/api/contacts/contacts.context";
+import { getAvatarAssets } from "@/constants/Avatars";
 
 export default function SettngScreen() {
   const { colors } = useTheme();
   const { contacts } = useContext(ContactsContext);
-  for (const contact of contacts.values()) {
-    console.log(contact.avatar);
-  }
+  const assets = getAvatarAssets();
+
   return (
     <>
       <View style={{ marginBottom: 15 }}>
@@ -100,7 +100,7 @@ export default function SettngScreen() {
                     params: {
                       contact_username: item.username,
                       contact_first_name: item.first_name,
-                      avatar: item.avatar,
+                      avatar_index: item.custom_json,
                       source: "contact",
                     },
                   })
@@ -108,7 +108,9 @@ export default function SettngScreen() {
               >
                 <ContactBar
                   contact_alias={item.first_name}
-                  avatar_img_src={[item.avatar]}
+                  avatar_img_src={
+                    assets ? [assets[Number(item.custom_json)]] : []
+                  }
                 />
               </TouchableOpacity>
             )}
