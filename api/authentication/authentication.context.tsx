@@ -150,7 +150,7 @@ export const AuthenticationContextProvider = (props: {
     if (user && status_code === 200) {
       const updated_user = { ...user, custom_json: avatar_index.toString() };
       //updated_user.custom_json = avatar_index.toString();
-
+      console.log("change avatar!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       setUser(updated_user);
       await AuthenStorage.storeAuthenticatedUser(updated_user);
     }

@@ -70,7 +70,7 @@ export const UpdateMyAccount = async (
 
   let data;
 
-  if (!new_name && !new_password && !avatar_index) {
+  if (!new_name && !new_password && avatar_index === null) {
     return 0;
   } else if (new_name) {
     data = {
@@ -80,7 +80,7 @@ export const UpdateMyAccount = async (
     data = {
       secret: new_password,
     };
-  } else if (avatar_index) {
+  } else if (avatar_index !== null) {
     data = {
       custom_json: avatar_index.toString(),
     };

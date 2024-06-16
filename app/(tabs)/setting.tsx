@@ -78,7 +78,6 @@ export default function SettngScreen() {
 
   useEffect(() => {
     reloadAccountInfoRef.current = reloadAccountInfo;
-    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->" + user?.custom_json);
   }, [user]);
 
   return (
