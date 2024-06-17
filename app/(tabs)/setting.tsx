@@ -26,14 +26,14 @@ export default function SettngScreen() {
   const { resetMessageContext } = useContext(MessagesContext);
   const { closeWebSocket } = useContext(WebSocketContext);
   const { resetContacts } = useContext(ContactsContext);
-  const { disconnectFromNotificaiton } = useContext(NotificationContext);
+  const { disconnectFromNotification } = useContext(NotificationContext);
   const [refreshing, setRefreshing] = useState(false);
   const reloadAccountInfoRef = useRef(reloadAccountInfo);
   const avatars = getAvatarAssets();
 
   const handleLogout = async () => {
     console.log("SettingScreen() in setting.tsx is calling logOut()");
-    await disconnectFromNotificaiton();
+    await disconnectFromNotification(user?.username);
     resetMessageContext();
     resetChatContext();
     resetContacts();

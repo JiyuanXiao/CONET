@@ -5,21 +5,25 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { ChatsContext } from "../chats/chats.context";
 import { AuthenticationContext } from "../authentication/authentication.context";
-import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
+import { CE_ChatProps, CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 import * as NotificationServer from "@/api/notification/notification.api";
+import { AppState, AppStateStatus } from "react-native";
+import * as AuthStorage from "@/api/authentication/authentication.storage";
 
 interface NotificationContextProps {
   notification: Notifications.Notification | undefined;
   sendNotificationByChatId: (chat_id: number) => Promise<void>;
-  registerForPushNotificationsAsync(): Promise<string | undefined>;
-  disconnectFromNotificaiton: () => Promise<void>;
+  registerForPushNotificationsAsync(
+    username: string | undefined
+  ): Promise<string | undefined>;
+  disconnectFromNotification: (username: string | undefined) => Promise<void>;
 }
 
 export const NotificationContext = createContext<NotificationContextProps>({
   notification: undefined,
   sendNotificationByChatId: async () => {},
   registerForPushNotificationsAsync: async () => undefined,
-  disconnectFromNotificaiton: async () => {},
+  disconnectFromNotification: async () => {},
 });
 
 export const NotificationContextProvider = ({
@@ -37,6 +41,7 @@ export const NotificationContextProvider = ({
   const { user, is_authentication_initialized } = useContext(
     AuthenticationContext
   );
+  const [is_connected, setIsConneted] = useState(false);
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -51,7 +56,9 @@ export const NotificationContextProvider = ({
     throw new Error(errorMessage);
   }
 
-  async function registerForPushNotificationsAsync() {
+  async function registerForPushNotificationsAsync(
+    username: string | undefined
+  ) {
     if (Platform.OS === "android") {
       Notifications.setNotificationChannelAsync("default", {
         name: "default",
@@ -90,7 +97,7 @@ export const NotificationContextProvider = ({
         ).data;
         await NotificationServer.setNotificationToken(
           pushTokenString,
-          user?.username
+          username
         );
         return pushTokenString;
       } catch (e: unknown) {
@@ -169,11 +176,11 @@ export const NotificationContextProvider = ({
     }
   };
 
-  const disconnectFromNotificaiton = async () => {
+  const disconnectFromNotification = async (username: string | undefined) => {
     try {
-      await NotificationServer.disconnectFromNotificaiton(user?.username);
+      await NotificationServer.disconnectFromNotificaiton(username);
       console.log(
-        `[Notification Context] ${user?.username} stop receving notification`
+        `[Notification Context] ${username} stop receving notification`
       );
     } catch (err) {
       console.error(
@@ -184,7 +191,7 @@ export const NotificationContextProvider = ({
 
   useEffect(() => {
     if (is_authentication_initialized && user) {
-      registerForPushNotificationsAsync()
+      registerForPushNotificationsAsync(user.username)
         .then((token) => {
           setExpoPushToken(token ?? "");
           // await NotificationServer.setNotificationToken(token, user?.username);
@@ -218,9 +225,59 @@ export const NotificationContextProvider = ({
         );
       responseListener.current &&
         Notifications.removeNotificationSubscription(responseListener.current);
-      disconnectFromNotificaiton();
     };
   }, [is_authentication_initialized, user]);
+
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      if (nextAppState === "inactive") {
+        // App has gone to the background, disconnect from notification
+        try {
+          const curr_user = await AuthStorage.fetchAuthenticatedUser();
+          await disconnectFromNotification(curr_user?.username);
+          console.log(
+            `[Notification Context] ${curr_user?.username} disconnect notification successfully`
+          );
+        } catch (err) {
+          console.error(
+            `[Notification Context] disconnect notification failed: ${err}`
+          );
+        }
+      }
+      if (nextAppState === "active") {
+        try {
+          const curr_user = await AuthStorage.fetchAuthenticatedUser();
+          registerForPushNotificationsAsync(curr_user?.username)
+            .then((token) => {
+              setExpoPushToken(token ?? "");
+              // await NotificationServer.setNotificationToken(token, user?.username);
+              console.log(`[Notification Context] token: ${token}`);
+            })
+            .catch((error: any) => {
+              setExpoPushToken(`${error}`);
+              console.error(
+                `[Notification Context] register token error: ${error}`
+              );
+            });
+          console.log(
+            `[Notification Context] ${curr_user?.username} connect to notification successfully`
+          );
+        } catch (err) {
+          console.error(
+            `[Notification Context] connect to notification failed: ${err}`
+          );
+        }
+      }
+    };
+    const appStateListener = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
+    return () => {
+      appStateListener.remove();
+    };
+  }, []);
 
   return (
     <NotificationContext.Provider
@@ -228,7 +285,7 @@ export const NotificationContextProvider = ({
         notification,
         sendNotificationByChatId,
         registerForPushNotificationsAsync,
-        disconnectFromNotificaiton,
+        disconnectFromNotification,
       }}
     >
       {children}

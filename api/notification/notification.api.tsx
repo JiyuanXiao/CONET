@@ -12,7 +12,7 @@ export const setNotificationToken = async (
   }
   try {
     const url = `${process.env.EXPO_PUBLIC_NOTIFICATION_SERVER_URL}/${username}/`;
-    console.log(url);
+
     const headers = {
       "SECRET-KEY": process.env.EXPO_PUBLIC_NOTIFICATION_SERVER_KEY,
       TOKEN: token,

@@ -129,7 +129,7 @@ export default function ChatListScreen() {
 
     if (user) {
       console.log("refreshing...");
-      await registerForPushNotificationsAsync();
+      await registerForPushNotificationsAsync(user.username);
       await fetchChatDataFromServer(user);
       await initializeMessageContextRef.current();
       resetWebSocket();
