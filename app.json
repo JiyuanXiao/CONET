@@ -56,7 +56,7 @@
           "defaultChannel": "default",
           "sounds": [
             "./assets/sounds/correct-answer.wav",
-            "./assets/sounds/long-pop.wave"
+            "./assets/sounds/long-pop.wav"
           ]
         }
       ],
