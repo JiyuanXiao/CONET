@@ -228,56 +228,58 @@ export const NotificationContextProvider = ({
     };
   }, [is_authentication_initialized, user]);
 
-  useEffect(() => {
-    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (nextAppState === "inactive") {
-        // App has gone to the background, disconnect from notification
-        try {
-          const curr_user = await AuthStorage.fetchAuthenticatedUser();
-          await disconnectFromNotification(curr_user?.username);
-          console.log(
-            `[Notification Context] ${curr_user?.username} disconnect notification successfully`
-          );
-        } catch (err) {
-          console.error(
-            `[Notification Context] disconnect notification failed: ${err}`
-          );
-        }
-      }
-      if (nextAppState === "active") {
-        try {
-          const curr_user = await AuthStorage.fetchAuthenticatedUser();
-          registerForPushNotificationsAsync(curr_user?.username)
-            .then((token) => {
-              setExpoPushToken(token ?? "");
-              // await NotificationServer.setNotificationToken(token, user?.username);
-              console.log(`[Notification Context] token: ${token}`);
-            })
-            .catch((error: any) => {
-              setExpoPushToken(`${error}`);
-              console.error(
-                `[Notification Context] register token error: ${error}`
-              );
-            });
-          console.log(
-            `[Notification Context] ${curr_user?.username} connect to notification successfully`
-          );
-        } catch (err) {
-          console.error(
-            `[Notification Context] connect to notification failed: ${err}`
-          );
-        }
-      }
-    };
-    const appStateListener = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
+  // useEffect(() => {
+  //   const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+  //     console.log(nextAppState);
+  //     if (nextAppState === "inactive") {
+  //       // App has gone to the background, disconnect from notification
+  //       try {
+  //         const curr_user = await AuthStorage.fetchAuthenticatedUser();
+  //         await disconnectFromNotification(curr_user?.username);
+  //         console.log(
+  //           `[Notification Context] ${curr_user?.username} disconnect notification successfully`
+  //         );
+  //       } catch (err) {
+  //         console.error(
+  //           `[Notification Context] disconnect notification failed: ${err}`
+  //         );
+  //       }
+  //     }
+  //     if (nextAppState === "active") {
+  //       try {
+  //         const curr_user = await AuthStorage.fetchAuthenticatedUser();
+  //         registerForPushNotificationsAsync(curr_user?.username)
+  //           .then((token) => {
+  //             setExpoPushToken(token ?? "");
+  //             // await NotificationServer.setNotificationToken(token, user?.username);
+  //             console.log(`[Notification Context] token: ${token}`);
+  //           })
+  //           .catch((error: any) => {
+  //             setExpoPushToken(`${error}`);
+  //             console.error(
+  //               `[Notification Context] register token error: ${error}`
+  //             );
+  //           });
+  //         console.log(
+  //           `[Notification Context] ${curr_user?.username} connect to notification successfully`
+  //         );
+  //       } catch (err) {
+  //         console.error(
+  //           `[Notification Context] connect to notification failed: ${err}`
+  //         );
+  //       }
+  //     }
+  //   };
+  //   const appStateListener = AppState.addEventListener(
+  //     "change",
+  //     handleAppStateChange
+  //   );
 
-    return () => {
-      appStateListener.remove();
-    };
-  }, []);
+  //   return () => {
+  //     console.log("closed");
+  //     appStateListener.remove();
+  //   };
+  // }, []);
 
   return (
     <NotificationContext.Provider

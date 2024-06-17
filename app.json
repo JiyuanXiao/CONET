@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ianxiao.CONET",
-      "buildNumber": "19"
+      "buildNumber": "24"
     },
     "android": {
       "adaptiveIcon": {
@@ -51,16 +51,21 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/notification-icon.png",
+          "icon": "./assets/images/notificationicon.png",
           "color": "#fcc404",
           "defaultChannel": "default",
           "sounds": [
-            "./assets/sounds/correct-answer.wav",
-            "./assets/sounds/long-pop.wav"
+            "./assets/sounds/correctanswer.wav",
+            "./assets/sounds/longpop.wav"
           ]
         }
       ],
-      "expo-asset"
+      [
+        "expo-asset",
+        {
+          "assets": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
