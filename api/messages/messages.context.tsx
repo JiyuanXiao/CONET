@@ -421,66 +421,58 @@ export const MessagesContextProvider = (props: {
       setIsMessagesInitialized(false);
       console.log("[Message Context] Start to initialize message context...");
 
-      const chat_server_connected = true;
-
-      if (chat_server_connected) {
-        console.log(
-          "[Message Context] Start to get messages data from server and update to storage for " +
-            user.username
-        );
-        for (const chat of chats.values()) {
-          if (!MessagesStorage.messageTableExist(user.username, chat.id, db)) {
-            MessagesStorage.createMessageTableIfNotExists(
-              user.username,
-              chat.id,
-              db
-            );
-          }
-          const latest = MessagesStorage.fetchLatestMessage(
+      console.log(
+        "[Message Context] Start to get messages data from server and update to storage for " +
+          user.username
+      );
+      for (const chat of chats.values()) {
+        if (!MessagesStorage.messageTableExist(user.username, chat.id, db)) {
+          MessagesStorage.createMessageTableIfNotExists(
             user.username,
             chat.id,
             db
           );
-
-          try {
-            let last_read = await getLastRead(chat.id);
-            if (latest) {
-              last_read = Math.min(last_read, latest.message_id);
-            }
-            const ce_message_object_list =
-              await MessageServer.GetUnreadChatMessages(
-                user.username,
-                user.secret,
-                chat.id,
-                last_read
-              );
-
-            for (const ce_message_object of ce_message_object_list) {
-              if (ce_message_object.id > last_read) {
-                MessagesStorage.storeMessage(
-                  user.username,
-                  chat.id,
-                  ce_message_object,
-                  db
-                );
-              }
-            }
-            console.log(
-              `[Message Context] update chat ${chat.id} new messages to storage`
-            );
-          } catch (err) {
-            console.error(
-              `[Message Context] update chat ${chat.id} new messages to storage failed`
-            );
-          }
         }
-        console.log(
-          "[Message Context] Finish updating messages storage data from server..."
+        const latest = MessagesStorage.fetchLatestMessage(
+          user.username,
+          chat.id,
+          db
         );
-      }
 
+        try {
+          let last_read = await getLastRead(chat.id);
+          if (latest) {
+            last_read = Math.min(last_read, latest.message_id);
+          }
+          const ce_message_object_list =
+            await MessageServer.GetUnreadChatMessages(
+              user.username,
+              user.secret,
+              chat.id,
+              last_read
+            );
+
+          for (const ce_message_object of ce_message_object_list) {
+            if (ce_message_object.id > last_read) {
+              MessagesStorage.storeMessage(
+                user.username,
+                chat.id,
+                ce_message_object,
+                db
+              );
+            }
+          }
+          console.log(
+            `[Message Context] update chat ${chat.id} new messages to storage`
+          );
+        } catch (err) {
+          console.error(
+            `[Message Context] update chat ${chat.id} new messages to storage failed`
+          );
+        }
+      }
       console.log(
-        "[Message Context] Start to fetch messages data from local storage to context..."
+        "[Message Context] Finish updating messages storage data from server..."
       );
 
       const init_messages = new Map<number, MessageContextObjectProps>();

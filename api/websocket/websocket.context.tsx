@@ -9,11 +9,11 @@ import { AuthenticationContext } from "../authentication/authentication.context"
 import { MessagesContext } from "../messages/messages.context";
 import { CE_MessageProps } from "@/constants/ChatEngineObjectTypes";
 import * as MessagesStorage from "@/api/messages/messages.storage";
-import * as ChatStorage from "@/api/chats/chats.storage";
 import { useSQLiteContext } from "expo-sqlite";
 import { ChatsContext } from "../chats/chats.context";
 import { WebsocketContextProps } from "@/constants/ContextTypes";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
+import { Alert } from "react-native";
 
 interface MessageDataProps {
   id: number;
@@ -41,12 +41,14 @@ export const WebSocketProvider = ({
     // setChatMap,
     updateChat,
     deleteChat,
+    fetchChatDataFromServer,
   } = useContext(ChatsContext);
   const {
     messages,
     is_messages_initialized,
     receiveMessage,
     createMeesageObjectForNewChat,
+    initializeMessageContext,
   } = useContext(MessagesContext);
   const [websocket_connected, setWebSocketConnected] = useState(false);
   const receiveMessageRef = useRef(receiveMessage);
@@ -59,6 +61,7 @@ export const WebSocketProvider = ({
   const is_messages_initialized_Ref = useRef(is_messages_initialized);
   const user_Ref = useRef(user);
   const db = useSQLiteContext();
+  const initializeMessageContextRef = useRef(initializeMessageContext);
 
   const handleNewMessage = async (message_data: MessageDataProps) => {
     console.log(`[WebSocket] action: new_message for chat ${message_data.id}`);
@@ -199,29 +202,6 @@ export const WebSocketProvider = ({
     };
   };
 
-  useEffect(() => {
-    if (!websocket_connected && user && is_messages_initialized) {
-      connectWebSocket();
-    }
-    return () => {
-      web_socket.current?.close();
-    };
-  }, [user, is_messages_initialized]);
-
-  useEffect(() => {
-    setHasNewMessageStatusRef.current = setHasNewMessageStatus;
-  }, [has_new_message]);
-
-  useEffect(() => {
-    updateChatRef.current = updateChat;
-    deleteChatRef.current = deleteChat;
-  }, [chats]);
-
-  useEffect(() => {
-    receiveMessageRef.current = receiveMessage;
-    createMeesageObjectForNewChatRef.current = createMeesageObjectForNewChat;
-  }, [messages]);
-
   const closeWebSocket = () => {
     if (web_socket.current) {
       web_socket.current.close();
@@ -244,6 +224,41 @@ export const WebSocketProvider = ({
     }
   };
 
+  const loadNewData = async () => {
+    if (user) {
+      console.log(`[WebSocket] start to load new Data from server`);
+      await fetchChatDataFromServer(user);
+      await initializeMessageContextRef.current();
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      web_socket.current?.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!websocket_connected && user && is_messages_initialized) {
+      connectWebSocket();
+    }
+  }, [user, is_messages_initialized]);
+
+  useEffect(() => {
+    setHasNewMessageStatusRef.current = setHasNewMessageStatus;
+  }, [has_new_message]);
+
+  useEffect(() => {
+    updateChatRef.current = updateChat;
+    deleteChatRef.current = deleteChat;
+    initializeMessageContextRef.current = initializeMessageContext;
+  }, [chats]);
+
+  useEffect(() => {
+    receiveMessageRef.current = receiveMessage;
+    createMeesageObjectForNewChatRef.current = createMeesageObjectForNewChat;
+  }, [messages]);
+
   useEffect(() => {
     user_Ref.current = user;
     console.log(`[WebSocket] User: ${user ? "true" : "false"}`);
@@ -251,6 +266,9 @@ export const WebSocketProvider = ({
 
   useEffect(() => {
     console.log(`[WebSocket] websocket connected: ${websocket_connected}`);
+    if (websocket_connected && user) {
+      loadNewData();
+    }
   }, [websocket_connected]);
 
   useEffect(() => {

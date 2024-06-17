@@ -222,12 +222,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
 
       await fetchChatDataFromStorage(user);
 
-      const chat_server_connected = true;
-      if (chat_server_connected) {
-        await fetchChatDataFromServer(user);
-      } else {
-        console.log("[Chat Context] Cannot connet to chat server...");
-      }
+      await fetchChatDataFromServer(user);
 
       console.log("[Chat Context] Initialize chat context successfully...");
 
