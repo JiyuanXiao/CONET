@@ -7,23 +7,24 @@ import { ChatsContext } from "../chats/chats.context";
 import { AuthenticationContext } from "../authentication/authentication.context";
 import { CE_ChatProps, CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 import * as NotificationServer from "@/api/notification/notification.api";
-import { AppState, AppStateStatus } from "react-native";
-import * as AuthStorage from "@/api/authentication/authentication.storage";
+import * as NotificationStorage from "@/api/notification/notification.storage";
 
 interface NotificationContextProps {
   notification: Notifications.Notification | undefined;
+  is_notificaiton_on: boolean;
   sendNotificationByChatId: (chat_id: number) => Promise<void>;
-  registerForPushNotificationsAsync(
-    username: string | undefined
-  ): Promise<string | undefined>;
   disconnectFromNotification: (username: string | undefined) => Promise<void>;
+  turnOffNotificaiton: () => Promise<void>;
+  turnOnNotification: () => Promise<void>;
 }
 
 export const NotificationContext = createContext<NotificationContextProps>({
   notification: undefined,
+  is_notificaiton_on: false,
   sendNotificationByChatId: async () => {},
-  registerForPushNotificationsAsync: async () => undefined,
   disconnectFromNotification: async () => {},
+  turnOffNotificaiton: async () => {},
+  turnOnNotification: async () => {},
 });
 
 export const NotificationContextProvider = ({
@@ -31,17 +32,17 @@ export const NotificationContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [expoPushToken, setExpoPushToken] = useState("");
+  // const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
   >(undefined);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  // const notificationListener = useRef<Notifications.Subscription>();
+  // const responseListener = useRef<Notifications.Subscription>();
   const { chats } = useContext(ChatsContext);
   const { user, is_authentication_initialized } = useContext(
     AuthenticationContext
   );
-  const [is_connected, setIsConneted] = useState(false);
+  const [is_notificaiton_on, setIsNotificaitonOn] = useState(false);
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -81,7 +82,7 @@ export const NotificationContextProvider = ({
         handleRegistrationError(
           "Permission not granted to get push token for push notification!"
         );
-        return;
+        return false;
       }
       const projectId =
         Constants?.expoConfig?.extra?.eas?.projectId ??
@@ -99,14 +100,16 @@ export const NotificationContextProvider = ({
           pushTokenString,
           username
         );
-        return pushTokenString;
+        return true;
       } catch (e: unknown) {
         handleRegistrationError(`${e}`);
+        return false;
       }
     } else {
       handleRegistrationError(
         "Must use physical device for push notifications"
       );
+      return false;
     }
   }
 
@@ -179,6 +182,7 @@ export const NotificationContextProvider = ({
   const disconnectFromNotification = async (username: string | undefined) => {
     try {
       await NotificationServer.disconnectFromNotificaiton(username);
+
       console.log(
         `[Notification Context] ${username} stop receving notification`
       );
@@ -189,43 +193,72 @@ export const NotificationContextProvider = ({
     }
   };
 
+  const turnOffNotificaiton = async () => {
+    await disconnectFromNotification(user?.username);
+    await NotificationStorage.setNotificationState(false);
+    setIsNotificaitonOn(false);
+  };
+
+  const turnOnNotification = async () => {
+    const success = await registerForPushNotificationsAsync(user?.username);
+    if (success) {
+      NotificationStorage.setNotificationState(true);
+      setIsNotificaitonOn(true);
+    }
+  };
+
+  const initialNotification = async (username: string) => {
+    try {
+      const turn_on_notificaiton =
+        await NotificationStorage.getNotificationsState();
+
+      if (turn_on_notificaiton === null) {
+        const success = await registerForPushNotificationsAsync(username);
+        if (success) {
+          NotificationStorage.setNotificationState(true);
+          setIsNotificaitonOn(true);
+        }
+      } else if (turn_on_notificaiton) {
+        const success = await registerForPushNotificationsAsync(username);
+        if (success) {
+          setIsNotificaitonOn(true);
+        }
+      } else {
+        setIsNotificaitonOn(false);
+      }
+    } catch (err) {
+      console.error(
+        `[Notification Context] initialNotification() error: ${err}`
+      );
+    }
+  };
+
   useEffect(() => {
     if (is_authentication_initialized && user) {
-      registerForPushNotificationsAsync(user.username)
-        .then((token) => {
-          setExpoPushToken(token ?? "");
-          // await NotificationServer.setNotificationToken(token, user?.username);
-          console.log(`[Notification Context] token: ${token}`);
-        })
-        .catch((error: any) => {
-          setExpoPushToken(`${error}`);
-          console.error(
-            `[Notification Context] register token error: ${error}`
-          );
-        });
+      initialNotification(user.username);
 
       // App is in foreground
-      notificationListener.current =
-        Notifications.addNotificationReceivedListener((notification) => {
-          console.log(`[Notification Context] app is in foreground!!!`);
-          setNotification(notification);
-        });
+      // notificationListener.current =
+      //   Notifications.addNotificationReceivedListener((notification) => {
+      //     console.log(`[Notification Context] app is in foreground!!!`);
+      //     setNotification(notification);
+      //   });
 
-      // Notification is tapped
-      responseListener.current =
-        Notifications.addNotificationResponseReceivedListener((response) => {
-          console.log(`[Notification Context] notification is tapped!!!`);
-          console.log(response);
-        });
+      // // Notification is tapped
+      // responseListener.current =
+      //   Notifications.addNotificationResponseReceivedListener((response) => {
+      //     console.log(`[Notification Context] notification is tapped!!!`);
+      //     console.log(response);
+      //   });
     }
-    return () => {
-      notificationListener.current &&
-        Notifications.removeNotificationSubscription(
-          notificationListener.current
-        );
-      responseListener.current &&
-        Notifications.removeNotificationSubscription(responseListener.current);
-    };
+    // return () => {
+    //   notificationListener.current &&
+    //     Notifications.removeNotificationSubscription(
+    //       notificationListener.current
+    //     );
+    //   responseListener.current &&
+    //     Notifications.removeNotificationSubscription(responseListener.current);
+    // };
   }, [is_authentication_initialized, user]);
 
   // useEffect(() => {
@@ -285,9 +318,11 @@ export const NotificationContextProvider = ({
     <NotificationContext.Provider
       value={{
         notification,
+        is_notificaiton_on,
         sendNotificationByChatId,
-        registerForPushNotificationsAsync,
         disconnectFromNotification,
+        turnOffNotificaiton,
+        turnOnNotification,
       }}
     >
       {children}

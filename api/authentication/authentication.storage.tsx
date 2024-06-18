@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CE_UserProps } from "@/constants/ChatEngineObjectTypes";
-import * as FileSystem from "expo-file-system";
 
 export const storeAuthenticatedUser = async (user_data_json: CE_UserProps) => {
   try {

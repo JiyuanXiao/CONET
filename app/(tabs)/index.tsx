@@ -39,7 +39,6 @@ export default function ChatListScreen() {
   const { resetWebSocket } = useContext(WebSocketContext);
   const [refreshing, setRefreshing] = useState(false);
   const initializeMessageContextRef = useRef(initializeMessageContext);
-  const { registerForPushNotificationsAsync } = useContext(NotificationContext);
   const avatar_assets = getAvatarAssets();
 
   const getChatTitle = (chat: CE_ChatProps) => {
@@ -126,7 +125,6 @@ export default function ChatListScreen() {
 
     if (user) {
       console.log("refreshing...");
-      await registerForPushNotificationsAsync(user.username);
       await fetchChatDataFromServer(user);
       await initializeMessageContextRef.current();
       resetWebSocket();
