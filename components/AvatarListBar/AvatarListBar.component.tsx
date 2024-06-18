@@ -91,7 +91,7 @@ const AvatarListBar = ({
                   </View>
                 ) : (
                   <Text style={[styles.name, { color: colors.border }]}>
-                    {item.first_name}
+                    {item.first_name.substring(0, 4)}
                   </Text>
                 )}
               </View>

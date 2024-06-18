@@ -15,6 +15,7 @@ import { ThemeColorsProps } from "@/constants/ComponentTypes";
 import { WebSocketContext } from "@/api/websocket/websocket.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { NotificationContext } from "@/api/notification/notification.context";
+import { moderateScale } from "react-native-size-matters";
 
 // explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 
@@ -136,7 +137,7 @@ export default function TabLayout() {
               <ActivityIndicator
                 size="small"
                 color={colors.primary}
-                style={{ marginLeft: 140 }}
+                style={{ marginLeft: moderateScale(110, 1.7) }}
               />
             ),
         }}
