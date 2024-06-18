@@ -79,17 +79,6 @@ export default function LoginScreen() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={[styles.background, { backgroundColor: main }]}>
         <View style={styles.container}>
-          {/* <Portal>
-            <Dialog visible={visible} onDismiss={hideDialog}>
-              <Dialog.Title>Alert</Dialog.Title>
-              <Dialog.Content>
-                <Text>{`base url: ${process.env.EXPO_PUBLIC_BASE_URL}\nwb: ${process.env.EXPO_PUBLIC_WEBSOCKET_BASE_URL}\nID: ${process.env.EXPO_PUBLIC_PROJECT_ID}\n${errorRef.current}`}</Text>
-              </Dialog.Content>
-              <Dialog.Actions>
-                <Button onPress={hideDialog}>Done</Button>
-              </Dialog.Actions>
-            </Dialog>
-          </Portal> */}
           <Image
             style={styles.logo}
             source={require("@/assets/images/full-logo-transparent.png")}
@@ -185,26 +174,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: "85%",
-    marginVertical: 100,
+    marginTop: "20%",
     alignItems: "flex-start",
     justifyContent: "flex-start",
   },
   logo: {
     width: "100%",
-    height: 150,
+    height: "15%",
     marginBottom: 10,
     resizeMode: "contain",
   },
-  title: {
-    fontSize: 50,
-    fontWeight: "bold",
-  },
   input: {
     width: "100%",
-    marginTop: 30,
+    marginTop: "10%",
     marginBottom: 0,
     backgroundColor: "white",
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "bold",
   },
   input_icon: {
@@ -216,17 +201,11 @@ const styles = StyleSheet.create({
     width: "60%",
     height: 60,
     borderRadius: 30,
-
     justifyContent: "center",
     alignSelf: "center",
     borderColor: blur,
     borderWidth: 2,
     paddingVertical: 4,
-    marginTop: 10,
-  },
-  button_text: {
-    color: blur,
-    fontWeight: "bold",
-    fontSize: 18,
+    marginTop: "3%",
   },
 });

@@ -11,6 +11,7 @@ import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.component";
 import { CE_PersonProps } from "@/constants/ChatEngineObjectTypes";
 import { FontAwesome } from "@expo/vector-icons";
 import { getAvatarAssets } from "@/constants/Avatars";
+import { moderateScale } from "react-native-size-matters";
 
 const AvatarListBar = ({
   members,
@@ -68,7 +69,7 @@ const AvatarListBar = ({
               <View style={styles.avatar}>
                 <ProfileAvatar
                   img_src={avatars ? [avatars[Number(item.custom_json)]] : []}
-                  size={50}
+                  size={moderateScale(48, 0.8)}
                   theme_colors={colors}
                 />
                 {resetCandidates ? (
@@ -114,11 +115,12 @@ const styles = StyleSheet.create({
   },
   avatar: {
     marginVertical: 10,
-    marginHorizontal: 16,
+    marginHorizontal: moderateScale(10, 2),
   },
   name: {
     alignSelf: "center",
     paddingTop: 5,
+    fontSize: moderateScale(10, 2),
   },
 });
 

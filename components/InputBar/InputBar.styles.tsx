@@ -5,6 +5,7 @@ import {
   ThemeColorsProps,
   TextInputBarProps,
 } from "@/constants/ComponentTypes";
+import { moderateScale } from "react-native-size-matters";
 
 export const InputBarContainer: React.FC<TextInputBarProps> = styled.KeyboardAvoidingView.attrs(
   {
@@ -37,7 +38,7 @@ export const TextInput: React.FC<TextInputBarProps> = styled.TextInput.attrs(
     ...props,
   })
 )`
-  width: 250px;
+  width: 68%;
   height: ${(props) => props.inputHeight + 20}px;
   max-height: 120px;
   padding-left: 5px;
@@ -52,5 +53,5 @@ export const OffsetFooter: React.FC<{
   theme_colors: ThemeColorsProps;
 }> = styled.View`
   background-color: ${(props) => props.theme_colors.background};
-  height: ${Platform.OS === "ios" ? 30 : 0}px;
+  height: ${Platform.OS === "ios" ? moderateScale(20, 3) : 0}px;
 `;

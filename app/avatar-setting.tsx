@@ -8,6 +8,7 @@ import { AuthenticationContext } from "@/api/authentication/authentication.conte
 import { Asset, useAssets } from "expo-asset";
 import ProfileBar from "@/components/ProfileBar/ProfileBar.component";
 import { getAvatarAssets } from "@/constants/Avatars";
+import { moderateScale } from "react-native-size-matters";
 
 export default function AvatarSettingsScreen() {
   const { user } = useContext(AuthenticationContext);
@@ -64,7 +65,7 @@ export default function AvatarSettingsScreen() {
                 >
                   <ProfileAvatar
                     img_src={[item]}
-                    size={50}
+                    size={moderateScale(47, 0.8)}
                     theme_colors={colors}
                   />
                 </View>
@@ -103,10 +104,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
     marginVertical: 10,
+    height: "80%",
   },
   avatar: {
     marginVertical: 10,
-    marginHorizontal: 16,
+    marginHorizontal: moderateScale(10, 2),
   },
   name: {
     alignSelf: "center",

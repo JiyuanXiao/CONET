@@ -229,6 +229,7 @@ export const getTotalRowCount = async (
     if (!result) {
       return 0;
     }
+    return result.total_rows;
   } catch (error) {
     console.error("[Message Storage] Error fetching total row count:", error);
     return 0;
