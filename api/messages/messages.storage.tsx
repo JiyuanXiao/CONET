@@ -185,9 +185,11 @@ export const storeMessage = async (
   return lastest_message;
 };
 
-export const fetchAllMessages = async (
+export const fetchChunkOfMessages = async (
   username: string | undefined,
   chat_id: number,
+  chunk_size: number,
+  offset: number,
   db: SQLiteDatabase
 ) => {
   if (!username || username.length === 0) {
@@ -196,17 +198,39 @@ export const fetchAllMessages = async (
   }
 
   try {
-    const all_msg = (await db.getAllAsync(
-      `SELECT message_id, sender_username, text_content, file_url, content_type, timestamp FROM ${username}_messages_${chat_id} ORDER BY message_id DESC;`
+    // const messages = (await db.getAllAsync(
+    //   `SELECT message_id, sender_username, text_content, file_url, content_type, timestamp FROM ${username}_messages_${chat_id} ORDER BY message_id DESC `
+    // )) as MessagesProps[];
+    const messages = (await db.getAllAsync(
+      `SELECT message_id, sender_username, text_content, file_url, content_type, timestamp FROM ${username}_messages_${chat_id} ORDER BY message_id DESC LIMIT ${chunk_size} OFFSET ${offset};`
     )) as MessagesProps[];
-    if (all_msg) {
+    if (messages) {
       console.log(
-        `[Message Storage] Fetched all message from table [${username}_messages_${chat_id}] successfully...`
+        `[Message Storage] Fetched ${chunk_size} messages with offset ${offset} from table [${username}_messages_${chat_id}] successfully...`
       );
     }
-    return all_msg;
+    return messages;
   } catch (err) {
-    console.error("[Message Storage] fetchAllMessages(): " + err);
+    console.error("[Message Storage] fetchChunkOfMessages(): " + err);
     return [];
+  }
+};
+
+export const getTotalRowCount = async (
+  username: string | undefined,
+  chat_id: number,
+  db: SQLiteDatabase
+) => {
+  try {
+    const result: { total_rows: number } | null = await db.getFirstAsync(
+      `SELECT COUNT(*) as total_rows FROM ${username}_messages_${chat_id};`
+    );
+
+    if (!result) {
+      return 0;
+    }
+  } catch (error) {
+    console.error("[Message Storage] Error fetching total row count:", error);
+    return 0;
   }
 };

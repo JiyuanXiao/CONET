@@ -95,10 +95,7 @@ export default function ChatListScreen() {
           return avatar_list;
       }
     } else {
-      const [assets, error] = useAssets([
-        require("@/assets/avatars/avatar_default.png"),
-      ]);
-      return assets ? assets : [];
+      return [];
     }
   };
 
