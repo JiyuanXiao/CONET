@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
-import { TouchableOpacity, Alert } from "react-native";
+import { TouchableOpacity, Alert, Text } from "react-native";
+import { Modal, Portal, ActivityIndicator } from "react-native-paper";
 import { useTheme } from "@react-navigation/native";
 import { InputBarContainer, InputBox, OffsetFooter } from "./InputBar.styles";
 import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
@@ -57,7 +58,9 @@ const InputBar = (props: InputBarProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const { sendMessage } = useContext(MessagesContext);
-  const [assets, error] = useAssets([require("@/assets/images/icon.png")]);
+  const [modal_visible, setModalVisible] = React.useState(false);
+  const showModal = () => setModalVisible(true);
+  const hideModal = () => setModalVisible(false);
 
   const pickImage = async () => {
     // Ask for permission to access the media library
@@ -70,15 +73,15 @@ const InputBar = (props: InputBarProps) => {
     }
 
     // Pick an image
-    console.log("start");
+    showModal();
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: false,
       allowsMultipleSelection: true,
       selectionLimit: 9,
-      quality: 0.5,
+      quality: 0.4,
     });
-    console.log("finished");
+    hideModal();
 
     if (!result.canceled) {
       console.log("file size: " + result.assets[0].fileSize);
@@ -158,6 +161,31 @@ const InputBar = (props: InputBarProps) => {
 
   return (
     <>
+      <Portal>
+        <Modal
+          visible={modal_visible}
+          onDismiss={hideModal}
+          contentContainerStyle={{
+            backgroundColor: colors.card,
+            padding: 20,
+            width: "40%",
+            height: "10%",
+            justifyContent: "center",
+            alignSelf: "center",
+            borderRadius: 15,
+            flexDirection: "row",
+          }}
+        >
+          <ActivityIndicator
+            size="small"
+            color={colors.primary}
+            style={{ paddingHorizontal: 10 }}
+          />
+          <Text style={{ color: colors.text, alignSelf: "center" }}>
+            文件加载中...
+          </Text>
+        </Modal>
+      </Portal>
       <InputBarContainer inputHeight={inputHeight} theme_colors={colors}>
         <InputBox inputHeight={inputHeight} theme_colors={colors}>
           <TouchableOpacity onPress={pickImage}>

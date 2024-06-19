@@ -170,10 +170,13 @@ export const MessagesContextProvider = (props: {
       setMessageMap(chat_id, updated_messages_object);
 
       try {
-        await sendNotificationByChatIdRef.current(chat_id);
-        console.log(
-          `[Message Context] chat ${chat_id}: sent notifications to server successfully...`
-        );
+        // sending video will take longer than usual, so send notificaiton after video is sent
+        if (current_context_type !== "video_uri") {
+          await sendNotificationByChatIdRef.current(chat_id);
+          console.log(
+            `[Message Context] chat ${chat_id}: sent notifications to server successfully...`
+          );
+        }
         const success = await MessageServer.SendChatMessage(
           user?.username || "",
           user?.secret || "",
@@ -182,6 +185,12 @@ export const MessagesContextProvider = (props: {
           file_uri,
           temp_timestamp
         );
+        if (current_context_type === "video_uri" && success) {
+          await sendNotificationByChatIdRef.current(chat_id);
+          console.log(
+            `[Message Context] chat ${chat_id}: sent notifications to server successfully...`
+          );
+        }
         if (success) {
           console.log(
             `[Message Context] chat ${chat_id}: sent message to server successfully...`
