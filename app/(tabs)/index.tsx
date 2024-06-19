@@ -111,9 +111,10 @@ export default function ChatListScreen() {
 
     const result = {
       last_message:
-        target_messages.loaded_messages[0].content_type === "image_base64" ||
         target_messages.loaded_messages[0].content_type === "image_uri"
           ? "[图片]"
+          : target_messages.loaded_messages[0].content_type === "video_uri"
+          ? "视频"
           : target_messages.loaded_messages[0].text_content,
       last_message_time: target_messages.loaded_messages[0].timestamp,
     };

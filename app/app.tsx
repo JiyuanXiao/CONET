@@ -101,6 +101,15 @@ const App = () => {
             headerTitleAlign: "center",
           }}
         />
+        <Stack.Screen
+          name="video-screen"
+          options={{
+            headerBackTitleVisible: true,
+            headerBackTitle: "返回",
+            headerTitleAlign: "center",
+            title: "",
+          }}
+        />
       </Stack>
     ) : (
       <LoginScreen />

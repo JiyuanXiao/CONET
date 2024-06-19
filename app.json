@@ -12,7 +12,9 @@
       "resizeMode": "cover",
       "backgroundColor": "#fcc404"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ianxiao.CONET",
@@ -65,7 +67,8 @@
         {
           "assets": []
         }
-      ]
+      ],
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true

@@ -7,6 +7,7 @@ export const SendChatMessage = async (
   secret: string,
   chat_id: number,
   content: string,
+  file_uri: string | null,
   temp_timestamp: string
 ) => {
   if (username.length === 0 || secret.length === 0) {
@@ -24,18 +25,54 @@ export const SendChatMessage = async (
     "User-Secret": secret,
   };
 
-  const data = {
-    text: content,
-    custom_json: temp_timestamp,
-  };
+  if (file_uri) {
+    const data: Record<string, string> = {};
+    data["text"] = content;
+    data["custom_json"] = temp_timestamp;
 
-  try {
-    const response = await axios.post(url, data, { headers });
-    console.log(`[Message API] POST: SendChatMessage() for ${username}`);
-    return true;
-  } catch (err) {
-    console.error(`[Message API] POST: SendChatMessage() ERROR: ${err}`);
-    return false;
+    const options: FileSystem.FileSystemUploadOptions = {
+      headers: {
+        "Project-ID": process.env.EXPO_PUBLIC_PROJECT_ID || "",
+        "User-Name": username,
+        "User-Secret": secret,
+      },
+      httpMethod: "POST",
+      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+      fieldName: "attachments",
+      parameters: data,
+    };
+
+    try {
+      const response = await FileSystem.uploadAsync(url, file_uri, options);
+      if (response.status === 413) {
+        throw new Error("Error 413: File size too large");
+      } else if (response.status !== 200 && response.status !== 201) {
+        throw new Error(`Error ${response.status}: send file failed`);
+      }
+      console.log(
+        `[Message API] POST: SendChatMessage() send file done with status: ${response.status}`
+      );
+      return true;
+    } catch (err) {
+      console.error(
+        `[Message API] POST: SendChatMessage() send file ERROR: ${err}`
+      );
+      return false;
+    }
+  } else {
+    const data = {
+      text: content,
+      custom_json: temp_timestamp,
+    };
+
+    try {
+      const response = await axios.post(url, data, { headers });
+      console.log(`[Message API] POST: SendChatMessage() for ${username}`);
+      return true;
+    } catch (err) {
+      console.error(`[Message API] POST: SendChatMessage() ERROR: ${err}`);
+      return false;
+    }
   }
 };
 
@@ -100,53 +137,3 @@ export const GetUnreadChatMessages = async (
     curr_messages_count += AMOUNT_OF_MESSAGES_GET_AT_ONCE;
   }
 };
-
-// export const ReadMessage = async (
-//   username: string,
-//   secret: string,
-//   chat_id: number,
-//   last_read_message_id: number
-// ) => {
-//   const url = `${process.env.EXPO_PUBLIC_BASE_URL}/chats/${chat_id}/people/`;
-
-//   const headers = {
-//     "Project-ID": process.env.EXPO_PUBLIC_PROJECT_ID,
-//     "User-Name": username,
-//     "User-Secret": secret,
-//   };
-
-//   const data = new FormData();
-//   data.append("last_read", last_read_message_id.toString());
-
-//   try {
-//     await axios.patch(url, data, { headers });
-//     console.log(
-//       `PATCH Request: ReadMessage() for ${username}: updated lastest read message as ${last_read_message_id}`
-//     );
-//   } catch (err: any) {
-//     console.error(`PATCH Request: ReadMessage() ERROR:`, err.message);
-//   }
-// };
-
-// export const GetChatMessages = async (
-//   username: string,
-//   secret: string,
-//   chat_id: number
-// ): Promise<CE_MessageProps[]> => {
-//   const url = `${process.env.EXPO_PUBLIC_BASE_URL}/chats/${chat_id}/messages`;
-
-//   const headers = {
-//     "Project-ID": process.env.EXPO_PUBLIC_PROJECT_ID,
-//     "User-Name": username,
-//     "User-Secret": secret,
-//   };
-
-//   try {
-//     const response = await axios.get(url, { headers });
-//     console.log(`GET Request: GetChatMessages() for ${username}`);
-//     return response.data;
-//   } catch (err) {
-//     console.error(`GET Request: GetChatMessages() ERROR:`, err);
-//     return [];
-//   }
-// };

@@ -119,20 +119,35 @@ export const MessagesContextProvider = (props: {
     const content_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
     // determine the content type
     let current_context_type;
+    let file_uri;
 
     if (message_content.startsWith(`[${content_header}][系统消息]`)) {
       current_context_type = "system";
+      file_uri = null;
     } else if (message_content.startsWith(`[${content_header}][图片]`)) {
-      current_context_type = "image_base64";
+      current_context_type = "image_uri";
+      file_uri = message_content.replace(
+        new RegExp(`^\\[${content_header}\\]\\[图片\\]`),
+        ""
+      );
+      message_content = `[${content_header}][图片]`;
+    } else if (message_content.startsWith(`[${content_header}][视频]`)) {
+      current_context_type = "video_uri";
+      file_uri = message_content.replace(
+        new RegExp(`^\\[${content_header}\\]\\[视频\\]`),
+        ""
+      );
+      message_content = `[${content_header}][视频]`;
     } else {
       current_context_type = "text";
+      file_uri = null;
     }
 
     const new_message = {
       message_id: -1,
       sender_username: user?.username || "",
-      text_content: current_context_type === "url" ? "" : message_content,
-      file_url: current_context_type === "url" ? message_content : "",
+      text_content: message_content,
+      file_url: file_uri ? file_uri : "",
       content_type: current_context_type,
       timestamp: temp_timestamp,
     };
@@ -164,11 +179,18 @@ export const MessagesContextProvider = (props: {
           user?.secret || "",
           chat_id,
           message_content,
+          file_uri,
           temp_timestamp
         );
-        console.log(
-          `[Message Context] chat ${chat_id}: sent message to server successfully...`
-        );
+        if (success) {
+          console.log(
+            `[Message Context] chat ${chat_id}: sent message to server successfully...`
+          );
+        } else {
+          console.warn(
+            `[Message Context] chat ${chat_id}: sent message to server failed`
+          );
+        }
         return success;
       } catch (err) {
         console.error(
@@ -190,7 +212,6 @@ export const MessagesContextProvider = (props: {
     temp_timestamp: string
   ): boolean => {
     const target_messages_object = messages.get(Number(chat_id));
-    const message_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
 
     if (!target_messages_object) {
       console.log(
@@ -202,8 +223,8 @@ export const MessagesContextProvider = (props: {
     const received_message = {
       message_id: message.message_id,
       sender_username: message.sender_username,
-      text_content: message.content_type !== "url" ? message.text_content : "",
-      file_url: message.content_type === "url" ? message.file_url : "",
+      text_content: message.text_content,
+      file_url: message.file_url,
       content_type: message.content_type,
       timestamp: message.timestamp,
     } as MessagesProps;

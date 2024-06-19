@@ -7,7 +7,7 @@ import {
   Bubble,
   BubbleTime,
   BubbleAlias,
-} from "./ImageMessageBubble.styles";
+} from "./VideoMessageBubble.styles";
 import BubbleAvatar from "./BubbleAvatar.component";
 import { useTheme } from "@react-navigation/native";
 import { MessagesProps } from "@/constants/ContextTypes";
@@ -17,6 +17,7 @@ import { ActivityIndicator } from "react-native-paper";
 import ImageView from "react-native-image-viewing";
 import * as MediaLibrary from "expo-media-library";
 import { getAvatarAssets } from "@/constants/Avatars";
+import * as VideoThumbnails from "expo-video-thumbnails";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -41,7 +42,7 @@ const formatTimestamp = (utc_timestamp: string) => {
   }
 };
 
-const ImageMessageBubble = ({
+const VideoMessageBubble = ({
   chat_id,
   chat_member,
   message_object,
@@ -63,13 +64,15 @@ const ImageMessageBubble = ({
   const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
   const avatars = getAvatarAssets();
 
-  const HandleViewImage = () => {
-    const uri = message_object.file_url;
-    setImageUri(uri);
-    setImageViewerVisiable(true);
-  };
+  const [thumbnail, setThumbnail] = useState<string>("");
 
-  const savePhoto = useCallback(async (uri: string) => {
+  //   const HandleViewImage = () => {
+  //     const uri = message_object.file_url;
+  //     setImageUri(uri);
+  //     setImageViewerVisiable(true);
+  //   };
+
+  const saveVideo = useCallback(async (uri: string) => {
     let current_permission = permissionResponse;
     if (!current_permission || current_permission.status !== "granted") {
       current_permission = await requestPermission();
@@ -81,7 +84,7 @@ const ImageMessageBubble = ({
       return;
     }
 
-    Alert.alert("确认保存图片?", "", [
+    Alert.alert("确认保存视频?", "", [
       {
         isPreferred: true,
         text: "确认",
@@ -106,24 +109,38 @@ const ImageMessageBubble = ({
     ]);
   }, []);
 
+  useEffect(() => {
+    const generateThumbnail = async () => {
+      try {
+        const { uri } = await VideoThumbnails.getThumbnailAsync(
+          message_object.file_url,
+          {
+            time: 0,
+          }
+        );
+        setThumbnail(uri);
+      } catch (e) {
+        console.warn(e);
+      }
+    };
+    generateThumbnail();
+  }, []);
+
   return chat_member ? (
     <>
-      <ImageView
-        images={[{ uri: image_uri }]}
-        imageIndex={0}
-        visible={image_viewer_visiable && image_uri.length > 0}
-        onRequestClose={() => {
-          setImageViewerVisiable(false);
-          setImageUri("");
-        }}
-        onLongPress={() => {
-          savePhoto(image_uri);
-        }}
-      />
       <BubbleConatiner isReceived={is_received} theme_colors={colors}>
-        <TouchableOpacity onPress={HandleViewImage}>
+        <TouchableOpacity
+          onPress={() => {
+            router.push({
+              pathname: "/video-screen",
+              params: {
+                video_source: message_object.file_url,
+              },
+            });
+          }}
+        >
           <Bubble isReceived={is_received} theme_colors={colors}>
-            <BubbleImageContent source={message_object.file_url} />
+            <BubbleImageContent source={thumbnail} />
           </Bubble>
           {Number(message_object.message_id) < 0 ? (
             <ActivityIndicator color={colors.primary} size={14} />
@@ -167,4 +184,4 @@ const ImageMessageBubble = ({
   );
 };
 
-export default ImageMessageBubble;
+export default VideoMessageBubble;

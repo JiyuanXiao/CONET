@@ -108,49 +108,98 @@ export const storeMessage = async (
   let current_context_type;
 
   if (!message_object.text) {
-    current_context_type = "file";
+    current_context_type = "invalid";
   } else if (message_object.text.startsWith(`[${message_header}][系统消息]`)) {
     current_context_type = "system";
   } else if (message_object.text.startsWith(`[${message_header}][图片]`)) {
-    const base_64_data_match = message_object.text.match(
-      /data:image\/\w+;base64,([\s\S]*)/
-    );
-    const file_extension = message_object.text.match(
-      /data:image\/(\w+);base64,/
-    );
-    if (
-      base_64_data_match &&
-      base_64_data_match.length > 1 &&
-      file_extension &&
-      file_extension.length > 1
-    ) {
-      const base_64_data = base_64_data_match[1];
-      const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
-      const file_path = `${directory_path}${message_object.id}.${file_extension[1]}`;
-      try {
-        const dir_info = await FileSystem.getInfoAsync(directory_path);
-        if (!dir_info.exists) {
-          await FileSystem.makeDirectoryAsync(directory_path, {
-            intermediates: true,
-          });
-        }
-        await FileSystem.writeAsStringAsync(file_path, base_64_data, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        message_object.text = file_path;
-        console.log(`[Message Storage] saved image to ${message_object.text}`);
-      } catch (err) {
-        console.error(`[Message Storage] saving image to file system failed`);
-        return;
-      }
+    // const base_64_data_match = message_object.text.match(
+    //   /data:image\/\w+;base64,([\s\S]*)/
+    // );
+    // const file_extension = message_object.text.match(
+    //   /data:image\/(\w+);base64,/
+    // );
+    // if (
+    //   base_64_data_match &&
+    //   base_64_data_match.length > 1 &&
+    //   file_extension &&
+    //   file_extension.length > 1
+    // ) {
+    //   const base_64_data = base_64_data_match[1];
+    //   const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
+    //   const file_path = `${directory_path}${message_object.id}.${file_extension[1]}`;
+    //   try {
+    //     const dir_info = await FileSystem.getInfoAsync(directory_path);
+    //     if (!dir_info.exists) {
+    //       await FileSystem.makeDirectoryAsync(directory_path, {
+    //         intermediates: true,
+    //       });
+    //     }
+    //     await FileSystem.writeAsStringAsync(file_path, base_64_data, {
+    //       encoding: FileSystem.EncodingType.Base64,
+    //     });
+    //     message_object.text = file_path;
+    //     console.log(`[Message Storage] saved image to ${message_object.text}`);
+    //   } catch (err) {
+    //     console.error(`[Message Storage] saving image to file system failed`);
+    //     return;
+    //   }
+    // }
+
+    const file_url = message_object.attachments[0].file;
+    const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
+    const file_extension = file_url.match(/\/attachments\/[^?]+\.(\w+)\?/);
+    let file_path;
+    if (file_extension && file_extension.length > 1) {
+      file_path = `${directory_path}${message_object.id}.${file_extension[1]}`;
     } else {
-      console.error(message_object.text.substring(0, 100));
+      file_path = `${directory_path}${message_object.id}.png`;
+    }
+    try {
+      const dir_info = await FileSystem.getInfoAsync(directory_path);
+      if (!dir_info.exists) {
+        await FileSystem.makeDirectoryAsync(directory_path, {
+          intermediates: true,
+        });
+      }
+      await FileSystem.downloadAsync(file_url, file_path);
+      message_object.attachments[0].file = file_path;
+      console.log(`[Message Storage] saved image to ${file_path}`);
+    } catch (err) {
       console.error(
-        "[Message Storage] storeMessage(): Invalid input string format"
+        `[Message Storage] saving image to file system failed: ${err}`
       );
       return;
     }
+    message_object.text = "[图片]";
     current_context_type = "image_uri";
+  } else if (message_object.text.startsWith(`[${message_header}][视频]`)) {
+    const file_url = message_object.attachments[0].file;
+    const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
+    const file_extension = file_url.match(/\/attachments\/[^?]+\.(\w+)\?/);
+    let file_path;
+    if (file_extension && file_extension.length > 1) {
+      file_path = `${directory_path}${message_object.id}.${file_extension[1]}`;
+    } else {
+      file_path = `${directory_path}${message_object.id}.mp4`;
+    }
+    try {
+      const dir_info = await FileSystem.getInfoAsync(directory_path);
+      if (!dir_info.exists) {
+        await FileSystem.makeDirectoryAsync(directory_path, {
+          intermediates: true,
+        });
+      }
+      await FileSystem.downloadAsync(file_url, file_path);
+      message_object.attachments[0].file = file_path;
+      console.log(`[Message Storage] saved video to ${file_path}}`);
+    } catch (err) {
+      console.error(
+        `[Message Storage] saving video to file system failed: ${err}`
+      );
+      return;
+    }
+    message_object.text = "[视频]";
+    current_context_type = "video_uri";
   } else {
     current_context_type = "text";
   }
@@ -162,7 +211,9 @@ export const storeMessage = async (
       message_object.id,
       message_object.sender.username,
       message_object.text ? message_object.text : "",
-      "",
+      message_object.attachments.length > 0
+        ? message_object.attachments[0].file
+        : "",
       current_context_type,
       message_object.created
     );

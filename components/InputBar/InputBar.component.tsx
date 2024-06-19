@@ -8,6 +8,7 @@ import { ThemeColorsProps, InputBarProps } from "@/constants/ComponentTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 import * as ImagePicker from "expo-image-picker";
+import { useAssets, Asset } from "expo-asset";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   <FontAwesome
@@ -56,6 +57,7 @@ const InputBar = (props: InputBarProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const { sendMessage } = useContext(MessagesContext);
+  const [assets, error] = useAssets([require("@/assets/images/icon.png")]);
 
   const pickImage = async () => {
     // Ask for permission to access the media library
@@ -68,24 +70,47 @@ const InputBar = (props: InputBarProps) => {
     }
 
     // Pick an image
+    console.log("start");
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: false,
       allowsMultipleSelection: true,
       selectionLimit: 9,
-      base64: true,
       quality: 0.5,
     });
+    console.log("finished");
 
     if (!result.canceled) {
+      console.log("file size: " + result.assets[0].fileSize);
       try {
-        for (const image of result.assets) {
-          const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][图片]data:${image.mimeType};base64,${image.base64}`;
-          await sendMessage(props.chat_id, new_message, Date.now().toString());
+        for (const asset of result.assets) {
+          if (asset.fileSize && asset.fileSize > 20000000) {
+            Alert.alert("文件过大", "服务器不支持超过19.5M的文件", [
+              { text: "OK", onPress: () => {} },
+            ]);
+          } else if (asset.type === "image") {
+            //const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][图片]data:${image.mimeType};base64,${image.base64}`;
+            const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][图片]${asset.uri}`;
+            await sendMessage(
+              props.chat_id,
+              new_message,
+              Date.now().toString()
+            );
+          } else if (asset.type === "video") {
+            console.log("file size: " + asset.fileSize);
+            const new_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][视频]${asset.uri}`;
+            await sendMessage(
+              props.chat_id,
+              new_message,
+              Date.now().toString()
+            );
+          } else {
+            console.warn("[InputBar] Unknow type of media, message is aborted");
+          }
         }
       } catch (error) {
-        console.error("Error converting the image:", error);
-        Alert.alert("Error converting the image");
+        console.error("Error in sending the image or video:", error);
+        Alert.alert("发送出错", "", [{ text: "OK", onPress: () => {} }]);
       }
     }
   };
