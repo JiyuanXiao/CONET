@@ -144,7 +144,7 @@ export const MessagesContextProvider = (props: {
     }
 
     const new_message = {
-      message_id: -1,
+      message_id: 0,
       sender_username: user?.username || "",
       text_content: message_content,
       file_url: file_uri ? file_uri : "",
@@ -196,6 +196,28 @@ export const MessagesContextProvider = (props: {
             `[Message Context] chat ${chat_id}: sent message to server successfully...`
           );
         } else {
+          const failed_sent_message = {
+            message_id: -1,
+            sender_username: user?.username || "",
+            text_content: message_content,
+            file_url: file_uri ? file_uri : "",
+            content_type: current_context_type,
+            timestamp: temp_timestamp,
+          };
+          const updated_messages_object_with_failed_message: MessageContextObjectProps =
+            {
+              chat_id: chat_id,
+              loaded_messages: [
+                failed_sent_message,
+                ...target_messages_object.loaded_messages,
+              ],
+              current_index: target_messages_object.current_index + 1,
+              total_messages_amount:
+                target_messages_object.total_messages_amount + 1,
+            };
+
+          // Replace the target message object by the loaded one
+          setMessageMap(chat_id, updated_messages_object_with_failed_message);
           console.warn(
             `[Message Context] chat ${chat_id}: sent message to server failed`
           );

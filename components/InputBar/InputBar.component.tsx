@@ -88,7 +88,7 @@ const InputBar = (props: InputBarProps) => {
       try {
         for (const asset of result.assets) {
           if (asset.fileSize && asset.fileSize > 20000000) {
-            Alert.alert("文件过大", "服务器不支持超过19.5M的文件", [
+            Alert.alert("文件过大", "文件不能超过19.5M", [
               { text: "OK", onPress: () => {} },
             ]);
           } else if (asset.type === "image") {

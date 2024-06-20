@@ -14,10 +14,10 @@ import { MessagesProps } from "@/constants/ContextTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
-import ImageView from "react-native-image-viewing";
-import * as MediaLibrary from "expo-media-library";
 import { getAvatarAssets } from "@/constants/Avatars";
 import * as VideoThumbnails from "expo-video-thumbnails";
+import { FontAwesome } from "@expo/vector-icons";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -55,13 +55,10 @@ const VideoMessageBubble = ({
 }) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
+  const { sendMessage } = useContext(MessagesContext);
 
   const is_received = user?.username !== message_object.sender_username;
   const lastMessageTime = formatTimestamp(message_object.timestamp);
-  const text_header = process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR;
-  const [image_uri, setImageUri] = useState("");
-  const [image_viewer_visiable, setImageViewerVisiable] = useState(false);
-  const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
   const avatars = getAvatarAssets();
 
   const [thumbnail, setThumbnail] = useState<string>("");
@@ -72,42 +69,18 @@ const VideoMessageBubble = ({
   //     setImageViewerVisiable(true);
   //   };
 
-  const saveVideo = useCallback(async (uri: string) => {
-    let current_permission = permissionResponse;
-    if (!current_permission || current_permission.status !== "granted") {
-      current_permission = await requestPermission();
-      console.log(current_permission);
-    }
+  const resendMessage = async () => {
+    const message = `${message_object.text_content}${message_object.file_url}`;
+    console.log(message);
+    await sendMessage(chat_id, message, Date.now().toString());
+  };
 
-    if (current_permission?.status !== "granted") {
-      Alert.alert("未成功授权访问相册");
-      return;
-    }
-
-    Alert.alert("确认保存视频?", "", [
-      {
-        isPreferred: true,
-        text: "确认",
-        onPress: async () => {
-          try {
-            await MediaLibrary.saveToLibraryAsync(uri);
-            Alert.alert("保存成功", "", [{ text: "OK", onPress: () => {} }]);
-          } catch (err) {
-            console.error(
-              `[ImageMessageBubble.component] savePhoto: failed to save phto to library: ${err}`
-            );
-          }
-        },
-        style: "default",
-      },
-      {
-        isPreferred: false,
-        text: "取消",
-        onPress: () => {},
-        style: "destructive",
-      },
+  const handleFailedMessage = () => {
+    Alert.alert("消息发送失败", "", [
+      { text: "重新发送", onPress: resendMessage },
+      { text: "取消", onPress: () => {} },
     ]);
-  }, []);
+  };
 
   useEffect(() => {
     const generateThumbnail = async () => {
@@ -129,6 +102,18 @@ const VideoMessageBubble = ({
   return chat_member ? (
     <>
       <BubbleConatiner isReceived={is_received} theme_colors={colors}>
+        {message_object.message_id < 0 && (
+          <TouchableOpacity
+            style={{ alignSelf: "center" }}
+            onPress={handleFailedMessage}
+          >
+            <FontAwesome
+              name="exclamation-circle"
+              size={24}
+              color={colors.notification}
+            />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           onPress={() => {
             router.push({
@@ -141,8 +126,16 @@ const VideoMessageBubble = ({
         >
           <Bubble isReceived={is_received} theme_colors={colors}>
             <BubbleImageContent source={thumbnail} />
+            <FontAwesome
+              name="play-circle"
+              size={30}
+              color={colors.card}
+              style={{ position: "absolute", top: "50%", left: "55%" }}
+            />
           </Bubble>
           {Number(message_object.message_id) < 0 ? (
+            <></>
+          ) : Number(message_object.message_id) === 0 ? (
             <ActivityIndicator color={colors.primary} size={14} />
           ) : (
             <BubbleTime isReceived={is_received} theme_colors={colors}>

@@ -65,9 +65,6 @@ export const WebSocketProvider = ({
 
   const handleNewMessage = async (message_data: MessageDataProps) => {
     console.log(`[WebSocket] action: new_message for chat ${message_data.id}`);
-    // update message context
-
-    // update message storage
 
     if (
       !MessagesStorage.messageTableExist(user?.username, message_data.id, db)

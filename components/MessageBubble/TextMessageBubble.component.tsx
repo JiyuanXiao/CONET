@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { router } from "expo-router";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, Alert } from "react-native";
 import {
   BubbleContent,
   BubbleConatiner,
@@ -15,6 +15,8 @@ import { AuthenticationContext } from "@/api/authentication/authentication.conte
 import { CE_ChatMemberProps } from "@/constants/ChatEngineObjectTypes";
 import { ActivityIndicator } from "react-native-paper";
 import { getAvatarAssets } from "@/constants/Avatars";
+import { FontAwesome } from "@expo/vector-icons";
+import { MessagesContext } from "@/api/messages/messages.context";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -53,12 +55,37 @@ const TextMessageBubble = ({
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const avatars = getAvatarAssets();
-
+  const { sendMessage } = useContext(MessagesContext);
   const is_received = user?.username !== message_object.sender_username;
   const lastMessageTime = formatTimestamp(message_object.timestamp);
 
+  const resendMessage = async () => {
+    const message = `${message_object.text_content}`;
+    console.log(message);
+    await sendMessage(chat_id, message, Date.now().toString());
+  };
+
+  const handleFailedMessage = () => {
+    Alert.alert("消息发送失败", "", [
+      { text: "重新发送", onPress: resendMessage },
+      { text: "取消", onPress: () => {} },
+    ]);
+  };
+
   return chat_member ? (
     <BubbleConatiner isReceived={is_received} theme_colors={colors}>
+      {message_object.message_id < 0 && (
+        <TouchableOpacity
+          style={{ alignSelf: "center" }}
+          onPress={handleFailedMessage}
+        >
+          <FontAwesome
+            name="exclamation-circle"
+            size={24}
+            color={colors.notification}
+          />
+        </TouchableOpacity>
+      )}
       <View>
         <Bubble isReceived={is_received} theme_colors={colors}>
           <BubbleContent isReceived={is_received} theme_colors={colors}>
@@ -66,6 +93,8 @@ const TextMessageBubble = ({
           </BubbleContent>
         </Bubble>
         {Number(message_object.message_id) < 0 ? (
+          <></>
+        ) : Number(message_object.message_id) === 0 ? (
           <ActivityIndicator color={colors.primary} size={14} />
         ) : (
           <BubbleTime isReceived={is_received} theme_colors={colors}>

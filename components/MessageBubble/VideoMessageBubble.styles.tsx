@@ -7,6 +7,7 @@ import {
   MessageBubbleProps,
   ThemeColorsProps,
 } from "@/constants/ComponentTypes";
+import { FontAwesome } from "@expo/vector-icons";
 
 interface BubbleImageContentProps {
   source: string;
