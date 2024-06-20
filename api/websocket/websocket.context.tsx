@@ -96,7 +96,7 @@ export const WebSocketProvider = ({
         setHasNewMessageStatusRef.current(Number(message_data.id), true);
       }
     } else {
-      console.warn(`[WebSocket] Unable to store new message to local storage`);
+      console.warn(`[WebSocket] Unable to store message to local storage`);
     }
     console.log(
       `[WebSocket] finished new_message action: send by ${message_data.message.sender}`

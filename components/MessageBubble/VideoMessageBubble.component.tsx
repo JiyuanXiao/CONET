@@ -18,6 +18,7 @@ import { getAvatarAssets } from "@/constants/Avatars";
 import * as VideoThumbnails from "expo-video-thumbnails";
 import { FontAwesome } from "@expo/vector-icons";
 import { MessagesContext } from "@/api/messages/messages.context";
+import { moderateScale } from "react-native-size-matters";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -128,8 +129,8 @@ const VideoMessageBubble = ({
             <BubbleImageContent source={thumbnail} />
             <FontAwesome
               name="play-circle"
-              size={30}
-              color={colors.card}
+              size={moderateScale(25, 1.5)}
+              color="white"
               style={{ position: "absolute", top: "50%", left: "55%" }}
             />
           </Bubble>

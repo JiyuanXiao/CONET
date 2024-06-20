@@ -112,39 +112,6 @@ export const storeMessage = async (
   } else if (message_object.text.startsWith(`[${message_header}][系统消息]`)) {
     current_context_type = "system";
   } else if (message_object.text.startsWith(`[${message_header}][图片]`)) {
-    // const base_64_data_match = message_object.text.match(
-    //   /data:image\/\w+;base64,([\s\S]*)/
-    // );
-    // const file_extension = message_object.text.match(
-    //   /data:image\/(\w+);base64,/
-    // );
-    // if (
-    //   base_64_data_match &&
-    //   base_64_data_match.length > 1 &&
-    //   file_extension &&
-    //   file_extension.length > 1
-    // ) {
-    //   const base_64_data = base_64_data_match[1];
-    //   const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
-    //   const file_path = `${directory_path}${message_object.id}.${file_extension[1]}`;
-    //   try {
-    //     const dir_info = await FileSystem.getInfoAsync(directory_path);
-    //     if (!dir_info.exists) {
-    //       await FileSystem.makeDirectoryAsync(directory_path, {
-    //         intermediates: true,
-    //       });
-    //     }
-    //     await FileSystem.writeAsStringAsync(file_path, base_64_data, {
-    //       encoding: FileSystem.EncodingType.Base64,
-    //     });
-    //     message_object.text = file_path;
-    //     console.log(`[Message Storage] saved image to ${message_object.text}`);
-    //   } catch (err) {
-    //     console.error(`[Message Storage] saving image to file system failed`);
-    //     return;
-    //   }
-    // }
-
     const file_url = message_object.attachments[0].file;
     const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
     const file_extension = file_url.match(/\/attachments\/[^?]+\.(\w+)\?/);
@@ -220,6 +187,8 @@ export const storeMessage = async (
     console.log(
       `[Message Storage] Insert new message into table [${username}_messages_${chat_id}]: ${message_object.id}`
     );
+    const lastest_message = fetchLatestMessage(username, chat_id, db);
+    return lastest_message;
   } catch (err: any) {
     if (err.message.includes("UNIQUE constraint failed")) {
       console.log(
@@ -231,9 +200,6 @@ export const storeMessage = async (
       );
     }
   }
-
-  const lastest_message = fetchLatestMessage(username, chat_id, db);
-  return lastest_message;
 };
 
 export const fetchChunkOfMessages = async (

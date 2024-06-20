@@ -10,6 +10,7 @@ import { AuthenticationContext } from "@/api/authentication/authentication.conte
 import { MessagesContext } from "@/api/messages/messages.context";
 import * as ImagePicker from "expo-image-picker";
 import { useAssets, Asset } from "expo-asset";
+import { moderateScale } from "react-native-size-matters";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   <FontAwesome
@@ -177,11 +178,17 @@ const InputBar = (props: InputBarProps) => {
           }}
         >
           <ActivityIndicator
-            size="small"
+            size={moderateScale(18, 1)}
             color={colors.primary}
             style={{ paddingHorizontal: 10 }}
           />
-          <Text style={{ color: colors.text, alignSelf: "center" }}>
+          <Text
+            style={{
+              color: colors.text,
+              alignSelf: "center",
+              fontSize: moderateScale(12, 1.5),
+            }}
+          >
             文件加载中...
           </Text>
         </Modal>
