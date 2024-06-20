@@ -9,11 +9,13 @@ import {
 } from "react-native-paper";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { ChatsContext } from "@/api/chats/chats.context";
 
 export default function AccountSettingScreen() {
   const { user, chanegName, changePassword } = useContext(
     AuthenticationContext
   );
+  const { changeChatTitle } = useContext(ChatsContext);
   const [name, setName] = useState("");
   const [old_password, setOldPassword] = useState("");
   const [old_password_again, setOldPasswordAgain] = useState("");
@@ -25,32 +27,39 @@ export default function AccountSettingScreen() {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
-  const { setting_type } = route.params as {
+  const { setting_type, chat_id } = route.params as {
     setting_type: string;
+    chat_id: number;
   };
 
   const handleChangeName = async () => {
     try {
       setIsUpLoading(true);
-      const status_code = await chanegName(name);
-      if (status_code === 200) {
+      if (setting_type === "change-name") {
+        const status_code = await chanegName(name);
+        if (status_code === 200) {
+          navigation.goBack();
+        } else if (status_code === 429) {
+          Alert.alert("重置名字失败", "用户请求达到上限，请稍后再试", [
+            { text: "OK", onPress: () => {} },
+          ]);
+        } else if (status_code === 403 || status_code === 404) {
+          Alert.alert("重置名字失败", "用户信息认证失败，请联系开发人员", [
+            { text: "OK", onPress: () => {} },
+          ]);
+        } else if (status_code === 400) {
+          Alert.alert("重置名字失败", "无效请求，请联系开发人员", [
+            { text: "OK", onPress: () => {} },
+          ]);
+        } else {
+          Alert.alert("重置名字失败", "服务器错误，请联系开发人员", [
+            { text: "OK", onPress: () => {} },
+          ]);
+        }
+      } else if (setting_type === "change-chat-title") {
+        await changeChatTitle(chat_id, name);
+        Alert.alert("修改成功", "", [{ text: "OK", onPress: () => {} }]);
         navigation.goBack();
-      } else if (status_code === 429) {
-        Alert.alert("重置名字失败", "用户请求达到上限，请稍后再试", [
-          { text: "OK", onPress: () => {} },
-        ]);
-      } else if (status_code === 403 || status_code === 404) {
-        Alert.alert("重置名字失败", "用户信息认证失败，请联系开发人员", [
-          { text: "OK", onPress: () => {} },
-        ]);
-      } else if (status_code === 400) {
-        Alert.alert("重置名字失败", "无效请求，请联系开发人员", [
-          { text: "OK", onPress: () => {} },
-        ]);
-      } else {
-        Alert.alert("重置名字失败", "服务器错误，请联系开发人员", [
-          { text: "OK", onPress: () => {} },
-        ]);
       }
       setIsUpLoading(false);
     } catch (err) {
@@ -112,13 +121,17 @@ export default function AccountSettingScreen() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: setting_type === "change-name" ? "名字设置" : "更改密码",
+      title:
+        setting_type === "change-name" || setting_type === "change-chat-title"
+          ? "名字设置"
+          : "更改密码",
     });
   }, [navigation]);
 
   return (
     <View style={styles.container}>
-      {setting_type === "change-name" && (
+      {(setting_type === "change-name" ||
+        setting_type === "change-chat-title") && (
         <View style={styles.input_bar}>
           <Searchbar
             mode="bar"

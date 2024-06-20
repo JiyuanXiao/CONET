@@ -105,6 +105,16 @@ export default function ChatSettingsScreen() {
     });
   };
 
+  const changeChatTitle = () => {
+    router.push({
+      pathname: "/account-setting",
+      params: {
+        setting_type: "change-chat-title",
+        chat_id: chat_id,
+      },
+    });
+  };
+
   useEffect(() => {
     if (isConfirm) {
       actionFunction();
@@ -138,19 +148,19 @@ export default function ChatSettingsScreen() {
           " is not in chat context"
       );
     }
-  }, []);
-
-  useEffect(() => {
-    const current_chat = chats.get(Number(chat_id));
-    if (current_chat) {
-      const current_members = [];
-      for (const person of current_chat.people) {
-        current_members.push(person.person);
-      }
-      setChatMembers(current_members);
-      setIsDirectChat(current_chat.people.length <= 2);
-    }
   }, [chats]);
+
+  // useEffect(() => {
+  //   const current_chat = chats.get(Number(chat_id));
+  //   if (current_chat) {
+  //     const current_members = [];
+  //     for (const person of current_chat.people) {
+  //       current_members.push(person.person);
+  //     }
+  //     setChatMembers(current_members);
+  //     setIsDirectChat(current_chat.people.length <= 2);
+  //   }
+  // }, [chats]);
 
   return (
     <>
@@ -174,6 +184,9 @@ export default function ChatSettingsScreen() {
       )}
       <TouchableOpacity onPress={addChatMember}>
         <OptionBar content="添加新成员到群" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={changeChatTitle}>
+        <OptionBar content="修改群名称" />
       </TouchableOpacity>
       {is_clearing ? (
         <ActivityIndicator

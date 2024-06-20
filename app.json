@@ -12,13 +12,11 @@
       "resizeMode": "cover",
       "backgroundColor": "#fcc404"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ianxiao.CONET",
-      "buildNumber": "0"
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {

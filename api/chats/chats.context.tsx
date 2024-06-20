@@ -21,6 +21,7 @@ export const ChatsContext = createContext<ChatsContextProps>({
   setLastRead: async () => {},
   fetchChatDataFromServer: async () => {},
   resetChatContext: () => {},
+  changeChatTitle: async () => {},
 });
 
 // Friends context provides friend log such as last message and last message timestamp
@@ -215,6 +216,26 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     console.log("[Chat Context] Chat data has been loaded from server");
   };
 
+  const changeChatTitle = async (chat_id: number, new_title: string) => {
+    try {
+      const success = await ChatServer.UpdateChatDetails(
+        user?.username || "",
+        user?.secret || "",
+        chat_id,
+        new_title
+      );
+      if (!success) {
+        throw new Error("UpdateChatDetails() error");
+      } else {
+        console.log(
+          `[Chat Context] change chat ${chat_id}'s title successfully`
+        );
+      }
+    } catch (err) {
+      console.error(`[Chat Context] changeChatTitle: ${err}`);
+    }
+  };
+
   const initializeChatsContext = async () => {
     if (user) {
       setIsChatsInitialized(false);
@@ -267,6 +288,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         setLastRead,
         fetchChatDataFromServer,
         resetChatContext,
+        changeChatTitle,
       }}
     >
       {props.children}

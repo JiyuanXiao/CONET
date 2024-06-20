@@ -64,6 +64,7 @@ export interface ChatsContextProps {
   setLastRead: (chat_id: number, last_read_message_id: number) => Promise<void>;
   fetchChatDataFromServer: (user: CE_UserProps) => Promise<void>;
   resetChatContext: () => void;
+  changeChatTitle: (chat_id: number, new_title: string) => Promise<void>;
 }
 
 /////////////////////////////////////// MESSAGE CONTEXT ////////////////////////////////////////////////
