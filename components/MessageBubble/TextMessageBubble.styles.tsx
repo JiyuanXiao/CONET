@@ -6,10 +6,11 @@ import {
   ThemeColorsProps,
 } from "@/constants/ComponentTypes";
 
-export const BubbleContent: React.FC<MessageBubbleProps> = styled.Text.attrs<MessageBubbleProps>(
+export const BubbleContent: React.FC<MessageBubbleProps> = styled.TextInput.attrs<MessageBubbleProps>(
   (props) => ({
-    selectable: true,
-    selectionColor: props.theme_colors?.card,
+    editable: false,
+    value: props.value,
+    multiline: true,
   })
 )`
   font-size: 16px;
@@ -27,9 +28,9 @@ export const BubbleConatiner: React.FC<MessageBubbleProps> = styled.View`
 
 export const Bubble: React.FC<MessageBubbleProps> = styled.View`
   position: relative;
-  padding-horizontal: ${moderateScale(12, 2)}px;
-  padding-top: ${moderateScale(10, 2)}px;
-  padding-bottom: ${moderateScale(10, 2)}px;
+  padding-horizontal: ${moderateScale(8, 2)}px;
+  padding-top: ${moderateScale(5, 2)}px;
+  padding-bottom: ${moderateScale(8, 2)}px;
   margin-horizontal: ${moderateScale(5, 2)}px;
   max-width: ${moderateScale(250, 1)}px;
   border-radius: 25px;

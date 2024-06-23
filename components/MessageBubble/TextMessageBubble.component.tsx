@@ -88,9 +88,11 @@ const TextMessageBubble = ({
       )}
       <View>
         <Bubble isReceived={is_received} theme_colors={colors}>
-          <BubbleContent isReceived={is_received} theme_colors={colors}>
-            {message_object.text_content}
-          </BubbleContent>
+          <BubbleContent
+            isReceived={is_received}
+            theme_colors={colors}
+            value={message_object.text_content}
+          />
         </Bubble>
         {Number(message_object.message_id) < 0 ? (
           <></>

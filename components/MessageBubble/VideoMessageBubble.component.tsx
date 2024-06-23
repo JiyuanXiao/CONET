@@ -131,7 +131,10 @@ const VideoMessageBubble = ({
               name="play-circle"
               size={moderateScale(25, 1.5)}
               color="white"
-              style={{ position: "absolute", top: "50%", left: "55%" }}
+              style={{
+                position: "absolute",
+                alignSelf: "center",
+              }}
             />
           </Bubble>
           {Number(message_object.message_id) < 0 ? (

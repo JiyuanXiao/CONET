@@ -59,17 +59,12 @@ export const BubbleConatiner: React.FC<MessageBubbleProps> = styled.View`
 
 export const Bubble: React.FC<MessageBubbleProps> = styled.View`
   position: relative;
-  padding-horizontal: ${moderateScale(12, 2)}px;
-  padding-top: ${moderateScale(10, 2)}px;
-  padding-bottom: ${moderateScale(10, 2)}px;
+  justify-content: center;
+
+  margin-vertical: ${moderateScale(5, 2)}px;
   margin-horizontal: ${moderateScale(5, 2)}px;
   max-width: ${moderateScale(250, 1)}px;
-  border-radius: 25px;
-  border-bottom-left-radius: ${(props) => (props.isReceived ? "0" : "25")}px;
-  border-bottom-right-radius: ${(props) => (props.isReceived ? "25" : "0")}px;
-  border-color: ${(props) => props.theme_colors?.card};
-  border-style: solid;
-  border-width: 1px;
+
   background-color: ${(props) => props.theme_colors?.card};
 `;
 

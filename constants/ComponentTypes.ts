@@ -47,6 +47,7 @@ export interface InputBarProps {
 //MessageBubble Components props
 export interface MessageBubbleProps {
   isReceived: boolean;
+  value?: string;
   message_content?: string;
   avatar_img_src?: string[];
   theme_colors?: ThemeColorsProps;
