@@ -1,33 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Modal,
-  Animated,
-  Easing,
-  PanResponder,
-  GestureResponderEvent,
-  PanResponderGestureState,
-  PanResponderInstance,
-  Dimensions,
-} from "react-native";
+import React, { useEffect, useRef } from "react";
+import { StyleSheet, Text, View, Modal, Animated, Easing } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import { Audio } from "expo-av";
 import { FontAwesome } from "@expo/vector-icons";
-
-// async function getItems() {
-//   await new Promise((resolve) => setTimeout(resolve, 5000));
-//   return ['Apple', 'Banana', 'Orange', 'Pineapple', 'Mango', 'Kiwi'];
-// }
-
-// function Item({ name }) {
-//   return (
-//     <View style={styles.item}>
-//       <Text style={styles.itemText}>{name}</Text>
-//     </View>
-//   );
-// }
 
 function CustomActivityIndicator({
   time_left,
@@ -71,7 +45,7 @@ function CustomActivityIndicator({
             backgroundColor:
               time_left <= timeout_notice_point || !is_inside_panel
                 ? colors.notification
-                : colors.border,
+                : "#2ec42e",
           }}
         >
           {is_inside_panel ? (
@@ -124,32 +98,6 @@ function RecordingAnimationModal({
     </Modal>
   );
 }
-
-// function App() {
-//   const [items, setItems] = useState(['Pineapple', 'Mango', 'Kiwi']);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     getItems().then((items) => {
-//       setItems(items);
-//       setLoading(false);
-//     });
-//   }, []);
-
-//   const renderItem = ({ item }) => (
-//     <Item name={item}/>
-//   );
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <FlatList
-//         data={items}
-//         renderItem={renderItem}
-//       />
-//       { loading ? <LoadingAnimationModal/> : null }
-//     </SafeAreaView>
-//   );
-// };
 
 const styles = StyleSheet.create({
   container: {

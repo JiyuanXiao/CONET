@@ -6,8 +6,6 @@ import {
   PanResponder,
   GestureResponderEvent,
   PanResponderGestureState,
-  PanResponderInstance,
-  Animated,
   Dimensions,
 } from "react-native";
 import { Modal, Portal, ActivityIndicator } from "react-native-paper";
@@ -20,18 +18,13 @@ import {
 } from "./InputBar.styles";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
-import {
-  ThemeColorsProps,
-  InputBarProps,
-  VoiceInputBarProps,
-} from "@/constants/ComponentTypes";
+import { ThemeColorsProps, InputBarProps } from "@/constants/ComponentTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 import * as ImagePicker from "expo-image-picker";
 import { moderateScale } from "react-native-size-matters";
 import { Audio } from "expo-av";
 import RecordingAnimationModal from "../RecordingIndicator/RecordingIndicator";
-import * as FileSystem from "expo-file-system";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   <FontAwesome name="microphone" size={25} color={theme_colors.text} />
@@ -222,17 +215,6 @@ const InputBar = (props: InputBarProps) => {
       stopRecording();
     }
   }, [timeLeft]);
-
-  const playSound = async () => {
-    if (sound_uri) {
-      console.log(sound_uri);
-      // Get file size
-      const voice = await Audio.Sound.createAsync({ uri: sound_uri });
-      //const status = await voice.sound.getStatusAsync();
-      //console.log(status.durationMillis / 1000);
-      voice.sound.replayAsync();
-    }
-  };
 
   useEffect(() => {
     const setupSoundEffect = async () => {
@@ -481,9 +463,6 @@ const InputBar = (props: InputBarProps) => {
               />
             </TouchableOpacity>
           )}
-          {/* <TouchableOpacity onPress={playSound}>
-            <Entypo name="voicemail" size={24} color={colors.text} />
-          </TouchableOpacity> */}
         </InputBox>
       </InputBarContainer>
       <OffsetFooter theme_colors={colors} />

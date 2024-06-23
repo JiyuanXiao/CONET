@@ -7,7 +7,6 @@ import {
   MessageBubbleProps,
   ThemeColorsProps,
 } from "@/constants/ComponentTypes";
-import { FontAwesome } from "@expo/vector-icons";
 
 interface BubbleImageContentProps {
   source: string;
@@ -60,12 +59,12 @@ export const BubbleConatiner: React.FC<MessageBubbleProps> = styled.View`
 export const Bubble: React.FC<MessageBubbleProps> = styled.View`
   position: relative;
   justify-content: center;
-
+  align-items: center;
   margin-vertical: ${moderateScale(5, 2)}px;
   margin-horizontal: ${moderateScale(5, 2)}px;
   max-width: ${moderateScale(250, 1)}px;
 
-  background-color: ${(props) => props.theme_colors?.card};
+  background-color: ${(props) => props.theme_colors?.background};
 `;
 
 export const BubbleTime: React.FC<{

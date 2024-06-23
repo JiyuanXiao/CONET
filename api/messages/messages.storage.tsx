@@ -169,7 +169,6 @@ export const storeMessage = async (
     current_context_type = "video_uri";
   } else if (message_object.text.startsWith(`[${message_header}][语音]`)) {
     const file_url = message_object.attachments[0].file;
-    console.log(file_url);
     const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
     const file_extension = file_url.match(/\/attachments\/[^?]+\.(\w+)\?/);
     let file_path;

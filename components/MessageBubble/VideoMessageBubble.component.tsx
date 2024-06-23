@@ -19,6 +19,7 @@ import * as VideoThumbnails from "expo-video-thumbnails";
 import { FontAwesome } from "@expo/vector-icons";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { moderateScale } from "react-native-size-matters";
+import * as FileSystem from "expo-file-system";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);
@@ -64,12 +65,6 @@ const VideoMessageBubble = ({
 
   const [thumbnail, setThumbnail] = useState<string>("");
 
-  //   const HandleViewImage = () => {
-  //     const uri = message_object.file_url;
-  //     setImageUri(uri);
-  //     setImageViewerVisiable(true);
-  //   };
-
   const resendMessage = async () => {
     const message = `${message_object.text_content}${message_object.file_url}`;
     console.log(message);
@@ -85,20 +80,43 @@ const VideoMessageBubble = ({
 
   useEffect(() => {
     const generateThumbnail = async () => {
-      try {
-        const { uri } = await VideoThumbnails.getThumbnailAsync(
-          message_object.file_url,
-          {
-            time: 0,
+      if (user) {
+        try {
+          if (message_object.message_id <= 0) {
+            console.log("situation 1");
+            const { uri } = await VideoThumbnails.getThumbnailAsync(
+              message_object.file_url,
+              {
+                time: 0,
+              }
+            );
+            setThumbnail(uri);
+          } else {
+            const thumbnail_path = `${FileSystem.documentDirectory}${user?.username}/${chat_id}/${message_object.message_id}-thumbnail.png`;
+            const file_info = await FileSystem.getInfoAsync(thumbnail_path);
+            if (!file_info.exists) {
+              const { uri } = await VideoThumbnails.getThumbnailAsync(
+                message_object.file_url,
+                {
+                  time: 0,
+                }
+              );
+              await FileSystem.moveAsync({
+                from: uri,
+                to: thumbnail_path,
+              });
+              setThumbnail(thumbnail_path);
+            } else {
+              setThumbnail(thumbnail_path);
+            }
           }
-        );
-        setThumbnail(uri);
-      } catch (e) {
-        console.warn(e);
+        } catch (e) {
+          console.warn(e);
+        }
       }
     };
     generateThumbnail();
-  }, []);
+  }, [message_object]);
 
   return chat_member ? (
     <>
