@@ -1,9 +1,10 @@
 import React from "react";
 import styled, { useTheme } from "styled-components/native";
-import { Platform } from "react-native";
+import { Platform, Animated } from "react-native";
 import {
   ThemeColorsProps,
   TextInputBarProps,
+  VoiceInputBarProps,
 } from "@/constants/ComponentTypes";
 import { moderateScale } from "react-native-size-matters";
 
@@ -49,9 +50,23 @@ export const TextInput: React.FC<TextInputBarProps> = styled.TextInput.attrs(
   color: ${(props) => props.theme_colors?.text};
 `;
 
+export const VoiceInput: React.FC<VoiceInputBarProps> = styled(
+  Animated.View
+).attrs((props) => ({
+  ...props,
+}))`
+  width: 68%;
+  height: 39.5px;
+  align-items: center;
+  justify-content: center;
+
+  background-color: ${(props) => props.theme_colors.border};
+  border-radius: 10px;
+`;
+
 export const OffsetFooter: React.FC<{
   theme_colors: ThemeColorsProps;
 }> = styled.View`
   background-color: ${(props) => props.theme_colors.background};
-  height: ${Platform.OS === "ios" ? moderateScale(20, 3) : 0}px;
+  height: ${Platform.OS === "ios" ? moderateScale(15, 3) : 0}px;
 `;

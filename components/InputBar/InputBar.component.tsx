@@ -1,24 +1,44 @@
-import React, { useState, useContext, useEffect } from "react";
-import { TouchableOpacity, Alert, Text } from "react-native";
+import React, { useState, useContext, useEffect, useRef } from "react";
+import {
+  TouchableOpacity,
+  Alert,
+  Text,
+  PanResponder,
+  GestureResponderEvent,
+  PanResponderGestureState,
+  PanResponderInstance,
+  Animated,
+  Dimensions,
+} from "react-native";
 import { Modal, Portal, ActivityIndicator } from "react-native-paper";
 import { useTheme } from "@react-navigation/native";
-import { InputBarContainer, InputBox, OffsetFooter } from "./InputBar.styles";
-import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
+import {
+  InputBarContainer,
+  InputBox,
+  OffsetFooter,
+  VoiceInput,
+} from "./InputBar.styles";
+import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { TextInput } from "./InputBar.styles";
-import { ThemeColorsProps, InputBarProps } from "@/constants/ComponentTypes";
+import {
+  ThemeColorsProps,
+  InputBarProps,
+  VoiceInputBarProps,
+} from "@/constants/ComponentTypes";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesContext } from "@/api/messages/messages.context";
 import * as ImagePicker from "expo-image-picker";
-import { useAssets, Asset } from "expo-asset";
 import { moderateScale } from "react-native-size-matters";
+import { Audio } from "expo-av";
+import RecordingAnimationModal from "../RecordingIndicator/RecordingIndicator";
+import * as FileSystem from "expo-file-system";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
-  <FontAwesome
-    name="microphone"
-    size={26}
-    color={theme_colors.border}
-    style={{ marginLeft: 5 }}
-  />
+  <FontAwesome name="microphone" size={25} color={theme_colors.text} />
+);
+
+const KeyBoardIcon = (theme_colors: ThemeColorsProps) => (
+  <Entypo name="keyboard" size={25} color={theme_colors.text} style={{}} />
 );
 
 const SubmitIcon = ({
@@ -37,8 +57,8 @@ const SubmitIcon = ({
       borderWidth: 2,
       borderRadius: 12,
       borderColor: disable ? theme_colors.border : theme_colors.primary,
-      paddingRight: 15,
-      paddingLeft: 13,
+      paddingRight: 12,
+      paddingLeft: 10,
       paddingVertical: 7,
     }}
   />
@@ -49,7 +69,7 @@ const SelectPictureIcon = (theme_colors: ThemeColorsProps) => (
     name="picture-o"
     size={26}
     color={theme_colors.text}
-    style={{ marginLeft: 8 }}
+    style={{ marginHorizontal: 9 }}
   />
 );
 
@@ -59,9 +79,217 @@ const InputBar = (props: InputBarProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const { sendMessage } = useContext(MessagesContext);
-  const [modal_visible, setModalVisible] = React.useState(false);
-  const showModal = () => setModalVisible(true);
-  const hideModal = () => setModalVisible(false);
+  const [is_voice_message_mode, setIsVoiceMessageMode] =
+    useState<boolean>(false);
+  const [loading_modal_visible, setLoadingModalVisible] =
+    useState<boolean>(false);
+  const [recording_modal_visible, setRecordingModalVisible] =
+    useState<boolean>(false);
+  const [sound_uri, setSoundUri] = useState<string | null>(null);
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const [time_out_sound, setTimeOutSound] = useState<Audio.Sound | null>(null);
+  const [voice_sent_sound, setVoiceSentSound] = useState<Audio.Sound | null>(
+    null
+  );
+  const [recording, setRecording] = useState<Audio.Recording | undefined>();
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const RECORDING_TIMEOUT_IN_SECOND = 59;
+  const TIMEOUT_NOTICE_POINT_IN_SECOND = 10;
+  const [timeLeft, setTimeLeft] = useState(RECORDING_TIMEOUT_IN_SECOND);
+
+  ///////////////////////////////////////////////////////////////////////////////////////
+  const [is_inside_panel, setIsInsidePanel] = useState<boolean>(true);
+  const { height: screenHeight } = Dimensions.get("window");
+  const controlPanelHeight = screenHeight * 0.15;
+
+  ///////////////////////////////////////////////////////////////
+
+  const openVoiceMessageMode = async () => {
+    try {
+      if (permissionResponse && permissionResponse.status !== "granted") {
+        console.log("Requesting permission..");
+        await requestPermission();
+        setIsVoiceMessageMode(true);
+      } else if (
+        permissionResponse &&
+        permissionResponse.status === "granted"
+      ) {
+        setIsVoiceMessageMode(true);
+      }
+    } catch (err) {
+      console.warn("Failed to open voice message mode", err);
+    }
+  };
+
+  const closeVoiceMessageMode = () => {
+    setIsVoiceMessageMode(false);
+  };
+
+  async function startRecording() {
+    setTimeLeft(RECORDING_TIMEOUT_IN_SECOND);
+    setRecordingModalVisible(true);
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      console.log("Starting recording..");
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      setRecording(recording);
+      console.log("Recording started");
+
+      // Start the timer
+      const timerId = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+      setTimer(timerId);
+    } catch (err) {
+      console.error("Failed to start recording", err);
+    }
+  }
+
+  async function stopRecording() {
+    setRecordingModalVisible(false);
+    if (recording) {
+      console.log("Stopping recording..");
+      try {
+        setRecording(undefined);
+        await recording.stopAndUnloadAsync();
+
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+        });
+        const uri = recording.getURI();
+
+        //setSoundUri(uri);
+        await voice_sent_sound?.replayAsync();
+        const voice_message = `[${process.env.EXPO_PUBLIC_SPECIAL_MESSAGE_INDICATOR}][语音]${uri}`;
+        await sendMessage(props.chat_id, voice_message, Date.now().toString());
+
+        // Clear the timer
+        if (timer) {
+          clearInterval(timer);
+          setTimer(null);
+        }
+      } catch (err) {
+        console.error(
+          `[InputBar.component.tsx]: Send voice message failed: ${err}`
+        );
+      }
+    }
+  }
+
+  const abortRecording = async () => {
+    setRecordingModalVisible(false);
+    if (recording) {
+      console.log("Aborting recording..");
+      try {
+        setRecording(undefined);
+        await recording.stopAndUnloadAsync();
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+        });
+        setSoundUri(null);
+        if (timer) {
+          clearInterval(timer);
+          setTimer(null);
+        }
+      } catch (err) {
+        console.error(
+          `[InputBar.component.tsx]: abort recording failed: ${err}`
+        );
+      }
+    }
+    setIsInsidePanel(true);
+  };
+
+  const stopRecordingRef = useRef(stopRecording);
+  const abortRecordingRef = useRef(abortRecording);
+
+  useEffect(() => {
+    stopRecordingRef.current = stopRecording;
+    abortRecordingRef.current = abortRecording;
+  }, [recording, timer]);
+
+  useEffect(() => {
+    if (timeLeft === TIMEOUT_NOTICE_POINT_IN_SECOND && recording) {
+      time_out_sound?.replayAsync();
+    }
+    if (timeLeft === 0 && recording) {
+      stopRecording();
+    }
+  }, [timeLeft]);
+
+  const playSound = async () => {
+    if (sound_uri) {
+      console.log(sound_uri);
+      // Get file size
+      const voice = await Audio.Sound.createAsync({ uri: sound_uri });
+      //const status = await voice.sound.getStatusAsync();
+      //console.log(status.durationMillis / 1000);
+      voice.sound.replayAsync();
+    }
+  };
+
+  useEffect(() => {
+    const setupSoundEffect = async () => {
+      try {
+        const timeout = await Audio.Sound.createAsync(
+          require("@/assets/sounds/doublebeep.wav") // Replace with your sound file
+        );
+        setTimeOutSound(timeout.sound);
+        const sent = await Audio.Sound.createAsync(
+          require("@/assets/sounds/longpop.wav") // Replace with your sound file
+        );
+        setVoiceSentSound(sent.sound);
+      } catch (error) {
+        console.error("Error playing timeout sound:", error);
+      }
+    };
+    setupSoundEffect();
+  }, []);
+
+  //////////////////////////////////////////////////////////////////////////////////
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onPanResponderGrant: () => {
+        console.log("Finger Down");
+        startRecording();
+      },
+      onStartShouldSetPanResponderCapture() {
+        return true;
+      },
+      onPanResponderMove: (
+        evt: GestureResponderEvent,
+        gestureState: PanResponderGestureState
+      ) => {
+        const { moveY } = gestureState;
+        const isInside = moveY >= screenHeight - controlPanelHeight;
+        setIsInsidePanel(isInside);
+      },
+      onPanResponderRelease: (
+        evt: GestureResponderEvent,
+        gestureState: PanResponderGestureState
+      ) => {
+        console.log("relase!!");
+        const { moveY } = gestureState;
+
+        if (moveY === 0 || moveY >= screenHeight - controlPanelHeight) {
+          stopRecordingRef.current();
+          console.log("sned!!");
+        } else {
+          abortRecordingRef.current();
+          console.log("abort!!!");
+        }
+      },
+    })
+  ).current;
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
 
   const pickImage = async () => {
     // Ask for permission to access the media library
@@ -74,7 +302,7 @@ const InputBar = (props: InputBarProps) => {
     }
 
     // Pick an image
-    showModal();
+    setLoadingModalVisible(true);
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: false,
@@ -82,7 +310,7 @@ const InputBar = (props: InputBarProps) => {
       selectionLimit: 9,
       quality: 0.4,
     });
-    hideModal();
+    setLoadingModalVisible(false);
 
     if (!result.canceled) {
       console.log("file size: " + result.assets[0].fileSize);
@@ -164,8 +392,8 @@ const InputBar = (props: InputBarProps) => {
     <>
       <Portal>
         <Modal
-          visible={modal_visible}
-          onDismiss={hideModal}
+          visible={loading_modal_visible}
+          onDismiss={() => setLoadingModalVisible(false)}
           contentContainerStyle={{
             backgroundColor: colors.card,
             padding: 20,
@@ -193,27 +421,69 @@ const InputBar = (props: InputBarProps) => {
           </Text>
         </Modal>
       </Portal>
+      <RecordingAnimationModal
+        visible={recording_modal_visible}
+        time_left={timeLeft}
+        timeout_notice_point={TIMEOUT_NOTICE_POINT_IN_SECOND}
+        is_inside_panel={is_inside_panel}
+      />
       <InputBarContainer inputHeight={inputHeight} theme_colors={colors}>
         <InputBox inputHeight={inputHeight} theme_colors={colors}>
-          <TouchableOpacity onPress={pickImage}>
-            <SelectPictureIcon {...colors} />
-          </TouchableOpacity>
-          <TextInput
-            value={new_message}
-            inputHeight={inputHeight}
-            theme_colors={colors}
-            onChangeText={handleChangeText}
-            onContentSizeChange={handleContentSizeChange}
-          />
-          <TouchableOpacity
-            onPress={handleSubmit}
-            disabled={new_message.length === 0}
-          >
-            <SubmitIcon
-              disable={new_message.length === 0}
+          {is_voice_message_mode ? (
+            <TouchableOpacity
+              onPress={closeVoiceMessageMode}
+              style={{
+                width: 40,
+                justifyContent: "center",
+                flexDirection: "row",
+              }}
+            >
+              <KeyBoardIcon {...colors} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={openVoiceMessageMode}
+              style={{
+                width: 40,
+                justifyContent: "center",
+                flexDirection: "row",
+              }}
+            >
+              <VoiceMessageIcon {...colors} />
+            </TouchableOpacity>
+          )}
+          {is_voice_message_mode ? (
+            <VoiceInput theme_colors={colors} {...panResponder.panHandlers}>
+              <Text style={{ color: colors.text, fontSize: 16 }}>按住说话</Text>
+            </VoiceInput>
+          ) : (
+            <TextInput
+              value={new_message}
+              inputHeight={inputHeight}
               theme_colors={colors}
+              onChangeText={handleChangeText}
+              onContentSizeChange={handleContentSizeChange}
             />
-          </TouchableOpacity>
+          )}
+
+          {new_message.length === 0 ? (
+            <TouchableOpacity onPress={pickImage}>
+              <SelectPictureIcon {...colors} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={handleSubmit}
+              disabled={new_message.length === 0}
+            >
+              <SubmitIcon
+                disable={new_message.length === 0}
+                theme_colors={colors}
+              />
+            </TouchableOpacity>
+          )}
+          {/* <TouchableOpacity onPress={playSound}>
+            <Entypo name="voicemail" size={24} color={colors.text} />
+          </TouchableOpacity> */}
         </InputBox>
       </InputBarContainer>
       <OffsetFooter theme_colors={colors} />

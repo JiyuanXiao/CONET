@@ -138,6 +138,13 @@ export const MessagesContextProvider = (props: {
         ""
       );
       message_content = `[${content_header}][视频]`;
+    } else if (message_content.startsWith(`[${content_header}][语音]`)) {
+      current_context_type = "voice_uri";
+      file_uri = message_content.replace(
+        new RegExp(`^\\[${content_header}\\]\\[语音\\]`),
+        ""
+      );
+      message_content = `[${content_header}][语音]`;
     } else {
       current_context_type = "text";
       file_uri = null;

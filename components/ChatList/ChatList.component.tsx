@@ -6,6 +6,7 @@ import TextMessageBubble from "@/components/MessageBubble/TextMessageBubble.comp
 import SystemMessageBubble from "../MessageBubble/SystemMessageBubble.component";
 import ImageMessageBubble from "../MessageBubble/ImageMessageBubble.component";
 import VideoMessageBubble from "../MessageBubble/VideoMessageBubble.component";
+import VoiceMessageBubble from "../MessageBubble/VoiceMessageBubble.component";
 import { MessagesContext } from "@/api/messages/messages.context";
 import { AuthenticationContext } from "@/api/authentication/authentication.context";
 import { MessagesProps } from "@/constants/ContextTypes";
@@ -105,6 +106,17 @@ export const ChatList = (props: {
           case "text":
             return (
               <TextMessageBubble
+                chat_id={Number(props.chat_id)}
+                chat_member={chat_members.get(item.sender_username)}
+                message_object={item}
+                is_direct_chat={
+                  current_chat ? Number(current_chat.people.length) <= 2 : false
+                }
+              />
+            );
+          case "voice_uri":
+            return (
+              <VoiceMessageBubble
                 chat_id={Number(props.chat_id)}
                 chat_member={chat_members.get(item.sender_username)}
                 message_object={item}

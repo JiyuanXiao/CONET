@@ -33,6 +33,12 @@ export interface TextInputBarProps {
   children?: React.ReactNode;
 }
 
+export interface VoiceInputBarProps {
+  theme_colors: ThemeColorsProps;
+
+  children?: React.ReactNode;
+}
+
 export interface InputBarProps {
   chat_id: number;
   setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
