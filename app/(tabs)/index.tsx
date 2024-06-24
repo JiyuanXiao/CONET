@@ -31,6 +31,7 @@ export default function ChatListScreen() {
     chats,
     has_new_message,
     is_chats_loaded_from_local,
+    message_draft,
     fetchChatDataFromServer,
   } = useContext(ChatsContext);
   const { is_message_loaded_from_local, messages, initializeMessageContext } =
@@ -102,6 +103,7 @@ export default function ChatListScreen() {
     chat_id: number
   ): { last_message: string; last_message_time: string } => {
     const target_messages = messages.get(Number(chat_id));
+    const draft_message = message_draft.get(Number(chat_id));
     if (!target_messages || target_messages?.loaded_messages.length === 0) {
       return {
         last_message: "",
@@ -111,7 +113,9 @@ export default function ChatListScreen() {
 
     const result = {
       last_message:
-        target_messages.loaded_messages[0].content_type === "image_uri"
+        draft_message && draft_message.length > 0
+          ? `[草稿]${draft_message}`
+          : target_messages.loaded_messages[0].content_type === "image_uri"
           ? "[图片]"
           : target_messages.loaded_messages[0].content_type === "video_uri"
           ? "[视频]"

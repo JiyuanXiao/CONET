@@ -25,6 +25,7 @@ import * as ImagePicker from "expo-image-picker";
 import { moderateScale } from "react-native-size-matters";
 import { Audio } from "expo-av";
 import RecordingAnimationModal from "../RecordingIndicator/RecordingIndicator";
+import { ChatsContext } from "@/api/chats/chats.context";
 
 const VoiceMessageIcon = (theme_colors: ThemeColorsProps) => (
   <FontAwesome name="microphone" size={25} color={theme_colors.text} />
@@ -72,6 +73,7 @@ const InputBar = (props: InputBarProps) => {
   const { colors } = useTheme();
   const { user } = useContext(AuthenticationContext);
   const { sendMessage } = useContext(MessagesContext);
+  const { message_draft, setMessageDraftMap } = useContext(ChatsContext);
   const [is_voice_message_mode, setIsVoiceMessageMode] =
     useState<boolean>(false);
   const [loading_modal_visible, setLoadingModalVisible] =
@@ -89,6 +91,7 @@ const InputBar = (props: InputBarProps) => {
   const RECORDING_TIMEOUT_IN_SECOND = 59;
   const TIMEOUT_NOTICE_POINT_IN_SECOND = 10;
   const [timeLeft, setTimeLeft] = useState(RECORDING_TIMEOUT_IN_SECOND);
+  const new_message_ref = useRef(new_message);
 
   ///////////////////////////////////////////////////////////////////////////////////////
   const [is_inside_panel, setIsInsidePanel] = useState<boolean>(true);
@@ -232,6 +235,11 @@ const InputBar = (props: InputBarProps) => {
       }
     };
     setupSoundEffect();
+
+    // load draft from chat context
+    const draft = message_draft.get(Number(props.chat_id));
+    console.log("draft: " + draft);
+    setNewMessage(draft ? draft : "");
   }, []);
 
   //////////////////////////////////////////////////////////////////////////////////
@@ -333,7 +341,9 @@ const InputBar = (props: InputBarProps) => {
     if (text.endsWith("\n")) {
       // let chat-window know a new message is sent
       props.setMessageSent(true);
+
       setNewMessage("");
+
       if (new_message.length > 0) {
         if (user) {
           // Update Message Context, Context will store message to local storage for us
@@ -353,6 +363,7 @@ const InputBar = (props: InputBarProps) => {
 
   const handleSubmit = () => {
     props.setMessageSent(true);
+
     setNewMessage("");
     if (new_message.length > 0) {
       if (user) {
@@ -369,6 +380,16 @@ const InputBar = (props: InputBarProps) => {
   const handleContentSizeChange = (event: any) => {
     setInputHeight(event.nativeEvent.contentSize.height);
   };
+
+  useEffect(() => {
+    new_message_ref.current = new_message;
+  }, [new_message]);
+
+  useEffect(() => {
+    return () => {
+      setMessageDraftMap(props.chat_id, new_message_ref.current);
+    };
+  }, []);
 
   return (
     <>

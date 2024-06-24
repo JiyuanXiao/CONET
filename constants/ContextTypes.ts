@@ -51,6 +51,7 @@ export interface ChatProps {
 
 export interface ChatsContextProps {
   chats: Map<number, CE_ChatProps>;
+  message_draft: Map<number, string>;
   setChatMap: (chat_id: number, chat: CE_ChatProps) => void;
   current_talking_chat_id: number;
   setCurrentTalkingChatId: React.Dispatch<React.SetStateAction<number>>;
@@ -65,6 +66,7 @@ export interface ChatsContextProps {
   fetchChatDataFromServer: (user: CE_UserProps) => Promise<void>;
   resetChatContext: () => void;
   changeChatTitle: (chat_id: number, new_title: string) => Promise<void>;
+  setMessageDraftMap: (chat_id: number, draft: string) => void;
 }
 
 /////////////////////////////////////// MESSAGE CONTEXT ////////////////////////////////////////////////

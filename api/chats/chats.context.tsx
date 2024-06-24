@@ -7,6 +7,7 @@ import { CE_ChatProps, CE_UserProps } from "@/constants/ChatEngineObjectTypes";
 
 export const ChatsContext = createContext<ChatsContextProps>({
   chats: new Map<number, CE_ChatProps>(),
+  message_draft: new Map<number, string>(),
   setChatMap: () => {},
   current_talking_chat_id: -1,
   setCurrentTalkingChatId: () => {},
@@ -22,6 +23,7 @@ export const ChatsContext = createContext<ChatsContextProps>({
   fetchChatDataFromServer: async () => {},
   resetChatContext: () => {},
   changeChatTitle: async () => {},
+  setMessageDraftMap: () => {},
 });
 
 // Friends context provides friend log such as last message and last message timestamp
@@ -43,6 +45,13 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
   const [has_new_message, setHasNewMessage] = useState<Map<number, boolean>>(
     new Map<number, boolean>()
   );
+  const [message_draft, setMessageDraft] = useState<Map<number, string>>(
+    new Map<number, string>()
+  );
+
+  const setMessageDraftMap = (chat_id: number, draft: string) => {
+    setMessageDraft(new Map(message_draft.set(Number(chat_id), draft)));
+  };
 
   const setChatMap = (chat_id: number, chat: CE_ChatProps) => {
     setChats(new Map(chats.set(Number(chat_id), chat)));
@@ -162,7 +171,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     console.log("[Chat Context] Start to update loacl chat data to context");
     for (const chat of all_chats) {
       setChatMap(chat.id, chat);
-
+      setMessageDraftMap(chat.id, "");
       const last_read = await ChatStorage.getLastRead(user.username, chat.id);
       setHasNewMessageStatus(chat.id, chat.last_message.id > last_read);
     }
@@ -306,6 +315,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     <ChatsContext.Provider
       value={{
         chats,
+        message_draft,
         setChatMap,
         current_talking_chat_id,
         setCurrentTalkingChatId,
@@ -320,6 +330,7 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
         fetchChatDataFromServer,
         resetChatContext,
         changeChatTitle,
+        setMessageDraftMap,
       }}
     >
       {props.children}
