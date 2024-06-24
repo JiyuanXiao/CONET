@@ -242,9 +242,11 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
       console.log("[Chat Context] Start to initialize chat context...");
 
       await fetchChatDataFromStorage(user);
+      console.log("chats from storage: " + chats.size);
 
       await fetchChatDataFromServer(user);
 
+      console.log("chats from server: " + chats.size);
       console.log("[Chat Context] Initialize chat context successfully...");
 
       setIsChatsInitialized(true);
@@ -258,6 +260,35 @@ export const ChatsContextProvider = (props: { children: React.ReactNode }) => {
     setHasNewMessage(new Map<number, boolean>());
     console.log(`[Chat Context] all chat context data has been cleaned`);
   };
+
+  const clearDeletedChatFromStorage = async () => {
+    if (user) {
+      try {
+        const all_chats = await ChatStorage.fetchAllChats(user.username);
+        for (const chat of all_chats) {
+          if (!chats.has(chat.id)) {
+            console.log(chat.title + "has been deleted");
+            await ChatStorage.deleteAllChatImagesFromFilesystem(
+              user?.username,
+              chat.id
+            );
+            await ChatStorage.removeChat(user?.username, chat.id);
+            // delete chat's last read data
+            await ChatStorage.deleteLastRead(user?.username, chat.id);
+            console.log(chat.title + "has been cleared from storage");
+          }
+        }
+      } catch (err) {
+        console.error(`[Chat Context] clearDeletedChatFromStorage: ${err}`);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (is_chats_initialized) {
+      clearDeletedChatFromStorage();
+    }
+  }, [is_chats_initialized]);
 
   useEffect(() => {
     if (is_authentication_initialized) {

@@ -79,8 +79,10 @@ const VoiceMessageBubble = ({
   const HandlePlayVoice = async () => {
     let status;
     if (is_playing) {
+      console.log("pause");
       status = await voice_sound?.pauseAsync();
     } else {
+      console.log("play");
       status = await voice_sound?.playAsync();
     }
 
@@ -105,19 +107,15 @@ const VoiceMessageBubble = ({
 
           if (status.isLoaded && status.didJustFinish) {
             await sound.setPositionAsync(0);
+            //await sound.unloadAsync();
           }
         }
       );
-
       if (status.isLoaded) {
-        const duration_in_second = status.durationMillis
-          ? status.durationMillis / 1000
-          : -1;
-        setVoiceDuration(Math.round(duration_in_second));
+        setVoiceDuration(
+          status.durationMillis ? Math.round(status.durationMillis / 1000) : -1
+        );
         setVoiceSound(sound);
-      } else {
-        // Handle the case where loading failed or status is an error
-        console.error("Failed to load sound", status.error);
       }
     };
 
@@ -130,6 +128,14 @@ const VoiceMessageBubble = ({
     loadSound();
     playInSlientMode();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (is_playing) {
+        voice_sound?.stopAsync();
+      }
+    };
+  }, [voice_sound, is_playing]);
 
   return chat_member ? (
     <>
