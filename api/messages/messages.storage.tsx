@@ -113,7 +113,7 @@ export const storeMessage = async (
     current_context_type = "system";
   } else if (message_object.text.startsWith(`[${message_header}][图片]`)) {
     const file_url = message_object.attachments[0].file;
-    const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
+    const directory_path = `${username}/${chat_id}/`;
     const file_extension = file_url.match(/\/attachments\/[^?]+\.(\w+)\?/);
     let file_path;
     if (file_extension && file_extension.length > 1) {
@@ -122,13 +122,21 @@ export const storeMessage = async (
       file_path = `${directory_path}${message_object.id}.png`;
     }
     try {
-      const dir_info = await FileSystem.getInfoAsync(directory_path);
+      const dir_info = await FileSystem.getInfoAsync(
+        `${FileSystem.documentDirectory}${directory_path}`
+      );
       if (!dir_info.exists) {
-        await FileSystem.makeDirectoryAsync(directory_path, {
-          intermediates: true,
-        });
+        await FileSystem.makeDirectoryAsync(
+          `${FileSystem.documentDirectory}${directory_path}`,
+          {
+            intermediates: true,
+          }
+        );
       }
-      await FileSystem.downloadAsync(file_url, file_path);
+      await FileSystem.downloadAsync(
+        file_url,
+        `${FileSystem.documentDirectory}${file_path}`
+      );
       message_object.attachments[0].file = file_path;
       console.log(`[Message Storage] saved image to ${file_path}`);
     } catch (err) {
@@ -141,7 +149,7 @@ export const storeMessage = async (
     current_context_type = "image_uri";
   } else if (message_object.text.startsWith(`[${message_header}][视频]`)) {
     const file_url = message_object.attachments[0].file;
-    const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
+    const directory_path = `${username}/${chat_id}/`;
     const file_extension = file_url.match(/\/attachments\/[^?]+\.(\w+)\?/);
     let file_path;
     if (file_extension && file_extension.length > 1) {
@@ -150,13 +158,21 @@ export const storeMessage = async (
       file_path = `${directory_path}${message_object.id}.mp4`;
     }
     try {
-      const dir_info = await FileSystem.getInfoAsync(directory_path);
+      const dir_info = await FileSystem.getInfoAsync(
+        `${FileSystem.documentDirectory}${directory_path}`
+      );
       if (!dir_info.exists) {
-        await FileSystem.makeDirectoryAsync(directory_path, {
-          intermediates: true,
-        });
+        await FileSystem.makeDirectoryAsync(
+          `${FileSystem.documentDirectory}${directory_path}`,
+          {
+            intermediates: true,
+          }
+        );
       }
-      await FileSystem.downloadAsync(file_url, file_path);
+      await FileSystem.downloadAsync(
+        file_url,
+        `${FileSystem.documentDirectory}${file_path}`
+      );
       message_object.attachments[0].file = file_path;
       console.log(`[Message Storage] saved video to ${file_path}}`);
     } catch (err) {
@@ -169,7 +185,7 @@ export const storeMessage = async (
     current_context_type = "video_uri";
   } else if (message_object.text.startsWith(`[${message_header}][语音]`)) {
     const file_url = message_object.attachments[0].file;
-    const directory_path = `${FileSystem.documentDirectory}${username}/${chat_id}/`;
+    const directory_path = `${username}/${chat_id}/`;
     const file_extension = file_url.match(/\/attachments\/[^?]+\.(\w+)\?/);
     let file_path;
     if (file_extension && file_extension.length > 1) {
@@ -178,13 +194,21 @@ export const storeMessage = async (
       file_path = `${directory_path}${message_object.id}.m4a`;
     }
     try {
-      const dir_info = await FileSystem.getInfoAsync(directory_path);
+      const dir_info = await FileSystem.getInfoAsync(
+        `${FileSystem.documentDirectory}${directory_path}`
+      );
       if (!dir_info.exists) {
-        await FileSystem.makeDirectoryAsync(directory_path, {
-          intermediates: true,
-        });
+        await FileSystem.makeDirectoryAsync(
+          `${FileSystem.documentDirectory}${directory_path}`,
+          {
+            intermediates: true,
+          }
+        );
       }
-      await FileSystem.downloadAsync(file_url, file_path);
+      await FileSystem.downloadAsync(
+        file_url,
+        `${FileSystem.documentDirectory}${file_path}`
+      );
       message_object.attachments[0].file = file_path;
       console.log(`[Message Storage] saved voice to ${file_path}}`);
     } catch (err) {

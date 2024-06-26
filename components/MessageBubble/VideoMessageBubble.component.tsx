@@ -64,9 +64,18 @@ const VideoMessageBubble = ({
   const avatars = getAvatarAssets();
 
   const [thumbnail, setThumbnail] = useState<string>("");
+  const [video_uri, setVideoUri] = useState<string>("");
+
+  useEffect(() => {
+    if (message_object.message_id <= 0) {
+      setVideoUri(message_object.file_url);
+    } else {
+      setVideoUri(`${FileSystem.documentDirectory}${message_object.file_url}`);
+    }
+  }, [message_object]);
 
   const resendMessage = async () => {
-    const message = `${message_object.text_content}${message_object.file_url}`;
+    const message = `${message_object.text_content}${video_uri}`;
     console.log(message);
     await sendMessage(chat_id, message, Date.now().toString());
   };
@@ -84,7 +93,7 @@ const VideoMessageBubble = ({
         try {
           if (message_object.message_id <= 0) {
             const { uri } = await VideoThumbnails.getThumbnailAsync(
-              message_object.file_url,
+              `${message_object.file_url}`,
               {
                 time: 0,
               }
@@ -95,7 +104,7 @@ const VideoMessageBubble = ({
             const file_info = await FileSystem.getInfoAsync(thumbnail_path);
             if (!file_info.exists) {
               const { uri } = await VideoThumbnails.getThumbnailAsync(
-                message_object.file_url,
+                `${FileSystem.documentDirectory}${message_object.file_url}`,
                 {
                   time: 0,
                 }
@@ -115,6 +124,11 @@ const VideoMessageBubble = ({
       }
     };
     generateThumbnail();
+    if (message_object.message_id <= 0) {
+      setVideoUri(message_object.file_url);
+    } else {
+      setVideoUri(`${FileSystem.documentDirectory}${message_object.file_url}`);
+    }
   }, [message_object]);
 
   return chat_member ? (
@@ -137,7 +151,7 @@ const VideoMessageBubble = ({
             router.push({
               pathname: "/video-screen",
               params: {
-                video_source: message_object.file_url,
+                video_source: video_uri,
               },
             });
           }}

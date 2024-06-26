@@ -63,9 +63,18 @@ const VoiceMessageBubble = ({
   const [is_playing, setIsPlaying] = useState<boolean>(false);
   const avatars = getAvatarAssets();
   const { sendMessage } = useContext(MessagesContext);
+  const [voice_uri, setVoiceUri] = useState<string>("");
+
+  useEffect(() => {
+    if (message_object.message_id <= 0) {
+      setVoiceUri(message_object.file_url);
+    } else {
+      setVoiceUri(`${FileSystem.documentDirectory}${message_object.file_url}`);
+    }
+  }, [message_object]);
 
   const resendMessage = async () => {
-    const message = `${message_object.text_content}${message_object.file_url}`;
+    const message = `${message_object.text_content}${voice_uri}`;
     console.log(message);
     await sendMessage(chat_id, message, Date.now().toString());
   };
@@ -96,7 +105,7 @@ const VoiceMessageBubble = ({
     const loadSound = async () => {
       const { sound, status } = await Audio.Sound.createAsync(
         {
-          uri: message_object.file_url,
+          uri: voice_uri,
         },
         {},
         async (status) => {
@@ -128,7 +137,7 @@ const VoiceMessageBubble = ({
 
     loadSound();
     playInSlientMode();
-  }, []);
+  }, [voice_uri]);
 
   useEffect(() => {
     return () => {

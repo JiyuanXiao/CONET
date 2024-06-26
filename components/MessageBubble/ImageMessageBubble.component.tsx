@@ -67,9 +67,17 @@ const ImageMessageBubble = ({
   const avatars = getAvatarAssets();
   const { sendMessage } = useContext(MessagesContext);
 
+  useEffect(() => {
+    if (message_object.message_id <= 0) {
+      setImageUri(message_object.file_url);
+    } else {
+      setImageUri(`${FileSystem.documentDirectory}${message_object.file_url}`);
+    }
+  }, [message_object]);
+
   const HandleViewImage = () => {
-    const uri = message_object.file_url;
-    setImageUri(uri);
+    // const uri = `${FileSystem.documentDirectory}${message_object.file_url}`;
+    // setImageUri(uri);
     setImageViewerVisiable(true);
   };
 
@@ -111,7 +119,7 @@ const ImageMessageBubble = ({
   }, []);
 
   const resendMessage = async () => {
-    const message = `${message_object.text_content}${message_object.file_url}`;
+    const message = `${message_object.text_content}${image_uri}`;
     console.log(message);
     await sendMessage(chat_id, message, Date.now().toString());
   };
@@ -131,7 +139,6 @@ const ImageMessageBubble = ({
         visible={image_viewer_visiable && image_uri.length > 0}
         onRequestClose={() => {
           setImageViewerVisiable(false);
-          setImageUri("");
         }}
         onLongPress={() => {
           savePhoto(image_uri);
@@ -152,7 +159,7 @@ const ImageMessageBubble = ({
         )}
         <TouchableOpacity onPress={HandleViewImage}>
           <Bubble isReceived={is_received} theme_colors={colors}>
-            <BubbleImageContent source={message_object.file_url} />
+            <BubbleImageContent source={image_uri} />
           </Bubble>
           {Number(message_object.message_id) < 0 ? (
             <></>
