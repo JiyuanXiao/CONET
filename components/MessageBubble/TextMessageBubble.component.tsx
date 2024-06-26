@@ -17,6 +17,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { getAvatarAssets } from "@/constants/Avatars";
 import { FontAwesome } from "@expo/vector-icons";
 import { MessagesContext } from "@/api/messages/messages.context";
+import { SelectableText } from "@rob117/react-native-selectable-text";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);

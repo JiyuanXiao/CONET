@@ -83,7 +83,6 @@ const VideoMessageBubble = ({
       if (user) {
         try {
           if (message_object.message_id <= 0) {
-            console.log("situation 1");
             const { uri } = await VideoThumbnails.getThumbnailAsync(
               message_object.file_url,
               {

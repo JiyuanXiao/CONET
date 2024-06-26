@@ -10,7 +10,7 @@ export const ContactsContext = createContext<ContactContextProps>({
   addContact: async () => {},
   removeContact: async () => {},
   searchContact: async () => null,
-  updateContacts: async () => {},
+  uploadContacts: async () => {},
   resetContacts: () => {},
 });
 
@@ -45,51 +45,87 @@ export const ContactsContextProvider = (props: {
   };
 
   const addContact = async (contact_id: number, contact: CE_PersonProps) => {
-    try {
-      // const new_contact_avatar_uri =
-      //   await ContactStorage.saveAvatarToFilesystem(
-      //     user?.username,
-      //     contact.username,
-      //     contact.custom_json
-      //   );
-      // if (new_contact_avatar_uri) {
-      //   contact.avatar = new_contact_avatar_uri;
-      // }
-      await ContactStorage.setContact(user?.username, contact_id, contact);
-      setContactsMap(contact_id, contact);
+    if (user) {
+      try {
+        await ContactStorage.setContact(user?.username, contact_id, contact);
+        await ContactServer.AddContact(
+          user?.username,
+          user?.secret,
+          contact_id
+        );
+        setContactsMap(contact_id, contact);
 
-      console.log(
-        `[Contact Context] add contact ${contact.first_name} to context successfully...`
-      );
-    } catch (err) {
-      console.log(
-        `[Contact Context] addContact() failed for ${contact.first_name}: ${err}`
-      );
+        console.log(
+          `[Contact Context] add contact ${contact.first_name} to context successfully...`
+        );
+      } catch (err) {
+        console.log(
+          `[Contact Context] addContact() failed for ${contact.first_name}: ${err}`
+        );
+      }
     }
   };
 
   const removeContact = async (contact_id: number) => {
-    try {
-      const target_contact = contacts.get(contact_id);
-      // if (target_contact) {
-      //   await ContactStorage.deleteAvatarFromFilesystem(target_contact.avatar);
-      // }
-      await ContactStorage.removeContact(user?.username, contact_id);
-      if (contacts.delete(contact_id)) {
-        setContacts(new Map<number, CE_PersonProps>(contacts));
-      }
+    if (user) {
+      try {
+        const target_contact = contacts.get(contact_id);
 
-      console.log(
-        `[Contact Context] remove contact ${contact_id} from context successfully...`
-      );
-    } catch (err) {
-      console.log(
-        `[Contact Context] removeContact() failed for ${contact_id}: ${err}`
-      );
+        await ContactStorage.removeContact(user?.username, contact_id);
+        if (contacts.delete(contact_id)) {
+          setContacts(new Map<number, CE_PersonProps>(contacts));
+        }
+        await ContactServer.DeleteContact(
+          user?.username,
+          user?.secret,
+          contact_id
+        );
+        console.log(
+          `[Contact Context] remove contact ${contact_id} from context successfully...`
+        );
+      } catch (err) {
+        console.log(
+          `[Contact Context] removeContact() failed for ${contact_id}: ${err}`
+        );
+      }
     }
   };
 
-  const updateContacts = async () => {};
+  const uploadContacts = async () => {
+    if (user) {
+      try {
+        const server_contact_records = await ContactServer.GetContacts(
+          user.username,
+          user.secret
+        );
+
+        if (!server_contact_records) {
+          const all_contacts = await ContactStorage.fetchAllContacts(
+            user.username
+          );
+          // fetch contects' data from server
+          for (const contact of all_contacts) {
+            await ContactServer.AddContact(
+              user.username,
+              user.secret,
+              contact.id
+            );
+            const updated_contact = await ContactServer.GetUser(contact.id);
+            if (updated_contact) {
+              setContactsMap(contact.id, updated_contact.contact);
+              console.log(
+                `[Contact Context] fetch contect ${contact.contact.first_name} data from server`
+              );
+            }
+          }
+        }
+      } catch (err) {
+        console.error(
+          `[Contact Context] failed to upload contacts to server: ${err}`
+        );
+      }
+    }
+  };
 
   const initializeContactContext = async () => {
     if (user) {
@@ -98,29 +134,70 @@ export const ContactsContextProvider = (props: {
       console.log(
         `[Contact Context] fetch all exist contacts from local storage`
       );
-      const all_contacts = await ContactStorage.fetchAllContacts(user.username);
 
-      // fetch contects' data from server
-      for (const contact of all_contacts) {
+      const server_contact_records = await ContactServer.GetContacts(
+        user.username,
+        user.secret
+      );
+
+      const local_contact_records = await ContactStorage.fetchAllContacts(
+        user.username
+      );
+
+      if (
+        !server_contact_records ||
+        local_contact_records.length >= server_contact_records.contact_id.length
+      ) {
         try {
-          const updated_contact = await ContactServer.GetUser(contact.id);
-          if (updated_contact) {
-            // const new_contact_avatar_uri =
-            //   await ContactStorage.saveAvatarToFilesystem(
-            //     user?.username,
-            //     updated_contact.contact.username,
-            //     updated_contact.contact.custom_json
-            //   );
-            // if (new_contact_avatar_uri) {
-            //   updated_contact.contact.avatar = new_contact_avatar_uri;
-            // }
-            setContactsMap(contact.id, updated_contact.contact);
-            console.log(
-              `[Contact Context] fetch contect ${contact.contact.first_name} data from server`
+          // fetch contects' data from server
+          for (const contact of local_contact_records) {
+            const success = await ContactServer.AddContact(
+              user.username,
+              user.secret,
+              contact.id
             );
+            if (!success) {
+              console.warn(
+                `[Contact Context] Failed to add contact ${contact.id} to server`
+              );
+            }
+            const updated_contact = await ContactServer.GetUser(
+              Number(contact.id)
+            );
+            if (updated_contact) {
+              setContactsMap(contact.id, updated_contact.contact);
+              console.log(
+                `[Contact Context] fetch contect ${contact.contact.first_name} data from server`
+              );
+            }
           }
-        } catch (err) {}
+        } catch (err) {
+          console.error(
+            `[Contact Context] failed to upload contacts to server: ${err}`
+          );
+        }
+      } else if (
+        local_contact_records.length < server_contact_records.contact_id.length
+      ) {
+        try {
+          for (const contact_id of server_contact_records.contact_id) {
+            const contact = await ContactServer.GetUser(Number(contact_id));
+            if (contact) {
+              await ContactStorage.setContact(
+                user.username,
+                contact_id,
+                contact.contact
+              );
+              setContactsMap(Number(contact_id), contact.contact);
+            }
+          }
+        } catch (err) {
+          console.error(
+            `[Contact Context] failed to update contacts to local: ${err}`
+          );
+        }
       }
+
       console.log(`[Contact Context] finished contact context initialization`);
     }
   };
@@ -139,10 +216,11 @@ export const ContactsContextProvider = (props: {
     <ContactsContext.Provider
       value={{
         contacts,
+
         addContact,
         removeContact,
         searchContact,
-        updateContacts,
+        uploadContacts,
         resetContacts,
       }}
     >

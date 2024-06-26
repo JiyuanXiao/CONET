@@ -139,6 +139,6 @@ export interface ContactContextProps {
   addContact: (contact_id: number, contact: CE_PersonProps) => Promise<void>;
   removeContact: (contact_id: number) => Promise<void>;
   searchContact: (contact_id: number) => Promise<ContactStorageProps | null>;
-  updateContacts: () => Promise<void>;
+  uploadContacts: () => Promise<void>;
   resetContacts: () => void;
 }

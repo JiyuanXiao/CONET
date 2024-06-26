@@ -19,6 +19,7 @@ import * as MediaLibrary from "expo-media-library";
 import { getAvatarAssets } from "@/constants/Avatars";
 import { FontAwesome } from "@expo/vector-icons";
 import { MessagesContext } from "@/api/messages/messages.context";
+import * as FileSystem from "expo-file-system";
 
 const formatTimestamp = (utc_timestamp: string) => {
   const dateObj = new Date(utc_timestamp);

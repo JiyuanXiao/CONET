@@ -14,6 +14,7 @@ import { ChatsContext } from "../chats/chats.context";
 import { WebsocketContextProps } from "@/constants/ContextTypes";
 import { CE_ChatProps } from "@/constants/ChatEngineObjectTypes";
 import { Alert } from "react-native";
+import { ContactsContext } from "../contacts/contacts.context";
 
 interface MessageDataProps {
   id: number;
@@ -50,6 +51,7 @@ export const WebSocketProvider = ({
     createMeesageObjectForNewChat,
     initializeMessageContext,
   } = useContext(MessagesContext);
+  const { uploadContacts } = useContext(ContactsContext);
   const [websocket_connected, setWebSocketConnected] = useState(false);
   const receiveMessageRef = useRef(receiveMessage);
   const setHasNewMessageStatusRef = useRef(setHasNewMessageStatus);
@@ -226,6 +228,7 @@ export const WebSocketProvider = ({
       console.log(`[WebSocket] start to load new Data from server`);
       await fetchChatDataFromServer(user);
       await initializeMessageContextRef.current();
+      await uploadContacts();
     }
   };
 
